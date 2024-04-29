@@ -1,6 +1,7 @@
 import express from "express"
 import mysql from "mysql"
 
+const PORT = 8080;
 const app = express()
 
 const db = mysql.createPool({
@@ -10,6 +11,6 @@ const db = mysql.createPool({
     database:"LUTO"
 })
 
-app.listen(8800, () => {
+app.listen(PORT, () => {
     console.log("Connected to Server!")
 })
