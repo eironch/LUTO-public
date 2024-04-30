@@ -11,6 +11,6 @@ const db = mysql.createPool({
     database:"LUTO"
 })
 
-app.listen(PORT, () => {
-    console.log("Connected to Server!")
+app.get("/", (req, res) => {
+    res.json("good mourning.")
 })
