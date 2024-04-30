@@ -1,15 +1,15 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import Authentication from './pages/Authentication'
+import Auth from './pages/Auth'
 
 function App() {
   return (
     <div>
       {/* task: a function that checks whether the user is logged in, 
-      to route them to either login page or the homepage */}
+      // to route them to either login page or the homepage */}
       <BrowserRouter>
         <Routes>
           {/* https://luto.com/login */}
-          <Route path="/authentication" element={<Authentication/>}/>
+          <Route path="/auth" element={<Auth/>}/>
         </Routes>
       </BrowserRouter>
     </div>
