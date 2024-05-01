@@ -1,7 +1,7 @@
 import express from "express"
 import mysql from "mysql"
 
-const PORT = 8080;
+const PORT = 8080
 const app = express()
 
 const db = mysql.createPool({
@@ -13,4 +13,8 @@ const db = mysql.createPool({
 
 app.get("/", (req, res) => {
     res.json("good mourning.")
+})
+
+app.listen(PORT, () => {
+    console.log("Connected to backend!");
 })
