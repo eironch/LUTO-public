@@ -12,7 +12,7 @@ const db = mysql.createPool({
 })
 
 app.get("/", (req, res) => {
-    res.json("good mourning.")
+    res.json("good mou.")
 })
 
 app.listen(PORT, () => {
