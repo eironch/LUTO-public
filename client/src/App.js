@@ -8,7 +8,7 @@ function App() {
       // to route them to either login page or the homepage */}
       <BrowserRouter>
         <Routes>
-          {/* https://luto.com/login */}
+          {/* https://luto.com/auth */}
           <Route path="/auth" element={<Auth/>}/>
         </Routes>
       </BrowserRouter>
