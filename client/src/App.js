@@ -1,17 +1,22 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import React, { useState, useLayoutEffect } from 'react'
 import Auth from './pages/Auth'
+import Home from './pages/Home'
 
 function App() {
+  const [isLoggedIn, setIsLoggedIn] = useState()
+
+  useLayoutEffect(() => {
+
+  })
+
   return (
     <div>
-      {/* task: a function that checks whether the user is logged in, 
-      // to route them to either login page or the homepage */}
-      <BrowserRouter>
-        <Routes>
-          {/* https://luto.com/auth */}
-          <Route path="/auth" element={<Auth/>}/>
-        </Routes>
-      </BrowserRouter>
+      { 
+        isLoggedIn ? 
+        <Home setIsLoggedIn={ setIsLoggedIn } />
+        :  
+        <Auth isLoggedIn={ isLoggedIn } setIsLoggedIn={ setIsLoggedIn } /> 
+      }
     </div>
   );
 }

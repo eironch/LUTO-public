@@ -1,81 +1,75 @@
-import express from "express"
-import mysql from "mysql"
+import express from 'express'
+import mysql from 'mysql'
+import cors from 'cors'
+import bcrypt from 'bcrypt'
 
 const PORT = 8080
 const app = express()
 
 const db = mysql.createPool({
-    host:"localhost",
-    user:"root",
-    password:"",
-    database:"LUTO"
+    host:'localhost',
+    user:'root',
+    password:'',
+    database:'LUTO'
 })
 
-app.get("/", (req, res) => {
+app.use(express.json())
+app.use(cors(
+    // {origin: 'https://checklist-app-client.vercel.app',
+    // methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    // allowedHeaders: ['Content-Type', 'Authorization']}
+))
+
+app.get('/', (req, res) => {
     res.json("good mourning.")
 })
 
-app.get("/create-account", (req, res) => {
-    const queryParams = req.query
-    const username = queryParams.username
-    const password = queryParams.password
+app.post('/create-account', (req, res) => {
+    const { email, username, password } = req.body
+    const query = `SELECT * FROM USERS WHERE username = ?`
 
-    let query = `SELECT * FROM USERS WHERE ?`
-
-    db.query(query, username, (err, data) => {
+    db.query(query, username, (err, data) => {        
         if (err) {
-            return res.json(err)
+            return res.status(500).json(err)
         } else if (data.length > 0) {
-            return res.json({ success: false, message: "Username exists."})
+            return res.status(202).json({ success: false, message: "Username exists." })
         }
 
-        createAccount(username, password)
+        return createAccount(res, email, username, password)
     })
 })
 
-function createAccount(username, password) {
-    query = `INSERT INTO USERS(username, password) VALUES (?, ?)`
+async function createAccount(res, email, username, password) {
+    const registration_date = new Date();
+    const hashedPassword = await bcrypt.hash(password, 8)
+    const query = `INSERT INTO USERS (email, username, password, registration_date) VALUES (?, ?, ?, ?)`
 
-    db.query(query, [username, password], (err, data) => {
+    db.query(query, [email, username, hashedPassword, registration_date], (err) => {
         if (err) {
-            return res.json(err)
+            return res.status(500).json(err)
         }
-        return res.json({ success: false, message: "User account created." })
+        return res.status(201).json({ success: true, message: "User account created." })
     })
 }
 
-app.get("/sign-in", (req, res) => {
-    const queryParams = req.query
-    const username = queryParams.username
-    const password = queryParams.password
+app.post('/sign-in', async (req, res) => {
+    const {username, password} = req.body
 
-    let query = `SELECT * FROM USERS WHERE username = ? AND pasword = ?`
+    let query = `SELECT * FROM USERS WHERE username = ?`
     
-    db.query(query, [username, password], (err, data) => {
+    db.query(query, [username, password], async (err, data) => {
         if (err) {
-            return res.json(err)
+            return res.status(500).json(err)
         } else if (data.length > 0) {
-            return res.json({ success: true, message: "User signed in." })
+            const match = await bcrypt.compare(password, data[0].password)
+            if (match) {
+                return res.status(200).json({ success: true, message: "User signed in." })
+            }
         }
-        return res.json({ success: false, message: "Incorrect username or password." })
+        return res.status(202).json({ success: false, message: "Incorrect username or password." })
     })
 })
 
 app.listen(PORT, () => {
-    const username = "userx"
-    const password = "password123"
-
-    let query = `SELECT * FROM USERS WHERE`
-    
-    db.query(query, [username, password], (err, data) => {
-        console.log(data)
-        if (err) {
-            console.log(err)
-            return
-        } else if (data.length > 0) {
-            console.log(({ success: true, message: "User signed in.", data}))
-            return
-        }
-        console.log({ success: false, message: "Incorrect username or password." })
-    })
+    console.log("Connected to backend.")
 })
