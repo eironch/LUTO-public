@@ -8,16 +8,19 @@ function AuthForm(p) {
             </div>
             
             <div className="flex flex-col mt-10 items-center">
-                <input className={`${p.isCredsCorrect ? "border-gray-200" : "border-red-700" } bg-transparent text-center border rounded-3xl p-4 w-10/12 caret-gray-50 text-xl text-gray-50 my-5`} value={ p.username } onChange={ (e) => { p.setUsername(e.target.value) } } type="text" placeholder="Username"/>
-                <input className={`${p.isCredsCorrect ? "border-gray-200" : "border-red-700" } bg-transparent text-center border rounded-3xl p-4 w-10/12 caret-gray-50 text-xl text-gray-50 mb-5`} value={ p.password } onChange={ (e) => { p.setPassword(e.target.value) } } type="password" placeholder="Password"/>
+                <input className={`${p.isCredsCorrect ? "border-gray-200" : "border-red-700" } bg-transparent text-center border rounded-3xl p-4 w-10/12 caret-gray-50 text-xl text-gray-50 my-5`} 
+                value={ p.username } onChange={ (e) => { p.setUsername(e.target.value) } } type="text" placeholder="Username"/>
+                <input className={`${p.isCredsCorrect ? "border-gray-200" : "border-red-700" } bg-transparent text-center border rounded-3xl p-4 w-10/12 caret-gray-50 text-xl text-gray-50 mb-5`} 
+                value={ p.password } onChange={ (e) => { p.setPassword(e.target.value) } } type="password" placeholder="Password"/>
                 {
                     p.action === "Sign In"? <div></div>:
-                    <input className={`${p.isCredsCorrect ? "border-gray-200" : "border-red-700" } bg-transparent text-center border rounded-3xl p-4 w-10/12 caret-gray-50 text-xl text-gray-50`} value={ p.passwordAgain } onChange={ (e) => { p.setPasswordAgain(e.target.value) } } type="password" placeholder="Password"/>
+                    <input className={`${p.isCredsCorrect ? "border-gray-200" : "border-red-700" } bg-transparent text-center border rounded-3xl p-4 w-10/12 caret-gray-50 text-xl text-gray-50`} 
+                    value={ p.passwordAgain } onChange={ (e) => { p.setPasswordAgain(e.target.value) } } type="password" placeholder="Password"/>
                 }
             </div>
 
             <div className="flex flex-col items-center mt-5">
-                <div className={`grid items-center w-10/12 gap-4`}>
+                <div className="grid items-center w-10/12 gap-4">
                     {
                         p.action === "Sign In"? (
                             <button className="hover:bg-zinc-800 text-xl font-semibold rounded-3xl text-gray-50 bg-zinc-700 p-4 w-full"
