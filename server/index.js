@@ -25,7 +25,7 @@ app.get('/', (req, res) => {
 })
 
 app.post('/create-account', (req, res) => {
-    const { email, username, password } = req.body
+    const { username, password } = req.body
     const query = `SELECT * FROM USERS WHERE username = ?`
 
     db.query(query, username, (err, data) => {        
@@ -35,16 +35,16 @@ app.post('/create-account', (req, res) => {
             return res.status(202).json({ success: false, message: "Username exists." })
         }
 
-        return createAccount(res, email, username, password)
+        return createAccount(res, username, password)
     })
 })
 
-async function createAccount(res, email, username, password) {
+async function createAccount(res, username, password) {
     const registration_date = new Date();
     const hashedPassword = await bcrypt.hash(password, 8)
-    const query = `INSERT INTO USERS (email, username, password, registration_date) VALUES (?, ?, ?, ?)`
+    const query = `INSERT INTO USERS (username, password, registration_date) VALUES (?, ?, ?)`
 
-    db.query(query, [email, username, hashedPassword, registration_date], (err) => {
+    db.query(query, [username, hashedPassword, registration_date], (err) => {
         if (err) {
             return res.status(500).json(err)
         }
