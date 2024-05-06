@@ -1,4 +1,4 @@
-import React from 'react';
+import React from 'react'
 
 function AuthForm(p) {
     return (
@@ -8,12 +8,12 @@ function AuthForm(p) {
             </div>
             
             <div className="flex flex-col mt-10 items-center">
+                <input className={`${p.isCredsCorrect ? "border-gray-200" : "border-red-700" } bg-transparent text-center border rounded-3xl p-4 w-10/12 caret-gray-50 text-xl text-gray-50 my-5`} value={ p.username } onChange={ (e) => { p.setUsername(e.target.value) } } type="text" placeholder="Username"/>
+                <input className={`${p.isCredsCorrect ? "border-gray-200" : "border-red-700" } bg-transparent text-center border rounded-3xl p-4 w-10/12 caret-gray-50 text-xl text-gray-50 mb-5`} value={ p.password } onChange={ (e) => { p.setPassword(e.target.value) } } type="password" placeholder="Password"/>
                 {
                     p.action === "Sign In"? <div></div>:
-                    <input className={`${p.isCredsCorrect ? "border-gray-200" : "border-red-700" } bg-transparent text-center border rounded-3xl p-4 w-10/12 caret-gray-50 text-xl text-gray-50`} value={ p.email } onChange={ (e) => { p.setEmail(e.target.value) } } type="email" placeholder="Email"/>
+                    <input className={`${p.isCredsCorrect ? "border-gray-200" : "border-red-700" } bg-transparent text-center border rounded-3xl p-4 w-10/12 caret-gray-50 text-xl text-gray-50`} value={ p.passwordAgain } onChange={ (e) => { p.setPasswordAgain(e.target.value) } } type="password" placeholder="Password"/>
                 }
-                <input className={`${p.isCredsCorrect ? "border-gray-200" : "border-red-700" } bg-transparent text-center border rounded-3xl p-4 w-10/12 caret-gray-50 text-xl text-gray-50 my-5`} value={ p.username } onChange={ (e) => { p.setUsername(e.target.value) } } type="text" placeholder="Username"/>
-                <input className={`${p.isCredsCorrect ? "border-gray-200" : "border-red-700" } bg-transparent text-center border rounded-3xl p-4 w-10/12 caret-gray-50 text-xl text-gray-50`} value={ p.password } onChange={ (e) => { p.setPassword(e.target.value) } } type="password" placeholder="Password"/>
             </div>
 
             <div className="flex flex-col items-center mt-5">
@@ -25,8 +25,10 @@ function AuthForm(p) {
                                         if (!p.username || !p.password) {
                                             p.setShowModal(true)
                                             p.setModalMessage("Please enter both username and password to log in.")
+                                            p.setIsCredsCorrect(false)
                                             return
                                         }
+
                                         p.signIn()
                                     } 
                                 }
@@ -36,9 +38,14 @@ function AuthForm(p) {
                         ) : (
                             <button className="hover:bg-zinc-800 text-xl font-semibold rounded-3xl text-center text-gray-50 bg-zinc-700 p-4 w-full"
                                 onClick={ () => {
-                                        if (!p.email || !p.username || !p.password) {
+                                        if (!p.username || !p.password || !p.passwordAgain) {
                                             p.setShowModal(true)
                                             p.setModalMessage("Please provide all required details to create an account")
+                                            p.setIsCredsCorrect(false)
+                                            return
+                                         } else if (p.password !== p.passwordAgain) {
+                                            p.setShowModal(true)
+                                            p.setModalMessage("Passwords do not match. Please re-enter your password.")
                                             p.setIsCredsCorrect(false)
                                             return
                                         }
@@ -61,9 +68,9 @@ function AuthForm(p) {
                         <p className="text-xl py-4 text-center">Don't have an account?</p> 
                         <button className="hover:bg-zinc-800 col-span-2 text-xl font-semibold rounded-3xl text-gray-50 bg-zinc-700 p-4 w-full"
                             onClick={ () => {
-                                    p.setEmail('')
                                     p.setUsername('')
-                                    p.setPassword('') 
+                                    p.setPassword('')
+                                    p.setPasswordAgain('')
                                     p.setIsCredsCorrect(true)
                                     p.setAction("Create Account") 
                                 }
@@ -77,9 +84,9 @@ function AuthForm(p) {
                         <p className="text-xl py-4 text-center">Already have an account?</p> 
                         <button className="hover:bg-zinc-800 col-span-2 text-xl font-semibold rounded-3xl text-center text-gray-50 bg-zinc-700 p-4 w-full"
                             onClick={ () => { 
-                                    p.setEmail('')
                                     p.setUsername('')
                                     p.setPassword('')
+                                    p.setPasswordAgain('')
                                     p.setIsCredsCorrect(true)
                                     p.setAction("Sign In") 
                                 } 
@@ -91,7 +98,7 @@ function AuthForm(p) {
                 }
             </div>
         </div>
-    );
+    )
 }
 
-export default AuthForm;
+export default AuthForm
