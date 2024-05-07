@@ -1,17 +1,16 @@
 import React, { useState } from 'react'
 import axios from 'axios'
 import AuthForm from '../components/AuthForm'
-import Logo from "../assets/luto_logo_white.png" 
+import Logo from '../assets/luto-logo-white.png'
 
 function Auth(p) {
     const [action, setAction] = useState('Sign In')
     const [isCredsCorrect, setIsCredsCorrect] = useState(true)
-    const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')
     const [passwordAgain, setPasswordAgain] = useState('')
 
     function createAccount() {
-        axios.post(`http://localhost:8080/create-account`, { username, password } )
+        axios.post(`http://localhost:8080/create-account`, { username: p.username, password } )
             .then(response => {
                 console.log('Status Code:' , response.status)
                 console.log('Data:', response.data)
@@ -21,7 +20,7 @@ function Auth(p) {
                     p.setModalMessage('Username already exists. Please choose a different username.')
                     setIsCredsCorrect(false)    
                 } else if (response.status === 201) {
-                    setUsername('')
+                    p.setUsername('')
                     setPassword('')
                     p.setShowModal(true)
                     p.setModalMessage('Account Created!')
@@ -42,7 +41,7 @@ function Auth(p) {
     }
 
     function signIn() {
-        axios.post(`http://localhost:8080/sign-in`, { username, password })
+        axios.post(`http://localhost:8080/sign-in`, { username: p.username, password })
             .then(response => {
                 console.log('Status Code:' , response.status)
                 console.log('Data:', response.data)
@@ -68,16 +67,16 @@ function Auth(p) {
     }
 
     return (
-        <div className="grid grid-cols-2 p-2 h-svh bg-gradient-to-b from-orange-500 to-orange-400 gap-2">
+        <div className="grid grid-cols-2 p-3 h-svh bg-gradient-to-b from-orange-500 to-orange-400 gap-3">
             <div className="flex flex-col items-center justify-center">
-                <img className="" src={Logo} alt=""/>
-                <p className="mt-2 text-gray-50 text-4xl">Community with a Recipe.</p>
+                <img className="" src={ Logo } alt=""/>
+                <p className="mt-3 text-zinc-50 text-4xl">Community with a Recipe.</p>
             </div>
             <AuthForm 
                 createAccount={ createAccount } signIn={ signIn } action={ action } setAction={ setAction }
                 showModal={ p.showModal } setShowModal={ p.setShowModal } setModalMessage={ p.setModalMessage }
                 isCredsCorrect={ isCredsCorrect } setIsCredsCorrect={ setIsCredsCorrect } 
-                username={ username } setUsername={ setUsername } password={ password } setPassword={ setPassword }
+                username={ p.username } setUsername={ p.setUsername } password={ password } setPassword={ setPassword }
                 passwordAgain={ passwordAgain } setPasswordAgain={ setPasswordAgain } 
             />
         </div>

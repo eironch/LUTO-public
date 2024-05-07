@@ -5,6 +5,7 @@ import Modal from './components/Modal'
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState()
+  const [username, setUsername] = useState('')
   const [modalMessage, setModalMessage] = useState('')
   const [showModal, setShowModal] = useState(false)
 
@@ -12,13 +13,14 @@ function App() {
     <div>
       { 
         isLoggedIn ? 
-        <Home setIsLoggedIn={ setIsLoggedIn } />
+        <Home setIsLoggedIn={ setIsLoggedIn } username={ username } />
         :  
         <Auth 
-          showModal={ showModal } setShowModal={ setShowModal } modalMessage={ modalMessage } setModalMessage={ setModalMessage } 
-          isLoggedIn={ isLoggedIn } setIsLoggedIn={ setIsLoggedIn } 
+          isLoggedIn={ isLoggedIn } setIsLoggedIn={ setIsLoggedIn } username={ username } setUsername={ setUsername }
+          showModal={ showModal } setShowModal={ setShowModal } modalMessage={ modalMessage } setModalMessage={ setModalMessage }     
         /> 
       }
+           {/* <Home setIsLoggedIn={ setIsLoggedIn } /> */}
       <Modal showModal={ showModal } setShowModal={ setShowModal } modalMessage={ modalMessage } setModalMessage={ setModalMessage } />
     </div>
   )
