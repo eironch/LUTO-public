@@ -1,17 +1,16 @@
-import React, { useState, useEffect } from 'react'
+import React, { useEffect, useRef } from 'react'
 
 function Modal(p) {
-    const [isTimerStart, setIsTimerStart] = useState(false)
-  
+    const modalTimer = useRef(null);
+
     useEffect(() => {
-        if (p.showModal && !isTimerStart) {
-            setIsTimerStart(true)
-            setTimeout(() => {
-                setIsTimerStart(false)
+        if (p.showModal) {
+            clearTimeout(modalTimer)
+            modalTimer.current = setTimeout(() => {
                 p.setShowModal(false)
             }, 3000)
         }
-    }, [p.showModal, isTimerStart])
+    }, [p.showModal])
 
     return (
         <div className={ `fixed inset-0 pt-96 mt-80 flex items-center justify-center transition-transform transform duration-1000 ${
