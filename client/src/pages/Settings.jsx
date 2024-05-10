@@ -3,11 +3,14 @@ import React from 'react'
 function Settings(p) {
     return (
         <div className="flex flex-col gap-3 p-3 h-svh bg-zinc-950">
-            <div className="flex flex-row w-full gap-3 h-16">
-                <div className="w-80"></div>
-                <div className="h-16 w-full rounded-3xl"></div>
-                <div className="w-80"></div>     
+            {/* space for top navbar */}
+            <div className="grid w-full gap-3 h-16" style={ { gridTemplateColumns: 'repeat(15, minmax(0, 1fr))' } }>
+                <div className="col-span-2"></div>
+                <div className="col-span-11 h-16 rounded-3xl bg-zinc-900"></div>
+                <div className="col-span-2"></div>     
             </div>
+            {/* space for top navbar */}
+            {/* content */}
             <div className="grid w-full gap-3 h-full" style={ { gridTemplateColumns: 'repeat(15, minmax(0, 1fr))' } }>
                 <div className="col-span-2"></div>
                 <div className="flex flex-col p-9 bg-zinc-900 rounded-3xl text-zinc-200" style={ { gridColumn: "span 13" } }>
@@ -37,6 +40,7 @@ function Settings(p) {
                     </div>
                 </div>
             </div>
+            {/* content */}
         </div>
     )
 }
