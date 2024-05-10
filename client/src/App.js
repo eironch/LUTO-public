@@ -2,6 +2,7 @@ import React, { useState, useLayoutEffect } from 'react'
 import Auth from './pages/Auth'
 import Home from './pages/Home'
 import Modal from './components/Modal'
+import Profile from './pages/Profile'
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState()
@@ -11,17 +12,9 @@ function App() {
 
   return (
     <div>
-      { 
-        isLoggedIn ? 
-        <Home setIsLoggedIn={ setIsLoggedIn } username={ username } />
-        :  
-        <Auth 
-          isLoggedIn={ isLoggedIn } setIsLoggedIn={ setIsLoggedIn } username={ username } setUsername={ setUsername }
-          showModal={ showModal } setShowModal={ setShowModal } modalMessage={ modalMessage } setModalMessage={ setModalMessage }     
-        /> 
-      }
-           {/* <Home setIsLoggedIn={ setIsLoggedIn } /> */}
-      <Modal showModal={ showModal } setShowModal={ setShowModal } modalMessage={ modalMessage } setModalMessage={ setModalMessage } />
+      
+        <Profile />
+      
     </div>
   )
 }
