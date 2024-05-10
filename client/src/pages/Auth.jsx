@@ -41,7 +41,7 @@ function Auth(p) {
     }
 
     function signIn() {
-        axios.post(`http://localhost:8080/sign-in`, { username: p.username, password })
+        axios.post(`http://localhost:8080/sign-in`, { username: p.username, password }, { withCredentials: true })
             .then(response => {
                 console.log('Status Code:' , response.status)
                 console.log('Data:', response.data)
@@ -51,7 +51,7 @@ function Auth(p) {
                     p.setModalMessage('Incorrect username or password. Please try again.')
                     setIsCredsCorrect(false)
                 } else if (response.status === 200) {
-                    p.setIsLoggedIn(true)
+                    p.setIsAuthenticated(true)
                 }
             })
             .catch(error => {
@@ -67,10 +67,10 @@ function Auth(p) {
     }
 
     return (
-        <div className="grid grid-cols-2 p-3 h-svh bg-gradient-to-b from-orange-500 to-orange-400 gap-3">
+        <div className="grid grid-cols-2 p-3 h-svh bg-gradient-to-b from-orange-500 to-orange-400 gap-3 overflow-hidden">
             <div className="flex flex-col items-center justify-center">
                 <img className="" src={ Logo } alt=""/>
-                <p className="mt-3 text-zinc-50 text-4xl">Community with a Recipe.</p>
+                <p className="mt-3 text-zinc-200 text-4xl">Community with a Recipe.</p>
             </div>
             <AuthForm 
                 createAccount={ createAccount } signIn={ signIn } action={ action } setAction={ setAction }
