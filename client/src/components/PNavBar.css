@@ -3,19 +3,47 @@
     justify-content: space-between;
     align-items: center;
     padding: 10px;
+    border-radius: 20px;
+  }
+  .back-button {
+    height: 50px;
+    width: 150px;
     background-color: #212121;
     border-radius: 20px;
   }
-  
   .back-button button img{
+    height: 35px;
+    padding-left: 50px;
+    margin-top: 5px;
+    color: white;
+    
+  }
+  .logo {
+    height: 50px;
+    background-color: #212121;
+    border-radius: 20px;
+    width: 1200px;
+    align-items: center;
+    justify-content: center;
+
+    background-color: #212121;
+  }
+  .logo img {
+    margin-top: 5px;
     height: 40px;
+    padding-left: 550px;
+  }
+  .user-button {
+    height: 50px;
+    width: 150px;
+    background-color: #212121;
+    border-radius: 20px;
+  }
+  .user-button button {
+    margin-top: 5px;
+    padding-left: 90px;
     color: white;
   }
-  
-  .logo img {
+  .user-button img {
     height: 40px;
-  }
-  
-  .user-button button {
-    /* Customize user button styles */
   }

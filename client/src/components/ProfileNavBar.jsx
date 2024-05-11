@@ -1,15 +1,15 @@
-import React from 'react';
-import './PNavBar.css'
-import Logo from '../assets/luto-logo-gradient.png'
-import BackButton from '../assets/back-button.png'
-
+import React from "react";
+import "./PNavBar.css";
+import Logo from "../assets/luto-logo-gradient.png";
+import BackButton from "../assets/back-button.png";
+import User from "../assets/profile-picture.png";
 
 const ProfilePage = () => {
   return (
     <div>
       <div className="header">
         <div className="back-button">
-          <button onClick={() => console.log('Go back')}>
+          <button>
             <img src={BackButton} alt="" />
           </button>
         </div>
@@ -17,11 +17,11 @@ const ProfilePage = () => {
           <img src={Logo} alt="Logo" />
         </div>
         <div className="user-button">
-          <button onClick={() => console.log('Go to user profile')}>User</button>
+          <button>
+            <img src={User} alt="" />
+          </button>
         </div>
       </div>
-      <h1>Profile Page</h1>
-      {/* Other profile page content */}
     </div>
   );
 };
