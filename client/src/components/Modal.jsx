@@ -17,7 +17,7 @@ function Modal(p) {
                 p.showModal ? "translate-y-0" : "translate-y-full" }` }
                 style={{ pointerEvents: 'none' }}
         >
-            <div className="rounded-2xl shadow-md mx-auto p-4 px-8 text-lg bg-zinc-700 text-gray-50" >
+            <div className="rounded-2xl shadow-md shadow-zinc-950 mx-auto p-4 px-8 text-lg bg-zinc-700 text-gray-50" >
                 <p>{ p.modalMessage }</p>
             </div>
         </div>

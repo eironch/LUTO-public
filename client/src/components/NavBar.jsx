@@ -1,63 +1,54 @@
 import React from 'react'
+import SearchBar from '../components/SearchBar'
+import TabSidebar from '../components/TabSidebar'
+import ProfileSidebar from '../components/ProfileSidebar'
 import Logo from '../assets/luto-logo-gradient.png'
-import SearchIcon from '../assets/search-icon.png'
-import HomeIcon from '../assets/home-icon.png'
-import PopularIcon from '../assets/popular-icon.png'
-import SavedIcon from '../assets/saved-icon.png'
-import SettingsIcon from '../assets/settings-icon.png'
+import Back from '../assets/back-icon.png'
 import ProfilePicture from '../assets/profile-picture.png'
 
 function NavBar(p) {
     return (
-        <div className="fixed flex flex-col gap-3 p-3 w-full h-svh pointer-events-none">
-            <div className="flex flex-row w-full gap-3 h-16 pointer-events-auto">
-                <div className="flex items-center justify-center w-2/12 rounded-3xl bg-zinc-900">
-                    <img className="w-48 m-3 px-4" src={ Logo } alt=""></img>
-                </div>
-                <div className="flex items-center justify-center w-full rounded-3xl">
-                    <div className="flex items-center justify-center rounded-3xl m-3 w-8/12 h-10 bg-zinc-700">
-                        <img className="mx-4 w-6" src={ SearchIcon } alt=""></img>
-                        <input className="w-full h-10 rounded-3xl bg-transparent text-zinc-400 text-center" src={ SearchIcon } type="text" placeholder="Search"/>
-                        <div className="flex flex-row mx-4 w-6 text-zinc-400">•••</div>
+        <div className={`${ p.currentTab==="Home" && "pr-0" } fixed flex flex-col gap-3 p-3 w-full h-svh pointer-events-none`}>
+            {/* above the navbar */}
+            { p.currentTab==="Home" && <SearchBar /> }
+            {/* above the navbar */}
+            {/* navbar */}
+            <div className="grid gap-3 w-full h-16 pointer-events-none" style={ { gridTemplateColumns: 'repeat(15, minmax(0, 1fr))' } }>
+                {
+                    p.currentTab==="Home" &&
+                    <div className="rounded-3xl flex col-span-2 items-center justify-center bg-zinc-900">
+                        <img className="m-3 px-4 w-48" src={ Logo } alt="" />   
                     </div>
+                }
+                {
+                    p.currentTab==="Profile" &&
+                    <button className={`${ p.currentTab==="Home" && "bg-zinc-700 shadow-sm shadow-zinc-950" } col-span-2 bg-zinc-900 pointer-events-auto flex flex-row w-full rounded-3xl hover:bg-zinc-500 hover:shadow-sm hover:shadow-zinc-950`} onClick={() => { p.setCurrentTab("Home") }}>
+                        <div className="flex items-center overflow-hidden m-4 gap-4 w-full">
+                            <img className="w-8" src={ Back } alt="" />
+                            <p className="text-zinc-200 text-lg">Back</p>
+                        </div>
+                    </button>
+                }
+                <div className={`${ p.currentTab!=="Home"  && "bg-zinc-900" } rounded-3xl flex items-center justify-center`} style={ { gridColumn: p.currentTab==="Home" ? "span 11" : "span 13" } }>
+                    { p.currentTab!=="Home" && <img className="p-3 w-48 fixed left-1/2 transform -translate-x-1/2" src={ Logo } alt="" /> }
                 </div>
-                <div className="flex items-center justify-end w-2/12 col-span-3 rounded-3xl bg-zinc-900">
-                    <p className="text-zinc-50 text-end w-full ml-3 text-xl overflow-hidden">{ p.username }</p>
-                    <img className="m-3 w-10" src={ ProfilePicture } alt=""></img>
-                </div>     
+                {
+                    p.currentTab!=="Profile" &&
+                    <button className="col-span-2 flex items-center justify-end rounded-3xl bg-zinc-900 pointer-events-auto hover:bg-zinc-500" onClick={ () => { p.setCurrentTab("Profile") } }>
+                        { p.currentTab!=="Profile" && <p className="text-zinc-200 text-end w-full ml-3 text-xl overflow-hidden">{ p.username }</p> }
+                        <img className="m-3 w-10" src={ ProfilePicture } alt="" />
+                    </button>
+                }
             </div>
-            <div className="flex flex-row w-full gap-3 h-full">
-                <div className="w-2/12 rounded-3xl bg-zinc-900 pointer-events-auto">
-                    <div className="flex items-center flex-col gap-3 m-3">
-                        <button className="flex flex-row w-full rounded-3xl hover:bg-zinc-700">
-                            <div className="flex items-center overflow-hidden m-4 gap-4 w-full">
-                                <img className="w-8" src={ HomeIcon } alt=""></img>
-                                <p className="text-zinc-50 text-lg">Home</p>
-                            </div>
-                        </button>
-                        <button className="flex flex-row w-full rounded-3xl hover:bg-zinc-700">
-                            <div className="flex items-center overflow-hidden m-4 gap-4 w-full">
-                                <img className="w-8" src={ PopularIcon } alt=""></img>
-                                <p className="text-zinc-50 text-lg">Popular</p>
-                            </div>
-                        </button>
-                        <button className="flex flex-row w-full rounded-3xl hover:bg-zinc-700">
-                            <div className="flex items-center overflow-hidden m-4 gap-4 w-full">
-                                <img className="w-8" src={ SavedIcon } alt=""></img>
-                                <p className="text-zinc-50 text-lg">Saved</p>
-                            </div>
-                        </button>
-                        <button className="flex flex-row w-full rounded-3xl hover:bg-zinc-700">
-                            <div className="flex items-center overflow-hidden m-4 gap-4 w-full">
-                                <img className="w-8" src={ SettingsIcon } alt=""></img>
-                                <p className="text-zinc-50 text-lg">Settings</p>
-                            </div>
-                        </button>
-                    </div>
-                </div>
-                <div className="flex flex-col w-full gap-3 bg-transparent"></div>
-                <div className="flex items-center justify-center w-2/12 rounded-3xl bg-zinc-900"></div>        
-            </div>
+            {/* navbar */}
+            {/* content */}
+            {
+                p.currentTab==="Profile" ? 
+                <ProfileSidebar />
+                :
+                <TabSidebar currentTab={ p.currentTab } setCurrentTab={ p.setCurrentTab }/>
+            }
+            {/* content */}
         </div>
     )
 }
