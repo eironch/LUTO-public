@@ -1,0 +1,21 @@
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    background-color: #212121;
+    border-radius: 20px;
+  }
+  
+  .back-button button img{
+    height: 40px;
+    color: white;
+  }
+  
+  .logo img {
+    height: 40px;
+  }
+  
+  .user-button button {
+    /* Customize user button styles */
+  }
