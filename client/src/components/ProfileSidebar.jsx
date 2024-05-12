@@ -1,12 +1,24 @@
-import React from 'react'
+import React from "react";
+import User from "../assets/profile-picture.png";
+import "./PSideBar.css";
+import { Scrollbars } from "react-custom-scrollbars";
 
 function ProfileSidebar(p) {
-    return (
-        <div className="grid w-full gap-3 h-full" style={ { gridTemplateColumns: 'repeat(15, minmax(0, 1fr))' } }>
-            <div className="col-span-4 rounded-3xl bg-zinc-900 pointer-events-auto"></div>
-            <div className="col-span-11"></div>
+  return (
+    <>
+      <div className="sidebar">
+        {/**this is the container ^ */}
+        <div className="user">
+          <div>
+            <img src={User} alt="profile" />
+            <h2>xXxRaysanxXx</h2>
+            <button>Follow</button>
+          </div>
         </div>
-    )
+        {/**insert here for new container */}
+      </div>
+    </>
+  );
 }
 
-export default ProfileSidebar
+export default ProfileSidebar;
