@@ -1,31 +1,39 @@
-import React, { useLayoutEffect } from 'react'
-import NavBar from '../components/NavBar'
+import React from "react";
+import Post from "../components/Post";
+import ProfileSidebar from "../components/ProfileSidebar";
+import ProfileNavBar from "../components/ProfileNavBar";
+import User from "../assets/profile-picture.png";
+import Pen from "../assets/pen.png";
+import "../components/css/Profile.css";
 
 function Profile(p) {
-    useLayoutEffect(() => {
-        p.setCurrentTab("Profile")
-    })
-
-    return (
-        <div>
-            <NavBar username={ p.username } currentTab={ p.currentTab } setCurrentTab={ p.setCurrentTab } />
-            <div className="flex flex-col gap-3 p-3 h-svh bg-zinc-950">
-                {/* space for top navbar */}
-                <div className="grid w-full gap-3 h-16" style={ { gridTemplateColumns: 'repeat(15, minmax(0, 1fr))' } }>
-                    <div className="col-span-2"></div>
-                    <div className="col-span-11 h-16 rounded-3xl"></div>
-                    <div className="col-span-2"></div>     
-                </div>
-                {/* content */}
-                <div className="grid w-full gap-3 h-full" style={ { gridTemplateColumns: 'repeat(15, minmax(0, 1fr))' } }>
-                    <div className="col-span-4"></div>
-                    <div className="col-span-11 block">
-                        
-                    </div>
-                </div>
+  return (
+    <>
+      <div className="flex flex-col gap-3 p-3 h-svh bg-zinc-950">
+        <ProfileNavBar />
+        <ProfileSidebar />
+        <div className="create-post">
+          <div className="create">
+            <img src={User} alt="User" />
+            <div className="input">
+              <input
+                type="text"
+                placeholder="Do you have a recipe to share?"
+                className="white-placeholder"
+              />
+              <button>
+                <img src={Pen} alt="create post" />
+              </button>
             </div>
+          </div>
         </div>
-    )
+        <div className="post">
+          <Post />
+          <Post />
+        </div>
+      </div>
+    </>
+  );
 }
 
-export default Profile
+export default Profile;

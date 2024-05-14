@@ -56,7 +56,32 @@ function NavBar(p) {
             }
             {/* content */}
         </div>
-    )
+        {p.currentTab !== "Profile" && (
+          <button
+            className="col-span-2 flex items-center justify-end rounded-3xl bg-zinc-900 pointer-events-auto hover:bg-zinc-500"
+            onClick={() => {
+              p.setCurrentTab("Profile");
+            }}
+          >
+            {p.currentTab !== "Profile" && (
+              <p className="text-zinc-200 text-end w-full ml-3 text-xl overflow-hidden">
+                {p.username}
+              </p>
+            )}
+            <img className="m-3 w-10" src={ProfilePicture} alt="" />
+          </button>
+        )}
+      </div>
+      {/* navbar */}
+      {/* content */}
+      {p.currentTab === "Profile" ? (
+        <ProfileSidebar />
+      ) : (
+        <TabSidebar currentTab={p.currentTab} setCurrentTab={p.setCurrentTab} />
+      )}
+      {/* content */}
+    </div>
+  );
 }
 
-export default NavBar
+export default NavBar;

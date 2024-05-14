@@ -1,0 +1,57 @@
+.flex .post{
+    position: absolute;
+    margin-top: 190px;
+    margin-left: 420px;
+    margin-right: 20px;
+}
+.flex .create-post{
+    position: absolute;
+    margin-top: 90px;
+    margin-left: 420px;
+    margin-right: 20px;
+    background: #212121;
+    border-radius: 26px;
+    width: 1135px;
+}
+.create img{
+    margin: 10px;
+}
+.create {
+    display: flex;
+    align-items: center;
+}
+  
+.create img {
+    margin-right: 10px; 
+}
+  
+.input {
+    display: flex;
+    align-items: center;
+    width: 1020px;
+    height: 50px;
+    margin-left: 20px; 
+    border-radius: 26px;
+    background: linear-gradient(#E7691A, #FE9032);
+}
+.input:hover{
+    background: transparent;
+    border: 1px solid #E7691A;
+}
+  
+.input input {
+    margin-right: 10px;
+    margin-left: 20px;
+    height: 50px;
+    color: white;
+    width: 930px;
+    outline: none;
+    background: transparent;
+    font-size: 20px;
+}
+.input img{
+    height: 30px;
+}
+.white-placeholder::placeholder {
+    color: white; 
+  }
