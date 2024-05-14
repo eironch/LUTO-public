@@ -1,13 +1,12 @@
 import React from "react";
 import User from "../assets/profile-picture.png";
-import "./PSideBar.css";
-import { Scrollbars } from "react-custom-scrollbars";
+import "./css/PSideBar.css";
 
 function ProfileSidebar(p) {
   return (
     <>
       <div className="sidebar">
-        {/**this is the container ^ */}
+        {/**User  */}
         <div className="user">
           <div>
             <img src={User} alt="profile" />
@@ -15,7 +14,46 @@ function ProfileSidebar(p) {
             <button>Follow</button>
           </div>
         </div>
-        {/**insert here for new container */}
+        {/**Bio */}
+        <div className="bio">
+          <div>
+            <h3>Bio</h3>
+            <p>
+              An aspiring cook from the Pearl of the Orient Sea, the
+              Philippines. Here to learn and be part of the cooking community.
+            </p>
+          </div>
+        </div>
+        {/**Friends */}
+        <div className="friends">
+          <div>
+            <h3>Friends</h3>
+            <div className="friendlist">
+              <div className="friend">
+                <img src={User} alt="profile" />
+                <h2>Friend 1</h2>
+              </div>
+            </div>
+            <div className="friendlist">
+              <div className="friend">
+                <img src={User} alt="profile" />
+                <h2>Friend 2</h2>
+              </div>
+            </div>
+            <div className="friendlist">
+              <div className="friend">
+                <img src={User} alt="profile" />
+                <h2>Friend 3</h2>
+              </div>
+            </div>
+            <div className="friendlist">
+              <div className="friend">
+                <img src={User} alt="profile" />
+                <h2>Friend 4</h2>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </>
   );

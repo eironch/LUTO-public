@@ -42,7 +42,6 @@ function App() {
 
   return (
     <div>
-      <Profile />
       {
         isLoading? 
         <></>

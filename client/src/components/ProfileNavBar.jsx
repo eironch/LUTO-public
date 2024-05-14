@@ -1,5 +1,5 @@
 import React from "react";
-import "./PNavBar.css";
+import "./css/PNavBar.css";
 import Logo from "../assets/luto-logo-gradient.png";
 import BackButton from "../assets/back-button.png";
 import User from "../assets/profile-picture.png";
