@@ -1,30 +1,33 @@
 import express from 'express'
-import mysql from 'mysql'
 import cors from 'cors'
 import bcrypt from 'bcrypt'
 import cookieParser from 'cookie-parser'
 import jwt from 'jsonwebtoken'
+import mongoose from 'mongoose'
+import User from './models/user.js'
 
 const PORT = 8080
+
+// jwst secret key
 const secretKey = "luto-app"
+
+// express app
 const app = express()
-
-const db = mysql.createPool({
-    host:'localhost',
-    user:'root',
-    password:'',
-    database:'LUTO'
-})
-
 app.use(express.json())
 app.use(cors({
     origin: 'http://localhost:3000',
     credentials: true
 }))
+
+// cookie for login
 app.use(cookieParser())
 
-function generateToken(userId, username) {
+function generateAccessToken(userId, username) {
     return jwt.sign({ userId, username}, secretKey, { expiresIn: '1h' })
+}
+
+function generateRefreshToken(userId, username) {
+    return jwt.sign({ userId, username}, secretKey, { expiresIn: '30d' })
 }
 
 function verifyToken(token) {
@@ -35,89 +38,108 @@ function verifyToken(token) {
     }
 }
 
+// connect to mongodb
+const dbURI = 'mongodb+srv://test:f2qWY9k3dxnsqj9T@luto.tihpifs.mongodb.net/luto?retryWrites=true&w=majority&appName=LUTO'
+mongoose.connect(dbURI)
+    .then(() => { 
+        app.listen(PORT, () => {
+            console.log("Connected to backend.")
+        }) 
+    })
+    .catch(err => { 
+        console.log("Connection error: ", err) 
+    })
+
+// mongoose and mongo sandbox routes
 app.get('/', (req, res) => {
     res.json("good mourning.")
 })
 
 app.post('/create-account', (req, res) => {
     const { username, password } = req.body
-    const query = `SELECT * FROM USERS WHERE username = ?`
+    const user = new User({
+        username,
+        password,
+        bio: '',
+        refreshToken: '',
+    })
 
-    db.query(query, username, (err, data) => {
-        if (err) {
-            return res.status(500).json(err)
-        } else if (data.length > 0) {
+    user.save()
+        .then(() => {
+            return res.status(201).json({ success: true, message: "Account created." })
+        })
+        .catch(err => {
             return res.status(202).json({ success: false, message: "Username exists." })
-        }
-
-        return createAccount(res, username, password)
-    })
+        })
 })
-
-async function createAccount(res, username, password) {
-    const registration_date = new Date();
-    const hashedPassword = await bcrypt.hash(password, 8)
-    const query = `INSERT INTO USERS (username, password, registrationDate) VALUES (?, ?, ?)`
-
-    db.query(query, [username, hashedPassword, registration_date], (err) => {
-        if (err) {
-            return res.status(500).json(err)
-        }
-        return res.status(201).json({ success: true, message: "User account created." })
-    })
-}
 
 app.post('/sign-in', async (req, res) => {
-    const {username, password} = req.body
-
-    let query = `SELECT * FROM USERS WHERE username = ?`
+    const { username, password } = req.body
     
-    db.query(query, [username, password], async (err, data) => {
-        if (err) {
-            return res.status(500).json(err)
-        } else if (data.length > 0) {
-            const match = await bcrypt.compare(password, data[0].password)
-            if (match) {
-                res.cookie(
-                    'authToken',  generateToken(data[0].userId, data[0].username), {
-                        httpOnly: true,
-                        secure: false,
-                        maxAge: 3600000,
-                    }
-                )
-                return res.status(200).json({ success: true, message: "User signed in." })
-            }
-        }
-        return res.status(202).json({ success: false, message: "Incorrect username or password." })
-    })
-})
+    try {
+        const user = await User.findOne({ username })
 
-app.get('/check-auth', (req, res) => {
-    const token = req.cookies.authToken
-    const decoded = verifyToken(token)
-    if (token && decoded) {
-        return res.status(200).json({ isAuthenticated: true, data: decoded.username})
-    } else {
-        return res.status(202).json({ isAuthenticated: false })
+        if(!user) {
+            return res.status(202).json({ success: false, message: "User not found." })
+        }
+
+        const isPasswordValid = await bcrypt.compare(password, user.password)
+
+        if (!isPasswordValid) {
+            return res.status(202).json({ success: false, message: "Incorrect username or password." })
+        }
+
+        res.cookie(
+            'accessToken',
+            generateAccessToken(user.userId, user.username), 
+            {
+                httpOnly: true,
+                secure: true,
+                maxAge: 3600000,
+            }
+        )
+
+        res.cookie(
+            'refreshToken',
+            generateRefreshToken(user.userId, user.username), 
+            {
+                httpOnly: true,
+                secure: true,
+                maxAge: 2592000000,
+            }
+        )
+        
+        return res.status(200).json({ success: true, message: "User signed in." })
+    } catch (err) {
+        console.error('Login error:', err)
+        return res.status(500).json({ message: 'Internal server error.' })
     }
 })
 
-app.listen(PORT, () => {
+app.get('/check-auth', (req, res) => {
+    const accessToken = req.cookies.authToken
+    const decodedAccessToken = verifyToken(accessToken)
 
-    let query = `SELECT * FROM USERS WHERE username = "ficuno"`
+    if (accessToken && decodedAccessToken) {
+        return res.status(200).json({ isAuthenticated: true, payload: { username: decodedAccessToken.username, userId: decodedAccessToken.userId }})
+    }
+    
+    const refreshToken = req.cookies.refreshToken
+    const decodedRefreshToken = verifyToken(refreshToken)
 
-    db.query(query, (err, data) => {
-        console.log(data[0].userId)
-        console.log({  'authToken':  generateToken(data[0].userId), 
-            httpOnly: true,
-            secure: true, // change this in production
-            maxAge: 3600000,
-        })
-        if (err) {
+    if (refreshToken && decodedRefreshToken) {
+        res.cookie(
+            'accessToken',
+            generateAccessToken(decodedRefreshToken.userId, decodedRefreshToken.username), 
+            {
+                httpOnly: true,
+                secure: true,
+                maxAge: 3600000,
+            }
+        )
 
-        } else if (data.length > 0) {
+        return res.status(200).json({ isAuthenticated: true, payload: { username: decodedRefreshToken.username, userId: decodedRefreshToken.userId }})
+    }
 
-        }
-    })
-    console.log("Connected to backend.")
+    return res.status(202).json({ isAuthenticated: false })
 })
