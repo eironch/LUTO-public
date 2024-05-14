@@ -1,11 +1,12 @@
 import React, { useState, useLayoutEffect } from 'react'
+import { Routes, Route, BrowserRouter } from 'react-router-dom'
 import axios from 'axios'
 import Auth from './pages/Auth'
 import Home from './pages/Home'
 import Profile from './pages/Profile'
 import Settings from './pages/Settings'
+import Search from './pages/Search'
 import Modal from './components/Modal'
-import NavBar from './components/NavBar'
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState()
@@ -22,7 +23,7 @@ function App() {
           console.log('Data:', response.data)
          
           setIsLoading(false)
-          setUsername(response.data.data)
+          setUsername(response.data.payload.username || "")
           setIsAuthenticated(response.data.isAuthenticated)
       })
       .catch(error => {
@@ -48,18 +49,23 @@ function App() {
         :
         isAuthenticated ?
         <>
-          <NavBar username={ username } currentTab={ currentTab } setCurrentTab={ setCurrentTab } />
-          { currentTab==="Home" && <Home setIsAuthenticated={ setIsAuthenticated } username={ username } currentTab={ currentTab } /> }
-          { currentTab==="Profile" && <Profile /> }
-          { currentTab==="Settings" && <Settings /> }
+          <BrowserRouter>
+            <Routes>
+              <Route path="/" element={ <Home setIsAuthenticated={ setIsAuthenticated } username={ username } currentTab={ currentTab } setCurrentTab={ setCurrentTab } /> } />
+              <Route path={`/${ username }`} element={ <Profile currentTab={ currentTab } setCurrentTab={ setCurrentTab } /> } />
+              <Route path="/settings" element={ <Settings username={ username } currentTab={ currentTab } setCurrentTab={ setCurrentTab } /> } />
+              <Route path="/search" element={ <Search username={ username } currentTab={ currentTab } setCurrentTab={ setCurrentTab } /> } />
+            </Routes>
+          </BrowserRouter>
         </>
-        :  
+        :
         <Auth 
           isAuthenticated={ isAuthenticated } setIsAuthenticated={ setIsAuthenticated } username={ username } setUsername={ setUsername }
           showModal={ showModal } setShowModal={ setShowModal } modalMessage={ modalMessage } setModalMessage={ setModalMessage }     
         />
       }
       <Modal showModal={ showModal } setShowModal={ setShowModal } modalMessage={ modalMessage } setModalMessage={ setModalMessage } />
+    
     </div>
   )
 }
