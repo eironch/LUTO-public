@@ -1,6 +1,6 @@
 import React, { useLayoutEffect } from 'react'
 import NavBar from '../components/NavBar'
-import PostOverview from '../components/PostOverview'
+import RecipeOverview from '../components/RecipeOverview'
 
 function Home(p) {
     useLayoutEffect(() => {
@@ -21,14 +21,14 @@ function Home(p) {
                 <div className="grid w-full gap-3 h-full" style={ { gridTemplateColumns: 'repeat(15, minmax(0, 1fr))' } }>
                     <div className="col-span-2"></div>
                     <div className="col-span-11 block">
-                        <PostOverview />
-                        <PostOverview />
-                        <PostOverview />
-                        <PostOverview />
-                        <PostOverview />
-                        <PostOverview />
-                        <PostOverview />
-                        <PostOverview />
+                        <RecipeOverview />
+                        <RecipeOverview />
+                        <RecipeOverview />
+                        <RecipeOverview />
+                        <RecipeOverview />
+                        <RecipeOverview />
+                        <RecipeOverview />
+                        <RecipeOverview />
                     </div>
                     <div className="col-span-2"></div>
                 </div>

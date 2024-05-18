@@ -20,7 +20,9 @@ function Search(p) {
                 <div className="grid w-full gap-3 h-full" style={ { gridTemplateColumns: 'repeat(15, minmax(0, 1fr))' } }>
                     <div className="col-span-2"></div>
                     <div className="col-span-11 flex flex-col p-9 bg-zinc-900 rounded-3xl text-zinc-100">
-                    <p className="text-4xl font-bold">Categories</p>
+                        <p className="text-4xl font-bold">
+                            Categories
+                        </p>
                     </div>
                     <div className="col-span-2"></div>
                 </div>

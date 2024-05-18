@@ -1,39 +1,34 @@
-import React from "react";
-import Post from "../components/Post";
-import ProfileSidebar from "../components/ProfileSidebar";
-import ProfileNavBar from "../components/ProfileNavBar";
-import User from "../assets/profile-picture.png";
-import Pen from "../assets/pen.png";
-import "../components/css/Profile.css";
+import React, { useLayoutEffect } from 'react'
+import { Link } from 'react-router-dom'
+import RecipeOverview from '../components/RecipeOverview'
+import NavBar from '../components/NavBar'
+import Logo from '../assets/luto-logo-gradient.png'
 
 function Profile(p) {
-  return (
-    <>
-      <div className="flex flex-col gap-3 p-3 h-svh bg-zinc-950">
-        <ProfileNavBar />
-        <ProfileSidebar />
-        <div className="create-post">
-          <div className="create">
-            <img src={User} alt="User" />
-            <div className="input">
-              <input
-                type="text"
-                placeholder="Do you have a recipe to share?"
-                className="white-placeholder"
-              />
-              <button>
-                <img src={Pen} alt="create post" />
-              </button>
+    useLayoutEffect(() => {
+        p.setCurrentTab("Profile")
+    })
+
+    return (
+       <div>
+            <NavBar username={ p.username } currentTab={ p.currentTab } setCurrentTab={ p.setCurrentTab } />
+            <div className="flex flex-col p-3 pr-0 h-svh bg-zinc-950">
+                {/* content */}
+                <div className="grid w-full gap-3 h-full" style={ { gridTemplateColumns: 'repeat(15, minmax(0, 1fr))' } }>
+                    <div className="col-span-4"></div>
+                    <div className="col-span-11">
+                        <RecipeOverview />
+                        <RecipeOverview />
+                        <RecipeOverview />
+                        <RecipeOverview />
+                        <RecipeOverview />
+                        <RecipeOverview />
+                        <RecipeOverview />
+                    </div>
+                </div> 
             </div>
-          </div>
-        </div>
-        <div className="post">
-          <Post />
-          <Post />
-        </div>
-      </div>
-    </>
-  );
+       </div>
+    )
 }
 
-export default Profile;
+export default Profile
