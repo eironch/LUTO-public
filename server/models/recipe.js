@@ -2,7 +2,7 @@ import mongoose from 'mongoose'
 
 const Schema = mongoose.Schema
 
-const postSchema = new Schema({
+const recipeSchema = new Schema({
     userId: {
         type: String,
         ref: 'User',
@@ -23,5 +23,5 @@ const postSchema = new Schema({
     },
 }, { timestamps: true })
 
-const Post = mongoose.model('Post', postSchema)
-export default Post
+const Recipe = mongoose.model('Recipe', recipeSchema)
+export default Recipe

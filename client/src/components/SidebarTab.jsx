@@ -6,30 +6,30 @@ import SavedIcon from '../assets/saved-icon.png'
 import CreateIcon from '../assets/create-icon.png'
 import SettingsIcon from '../assets/settings-icon.png'
 
-function TabSidebar(p) {
+function SidebarTab(p) {
     return (
-        <div className="grid w-full gap-3 h-full" style={ { gridTemplateColumns: 'repeat(15, minmax(0, 1fr))' } }>
+        <div className={`${ (p.currentTab==="Home" || p.currentTab==="Profile")  && "pr-0" } p-3 pt-0 grid w-full gap-3 h-full overflow-hidden`} style={ { gridTemplateColumns: 'repeat(15, minmax(0, 1fr))' } }>
             <div className="col-span-2 rounded-3xl bg-zinc-900 pointer-events-auto">
                 <div className="flex items-center flex-col gap-3 m-3">
                     <Link to="/" className={`${ p.currentTab==="Home" && "bg-zinc-700 shadow-sm shadow-zinc-950" } flex flex-row items-center gap-4 p-4 overflow-hidden w-full rounded-3xl hover:bg-zinc-500 hover:shadow-sm hover:shadow-zinc-950`}>
                         <img className="w-8" src={ HomeIcon } alt="" />
-                        <p className="text-zinc-100 text-lg">Home</p>
+                        <p className="text-zinc-100 text-lg font-semibold">Home</p>
                     </Link>
                     <Link to="/popular" className={`${ p.currentTab==="Popular" && "bg-zinc-700 shadow-sm shadow-zinc-950" } flex flex-row items-center gap-4 p-4 overflow-hidden w-full rounded-3xl hover:bg-zinc-500 hover:shadow-sm hover:shadow-zinc-950`}>
                         <img className="w-8" src={ PopularIcon } alt="" />
-                        <p className="text-zinc-100 text-lg">Popular</p>
+                        <p className="text-zinc-100 text-lg font-semibold">Popular</p>
                     </Link>
                     <Link to="/saved" className={`${ p.currentTab==="Saved" && "bg-zinc-700 shadow-sm shadow-zinc-950" } flex flex-row items-center gap-4 p-4 overflow-hidden w-full rounded-3xl hover:bg-zinc-500 hover:shadow-sm hover:shadow-zinc-950`}>
                         <img className="w-8" src={ SavedIcon } alt="" />
-                        <p className="text-zinc-100 text-lg">Saved</p>
+                        <p className="text-zinc-100 text-lg font-semibold">Saved</p>
                     </Link>
-                    <Link to="/create" className={`${ p.currentTab==="Create" && "bg-zinc-700 shadow-sm shadow-zinc-950" } flex flex-row items-center gap-4 p-4 overflow-hidden w-full rounded-3xl hover:bg-zinc-500 hover:shadow-sm hover:shadow-zinc-950`}>
+                    <Link to="/recipe-builder" className={`${ p.currentTab==="Create" && "bg-zinc-700 shadow-sm shadow-zinc-950" } flex flex-row items-center gap-4 p-4 overflow-hidden w-full rounded-3xl hover:bg-zinc-500 hover:shadow-sm hover:shadow-zinc-950`}>
                         <img className="w-8" src={ CreateIcon } alt="" />
-                        <p className="text-zinc-100 text-lg">Create</p>
+                        <p className="text-zinc-100 text-lg font-semibold">Create</p>
                     </Link>
                     <Link to="/settings" className={`${ p.currentTab==="Settings" && "bg-zinc-700 shadow-sm shadow-zinc-950" } flex flex-row items-center gap-4 p-4 overflow-hidden w-full rounded-3xl hover:bg-zinc-500 hover:shadow-sm hover:shadow-zinc-950`}>
                         <img className="w-8" src={ SettingsIcon } alt="" />
-                        <p className="text-zinc-100 text-lg">Settings</p>
+                        <p className="text-zinc-100 text-lg font-semibold">Settings</p>
                     </Link>
                 </div>
             </div>
@@ -39,4 +39,4 @@ function TabSidebar(p) {
     )
 }
 
-export default TabSidebar
+export default SidebarTab

@@ -6,6 +6,8 @@ import Home from './pages/Home'
 import Profile from './pages/Profile'
 import Settings from './pages/Settings'
 import Search from './pages/Search'
+import Recipe from './pages/Recipe'
+import RecipeBuilder from './pages/RecipeBuilder'
 import Modal from './components/Modal'
 
 function App() {
@@ -55,6 +57,8 @@ function App() {
               <Route path={`/${ username }`} element={ <Profile currentTab={ currentTab } setCurrentTab={ setCurrentTab } /> } />
               <Route path="/settings" element={ <Settings username={ username } currentTab={ currentTab } setCurrentTab={ setCurrentTab } /> } />
               <Route path="/search" element={ <Search username={ username } currentTab={ currentTab } setCurrentTab={ setCurrentTab } /> } />
+              <Route path="/recipe" element={ <Recipe username={ username } currentTab={ currentTab } setCurrentTab={ setCurrentTab } /> } />
+              <Route path="/recipe-builder" element={ <RecipeBuilder username={ username } currentTab={ currentTab } setCurrentTab={ setCurrentTab } /> } />
             </Routes>
           </BrowserRouter>
         </>

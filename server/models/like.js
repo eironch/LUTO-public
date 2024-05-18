@@ -3,9 +3,9 @@ import mongoose from 'mongoose'
 const Schema = mongoose.Schema
 
 const approveSchema = new Schema({
-    postId: {
+    RecipeId: {
         type: String,
-        ref: 'Post',
+        ref: 'Recipe',
         require: true
     },
     userId: {
