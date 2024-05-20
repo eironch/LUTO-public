@@ -4,11 +4,11 @@ import NavBar from '../components/NavBar'
 function Settings(p) {
     useLayoutEffect(() => {
         p.setCurrentTab("Settings")    
-    })
+    }, [])
 
     return (
         <div>
-            <NavBar username={ p.username } currentTab={ p.currentTab } setCurrentTab={ p.setCurrentTab } />
+            <NavBar user={ p.user } currentTab={ p.currentTab } setCurrentTab={ p.setCurrentTab } />
             <div className="flex flex-col gap-3 p-3 h-svh bg-zinc-950">
                 {/* space for top navbar */}
                 <div className="grid w-full gap-3 h-16" style={ { gridTemplateColumns: 'repeat(15, minmax(0, 1fr))' } }>

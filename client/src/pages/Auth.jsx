@@ -10,7 +10,7 @@ function Auth(p) {
     const [passwordAgain, setPasswordAgain] = useState('')
 
     function createAccount() {
-        axios.post(`http://localhost:8080/create-account`, { username: p.username, password } )
+        axios.post(`http://localhost:8080/create-account`, { username: p.user.username, password } )
             .then(response => {
                 console.log('Status Code:' , response.status)
                 console.log('Data:', response.data)
@@ -20,7 +20,7 @@ function Auth(p) {
                     p.setModalMessage('Username already exists. Please choose a different username.')
                     setIsCredsCorrect(false)    
                 } else if (response.status === 201) {
-                    p.setUsername('')
+                    p.setUser({ username: '', userId: '' })
                     setPassword('')
                     p.setShowModal(true)
                     p.setModalMessage('Account Created!')
@@ -28,20 +28,20 @@ function Auth(p) {
                     setAction("Sign In")
                 }
             })
-            .catch(error => {
-                if (error.response) {
-                    console.log('Error Status:', error.response.status)
-                    console.log('Error Data:', error.response.data)
-                } else if (error.request) {
-                    console.log('Error Request:', error.request)
+            .catch(err => {
+                if (err.response) {
+                    console.log('Error Status:', err.response.status)
+                    console.log('Error Data:', err.response.data)
+                } else if (err.request) {
+                    console.log('Error Request:', err.request)
                 } else {
-                    console.log('Error Message:', error.message)
+                    console.log('Error Message:', err.message)
                 }
             })
     }
 
     function signIn() {
-        axios.post(`http://localhost:8080/sign-in`, { username: p.username, password }, { withCredentials: true })
+        axios.post(`http://localhost:8080/sign-in`, { username: p.user.username, password }, { withCredentials: true })
             .then(response => {
                 console.log('Status Code:' , response.status)
                 console.log('Data:', response.data)
@@ -76,7 +76,7 @@ function Auth(p) {
                 createAccount={ createAccount } signIn={ signIn } action={ action } setAction={ setAction }
                 showModal={ p.showModal } setShowModal={ p.setShowModal } setModalMessage={ p.setModalMessage }
                 isCredsCorrect={ isCredsCorrect } setIsCredsCorrect={ setIsCredsCorrect } 
-                username={ p.username } setUsername={ p.setUsername } password={ password } setPassword={ setPassword }
+                user={ p.user } setUser={ p.setUser } password={ password } setPassword={ setPassword }
                 passwordAgain={ passwordAgain } setPasswordAgain={ setPasswordAgain } 
             />
         </div>

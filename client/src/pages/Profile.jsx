@@ -7,11 +7,11 @@ import Logo from '../assets/luto-logo-gradient.png'
 function Profile(p) {
     useLayoutEffect(() => {
         p.setCurrentTab("Profile")
-    })
+    }, [])
 
     return (
        <div>
-            <NavBar username={ p.username } currentTab={ p.currentTab } setCurrentTab={ p.setCurrentTab } />
+            <NavBar user={ p.user } currentTab={ p.currentTab } setCurrentTab={ p.setCurrentTab } />
             <div className="flex flex-col p-3 pr-0 h-svh bg-zinc-950">
                 {/* content */}
                 <div className="grid w-full gap-3 h-full" style={ { gridTemplateColumns: 'repeat(15, minmax(0, 1fr))' } }>

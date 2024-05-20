@@ -6,11 +6,6 @@ import { v4 as uuidv4 } from 'uuid'
 const Schema = mongoose.Schema
 
 const userSchema = new Schema({ 
-    userId: {
-        type: String,
-        default: uuidv4,
-        unique: true
-    },
     username: {
         type: String,
         unique: true,

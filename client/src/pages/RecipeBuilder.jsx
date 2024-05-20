@@ -1,16 +1,41 @@
-import React, { useLayoutEffect } from 'react'
+import React, { useState, useLayoutEffect } from 'react'
 import { Link } from 'react-router-dom'
 import NavBar from '../components/NavBar'
-import AddElement from '../assets/add-element-icon.png'
+import AddElement from '../assets/add-icon.png'
 
 function RecipeBuilder(p) {
+    const [summary, setSummary] = useState("")
+    const [ingredients, setIngredients] = useState([])
+    const [recipeElements, setRecipeElements] = useState({
+        userId: p.user.userId,
+        categories: [],
+        tags: [],
+        recipeImage: "",
+        title: "",
+        summary,
+        ingredients: [],
+        recipeELements: [{
+            contentType: "",
+            contents: [],
+        }],
+    })
+
+    function addIngredient() {
+        
+    }
+
     useLayoutEffect(() => {
         p.setCurrentTab("Builder")
-    })
+    }, [])
     
     return (
         <div>
-            <NavBar username={ p.username } currentTab={ p.currentTab } setCurrentTab={ p.setCurrentTab } />
+            <NavBar 
+                ingredients={ ingredients } setIngredients={ setIngredients }
+                summary={ summary } setSummary={ setSummary }
+                recipeElements={ recipeElements } setRecipeElements={ setRecipeElements } 
+                user={ p.user } currentTab={ p.currentTab } setCurrentTab={ p.setCurrentTab } 
+            />
             <div className="pr-3 flex flex-col gap-3 p-3 h-svh bg-zinc-950">
                 <div className="grid w-full gap-3 h-16" style={ { gridTemplateColumns: 'repeat(15, minmax(0, 1fr))' } }>
                     <div className="col-span-4"></div>
@@ -23,6 +48,7 @@ function RecipeBuilder(p) {
                             <div className="flex justify-end">
                                 <img className="w-8" src={ AddElement } alt=""/>
                             </div>
+                            <div>Text</div>
                         </button>
                     </div>     
                 </div>

@@ -11,14 +11,14 @@ function Feedback(p) {
             <div className="flex flex-col gap-1 w-full">
                 <div className="flex flex-row font-semibold">
                     <div className="flex flex-row w-full">
-                        <p>{ p.username }&nbsp;•&nbsp;</p>
+                        <p>{ p.user.username }&nbsp;•&nbsp;</p>
                         <p className="text-zinc-400">said 18 hours ago</p>
                     </div>
                     <button className="flex px-3 items-center justify-center rounded-3xl hover:bg-zinc-500">
                         <img className="w-5" src={ MoreIcon } alt="" />
                     </button>
                 </div>
-                <p>This recipe is really great! I have tried it last week, had a rought time with how much seasong I should put but it was all worth it! My friends loved it!</p>
+                <p>This recipe is really great! I tried it last week, had a rought time with how much seasoning I should put but it was all worth it! My friends loved it!</p>
             </div>
         </div>
        
