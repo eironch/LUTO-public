@@ -4,7 +4,7 @@ import NavBar from '../components/NavBar'
 function Search(p) {
     useLayoutEffect(() => {
         p.setCurrentTab("Search")
-    })
+    }, [])
 
     return (
         <div>

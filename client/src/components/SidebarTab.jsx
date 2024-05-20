@@ -8,7 +8,7 @@ import SettingsIcon from '../assets/settings-icon.png'
 
 function SidebarTab(p) {
     return (
-        <div className={`${ (p.currentTab==="Home" || p.currentTab==="Profile")  && "pr-0" } p-3 pt-0 grid w-full gap-3 h-full overflow-hidden`} style={ { gridTemplateColumns: 'repeat(15, minmax(0, 1fr))' } }>
+        <div className="p-3 pt-0 grid w-full gap-3 h-full overflow-hidden" style={ { gridTemplateColumns: 'repeat(15, minmax(0, 1fr))' } }>
             <div className="col-span-2 rounded-3xl bg-zinc-900 pointer-events-auto">
                 <div className="flex items-center flex-col gap-3 m-3">
                     <Link to="/" className={`${ p.currentTab==="Home" && "bg-zinc-700 shadow-sm shadow-zinc-950" } flex flex-row items-center gap-4 p-4 overflow-hidden w-full rounded-3xl hover:bg-zinc-500 hover:shadow-sm hover:shadow-zinc-950`}>
