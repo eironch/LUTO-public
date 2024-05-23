@@ -172,7 +172,7 @@ app.post('/publish-recipe', (req, res) => {
         title: 'A new delicious recipe made in ten minutes',
         summary: 'This new and easy to do recipe is good for home cooking',
         ingredients,
-        recipeElements: [
+        recipeContents: [
             {
                 contentType: 'Headline',
                 contents: [

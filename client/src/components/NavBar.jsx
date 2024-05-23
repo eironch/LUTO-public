@@ -89,7 +89,7 @@ function NavBar(p) {
                         <SidebarBuilder
                         ingredients={ p.ingredients || null} setIngredients={ p.setIngredients || null}
                         summary={ p.summary || null} setSummary={ p.setSummary || null}
-                        recipeElements={ p.recipeElements || null} setRecipeElements={ p.setRecipeElements || null} 
+                        recipeContents={ p.recipeContents || null} setRecipeContents={ p.setRecipeContents || null} 
                         user={ p.user } currentTab={ p.currentTab } setCurrentTab={ p.setCurrentTab } 
                     />
                     )
@@ -98,5 +98,6 @@ function NavBar(p) {
         </div>
     )
 }
+
 
 export default NavBar

@@ -21,7 +21,6 @@ function Feedback(p) {
                 <p>This recipe is really great! I tried it last week, had a rought time with how much seasoning I should put but it was all worth it! My friends loved it!</p>
             </div>
         </div>
-       
     )
 }
 

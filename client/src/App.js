@@ -41,7 +41,7 @@ function App() {
       .then(response => {
           console.log('Status Code:' , response.status)
           console.log('Data:', response.data)
-          console.log(response.data.payload.userId + " asdsadasdasdsa")
+
           setIsLoading(false)
           setUser({ username: response.data.payload.username, userId: response.data.payload.userId })
           setIsAuthenticated(response.data.isAuthenticated)

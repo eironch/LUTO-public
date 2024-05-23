@@ -1,8 +1,13 @@
-import React, { useRef, useLayoutEffect } from 'react'
-import { ScrollRestoration } from 'react-router-dom'
+import React, { useState, useRef, useLayoutEffect } from 'react'
 
 function Textarea(p) {
     const textareaRef = useRef(null)
+    const [isFocused, setIsFocused] = useState(false)
+    const value = p.value
+    const setValue = p.setValue
+    const placeholder = p.placeholder
+    const maxLength = p.maxLength
+    const attribute = p.attribute
 
     function autoResize() {
         const textarea = textareaRef.current
@@ -27,9 +32,13 @@ function Textarea(p) {
     }, [ p.value ])
 
     return (
-        <textarea className={`${ !p.value ?  "text-center" : "text-justify" } focus:text-justify  w-full text-lg p-3 box-border rounded-3xl bg-zinc-700 overflow-hidden resize-none`}
-            ref={ textareaRef } value={ p.value } maxLength={ p.maxLength }
-            onChange={ e => { p.setValue(e.target.value) } } placeholder={ p.placeholder } 
+        <textarea className={`${ attribute } w-full p-3 box-border rounded-3xl overflow-hidden resize-none`}
+            ref={ textareaRef } value={ value } maxLength={ maxLength }
+            onChange={ e => { setValue(e.target.value) } } placeholder={ placeholder } 
+            spellCheck={ isFocused }
+            onFocus={ () => { setIsFocused(true) } }
+            onBlur={ () => { setIsFocused(false) } }
+            rows={ 1 }
         />
     )
 }
