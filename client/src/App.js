@@ -76,8 +76,8 @@ function App() {
               <Route path={`/${ user.username }`} element={ <Profile user={ user } currentTab={ currentTab } setCurrentTab={ setCurrentTab } /> } />
               <Route path="/settings" element={ <Settings user={ user } currentTab={ currentTab } setCurrentTab={ setCurrentTab } /> } />
               <Route path="/search" element={ <Search user={ user } currentTab={ currentTab } setCurrentTab={ setCurrentTab } /> } />
-              <Route path="/recipe" element={ <Recipe user={ user } currentTab={ currentTab } setCurrentTab={ setCurrentTab } /> } />
               <Route path="/recipe-builder" element={ <RecipeBuilder user={ user } currentTab={ currentTab } setCurrentTab={ setCurrentTab } /> } />
+              <Route path="/recipe/:recipeId" element={ <Recipe user={ user } currentTab={ currentTab } setCurrentTab={ setCurrentTab } /> } />
             </Routes>
           </BrowserRouter>
         </>

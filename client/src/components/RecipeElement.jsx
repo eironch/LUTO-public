@@ -9,6 +9,7 @@ function CustomTextarea(p) {
     const maxLength = p.maxLength
     const attribute = p.attribute
     const recipeElements = p.recipeElements
+    const setRecipeElements = p.setRecipeElements
 
     function autoResize() {
         const textarea = textareaRef.current
@@ -33,11 +34,14 @@ function CustomTextarea(p) {
     }, [ p.value ])
 
     function updateValue(value) {
-        recipeElements.forEach(element => {
+        const newRecipeElements = [...recipeElements]
+        newRecipeElements.forEach(element => {
             if (element.key === keyIndex) {
                 element.value.contents[0] = value
             }
         })
+
+        setRecipeElements(newRecipeElements)
     }
 
     return (
@@ -52,25 +56,75 @@ function CustomTextarea(p) {
     )
 }
 
-function RecipeElement(p) {
+function Subheading(p) {
     const [isHovered, setIsHovered] = useState(false)
     const keyIndex = p.keyIndex
     const value = p.value
-    const setValue = p.setValue
+    const removeElement = p.removeElement
+    const recipeElements = p.recipeElements
+    const setRecipeElements = p.setRecipeElements
+    
+    return (
+        <div className="py-6 px-3 flex flex-col gap-3 mb-3 rounded-3xl bg-zinc-900" onMouseEnter={() => { setIsHovered(true) }} onMouseLeave={() => { setIsHovered(false) }}>
+            <CustomTextarea attribute={`${ !value && "bg-zinc-700" } px-3 text-3xl font-semibold w-full text-justify focus:bg-zinc-700 bg-transparent`} 
+                maxLength={ 50 } keyIndex={ keyIndex } value={ value }
+                recipeElements={ recipeElements } setRecipeElements={ setRecipeElements } 
+                placeholder="What do you want to tell?" 
+            />
+            {
+                isHovered && <button className="text-2xl font-semibold" onClick={ () => { removeElement() } }>Remove</button>
+            }
+        </div>
+    )
+}
+
+function Text(p) {
+    const [isHovered, setIsHovered] = useState(false)
+    const keyIndex = p.keyIndex
+    const value = p.value
+    const removeElement = p.removeElement
     const recipeElements = p.recipeElements
     const setRecipeElements = p.setRecipeElements
 
     return (
-        <div className="py-6 px-3 flex flex-col gap-3 mb-3 text-2xl font-semibold rounded-3xl bg-zinc-900" onMouseEnter={() => { setIsHovered(true) }} onMouseLeave={() => { setIsHovered(false) }}>
-            <CustomTextarea attribute={`${ !value[0] && "bg-zinc-700" } px-3 text-3xl font-semibold w-full text-justify focus:bg-zinc-700 bg-transparent`} 
-                maxLength={ 50 } keyIndex={ keyIndex } value={ value[0] }
-                recipeElements={ recipeElements } placeholder="What do you want to tell?" 
+        <div className="py-6 px-3 flex flex-col gap-3 mb-3 rounded-3xl bg-zinc-900" onMouseEnter={() => { setIsHovered(true) }} onMouseLeave={() => { setIsHovered(false) }}>
+            <CustomTextarea attribute={`${ !value && "bg-zinc-700" } px-3 text-xl w-full text-justify focus:bg-zinc-700 bg-transparent`} 
+                maxLength={ 2000 } keyIndex={ keyIndex } value={ value }
+                recipeElements={ recipeElements } setRecipeElements={ setRecipeElements } 
+                placeholder="What do you want to tell?" 
             />
             {
-                isHovered && <button className="">Remove</button>
+                isHovered && <button className="text-2xl font-semibold" onClick={ () => { removeElement() } }>Remove</button>
             }
         </div>
     )
+}
+
+function RecipeElement(p) {
+    const keyIndex = p.keyIndex
+    const contentType = p.contentType
+    const contents = p.contents
+    const recipeElements = p.recipeElements
+    const setRecipeElements = p.setRecipeElements
+
+    function removeElement() {
+        const newRecipeElements =  recipeElements.filter(element => element.key !== keyIndex)
+        setRecipeElements(newRecipeElements)
+    }
+    
+    if (contentType === 'Subheading') {
+        return <Subheading 
+            keyIndex={ keyIndex } value={ contents[0] } removeElement={ removeElement }
+            recipeElements={ recipeElements } setRecipeElements={ setRecipeElements }
+        />
+    } else if (contentType === 'Text') {
+        return <Text 
+            keyIndex={ keyIndex } value={ contents[0] } removeElement={ removeElement }
+            recipeElements={ recipeElements } setRecipeElements={ setRecipeElements }
+        />
+    }
+    
+    return null
 }
 
 export default RecipeElement
