@@ -70,7 +70,7 @@ function Auth(p) {
         <div className="grid grid-cols-2 p-3 h-svh bg-gradient-to-b from-orange-500 to-orange-400 gap-3 overflow-hidden">
             <div className="flex flex-col items-center justify-center">
                 <img className="" src={ Logo } alt=""/>
-                <p className="mt-3 text-zinc-200 text-4xl">Community with a Recipe.</p>
+                <p className="mt-3 text-zinc-100 text-4xl overflow-hidden text-ellipsis line-clamp-1">Community with a Recipe.</p>
             </div>
             <AuthForm 
                 createAccount={ createAccount } signIn={ signIn } action={ action } setAction={ setAction }
