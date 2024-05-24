@@ -7,6 +7,7 @@ import Settings from './pages/Settings'
 import Modal from './components/Modal'
 import NavBar from './components/NavBar'
 
+
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState()
   const [isLoading, setIsLoading] = useState(true) 
