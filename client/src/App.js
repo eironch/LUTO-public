@@ -41,7 +41,7 @@ function App() {
       .then(response => {
           console.log('Status Code:' , response.status)
           console.log('Data:', response.data)
-          console.log(response.data.payload.userId + " asdsadasdasdsa")
+
           setIsLoading(false)
           setUser({ username: response.data.payload.username, userId: response.data.payload.userId })
           setIsAuthenticated(response.data.isAuthenticated)
@@ -76,8 +76,8 @@ function App() {
               <Route path={`/${ user.username }`} element={ <Profile user={ user } currentTab={ currentTab } setCurrentTab={ setCurrentTab } /> } />
               <Route path="/settings" element={ <Settings user={ user } currentTab={ currentTab } setCurrentTab={ setCurrentTab } /> } />
               <Route path="/search" element={ <Search user={ user } currentTab={ currentTab } setCurrentTab={ setCurrentTab } /> } />
-              <Route path="/recipe" element={ <Recipe user={ user } currentTab={ currentTab } setCurrentTab={ setCurrentTab } /> } />
               <Route path="/recipe-builder" element={ <RecipeBuilder user={ user } currentTab={ currentTab } setCurrentTab={ setCurrentTab } /> } />
+              <Route path="/recipe/:recipeId" element={ <Recipe user={ user } currentTab={ currentTab } setCurrentTab={ setCurrentTab } /> } />
             </Routes>
           </BrowserRouter>
         </>

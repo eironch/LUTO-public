@@ -165,21 +165,14 @@ app.post('/publish-recipe', (req, res) => {
     } = req.body
 
     const recipe = new Recipe({
-        userId: new mongoose.Types.ObjectId('6649c35c8a14388c3a09bc4a'),
+        userId,
         categories,
         tags,
-        recipeImage: 'none', 
-        title: 'A new delicious recipe made in ten minutes',
-        summary: 'This new and easy to do recipe is good for home cooking',
+        recipeImage, 
+        title,
+        summary,
         ingredients,
-        recipeElements: [
-            {
-                contentType: 'Headline',
-                contents: [
-                    'Step 1'
-                ]
-            }
-        ]
+        recipeElements,
     })
 
     recipe.save()
@@ -250,7 +243,7 @@ app.get('/feed-recipes', (req, res) => {
                     .then(isApproved => isApproved.length > 0)
                     .catch(err => {
                         throw err
-                    });
+                    })
             
                 return { ...recipe.toObject(), isApproved }
             })
@@ -261,6 +254,33 @@ app.get('/feed-recipes', (req, res) => {
                 })
         })
         .catch(err => {
-            return res.status(500).json({ message: 'Internal server error.', err });
-        });
-});
+            return res.status(500).json({ message: 'Internal server error.', err })
+        })
+})
+
+app.get('/recipe', (req, res) => {
+    const { recipeId, userId } = req.query
+
+    Recipe.findById( recipeId )
+        .then(async recipe => {
+            if (!recipe) {
+                return res.status(400).json({ message: 'No such recipe found.' })
+            }
+
+            async function approvalPromises() {
+                const isApproved = await Approve.find({ userId, recipeId: recipe.recipeId })
+                    .then(isApproved => isApproved.length > 0)
+                    .catch(err => {
+                        throw err
+                    })
+                
+                    return { recipeContents: { ...recipe.toObject()}, appprovalStatus: {isApproved} }
+            }
+            
+            return Promise.all([approvalPromises()])
+                .then(recipe => {
+                    return res.status(200).json({ success: true, payload: recipe })
+                })
+        })
+ 
+})

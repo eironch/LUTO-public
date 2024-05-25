@@ -9,7 +9,7 @@ function SidebarProfile(p) {
             {/* user  */}
             <div className="p-6 gap-6 flex flex-row items-center text-2xl rounded-3xl bg-zinc-900">
                 <img className="w-48" src={ ProfilePicture } alt="" />
-                <p className="w-full overflow-hidden">{ p.user.username }</p>
+                <p className="w-full font-semibold overflow-hidden">{ p.user.username }</p>
                 <button className="px-8 py-1 rounded-3xl text-lg font-semibold gap-4 bg-gradient-to-bl from-orange-600 to-orange-400 hover:bg-gradient-to-br">Follow</button>
             </div>
             {/* bio */}
