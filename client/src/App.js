@@ -9,7 +9,7 @@ import Search from './pages/Search'
 import Recipe from './pages/Recipe'
 import RecipeBuilder from './pages/RecipeBuilder'
 import Modal from './components/Modal'
-
+import Popular from './pages/Popular'
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState()
@@ -79,6 +79,7 @@ function App() {
               <Route path="/search" element={ <Search user={ user } currentTab={ currentTab } setCurrentTab={ setCurrentTab } /> } />
               <Route path="/recipe" element={ <Recipe user={ user } currentTab={ currentTab } setCurrentTab={ setCurrentTab } /> } />
               <Route path="/recipe-builder" element={ <RecipeBuilder user={ user } currentTab={ currentTab } setCurrentTab={ setCurrentTab } /> } />
+              <Route path="/popular" element={ <Popular user={ user } currentTab={ currentTab } setCurrentTab={ setCurrentTab } /> } />
             </Routes>
           </BrowserRouter>
         </>
