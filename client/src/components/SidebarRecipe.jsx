@@ -21,7 +21,9 @@ function SidebarRecipe(p) {
             <div className="flex overflow-x-hidden overflow-y-scroll h-full scrollable-div flex-col text-zinc-100 col-span-4 pointer-events-auto">
                 {/* Recipe Image */}
                 <div className="p-2 mb-3 rounded-3xl bg-gradient-to-tr from-orange-500 to-orange-400">
-                    <img className="w-full h-auto rounded-3xl object-cover" src={ Image } alt="" />
+                    <div className="relative w-full h-auto aspect-w-2 aspect-h-2 bg-white rounded-3xl">
+                        <img className="absolute inset-0 w-full h-full rounded-3xl object-cover" src={ Image } alt="" />
+                    </div>
                     <div className="grid grid-cols-2 pt-2">
                         <div className="flex">
                             <div className="flex gap-3 px-4 py-2 items-center justify-start rounded-3xl hover:bg-orange-400">

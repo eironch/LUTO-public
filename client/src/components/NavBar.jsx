@@ -15,29 +15,14 @@ function NavBar(p) {
     const currentTab = p.currentTab
     const setCurrentTab = p.setCurrentTab
     const user = p.user
+    
+    const recipeImage = p.recipeImage
+    const setRecipeImage = p.setRecipeImage 
     const summary = p.summary
     const setSummary = p.setSummary
     const ingredients = p.ingredients
     const setIngredients = p.setIngredients
-    const recipeContents = p.recipeContents
-
-    function publishRecipe() {
-        axios.post(`http://localhost:8080/publish-recipe`, recipeContents)
-            .then(response => {
-                console.log('Status Code:' , response.status)
-                console.log('Data:', response.data)
-            })
-            .catch(err => {
-                if (err.response) {
-                    console.log('Error Status:', err.response.status)
-                    console.log('Error Data:', err.response.data)
-                } else if (err.request) {
-                    console.log('Error Request:', err.request)
-                } else {
-                    console.log('Error Message:', err.message)
-                }
-            })
-    }
+    const publishRecipe = p.publishRecipe
     
     return (
         <div>
@@ -115,8 +100,9 @@ function NavBar(p) {
                     currentTab === "Builder" &&
                     (
                         <SidebarBuilder
-                        ingredients={ ingredients || null} setIngredients={ setIngredients || null}
+                        setRecipeImage={ setRecipeImage || null }
                         summary={ summary || null} setSummary={ setSummary || null}
+                        ingredients={ ingredients || null} setIngredients={ setIngredients || null}
                         user={ user } currentTab={ currentTab } setCurrentTab={ setCurrentTab } 
                     />
                     )
@@ -125,8 +111,8 @@ function NavBar(p) {
                     currentTab === "Recipe" &&
                     (
                         <SidebarRecipe
-                        ingredients={ ingredients || null} setIngredients={ setIngredients || null}
                         summary={ summary || null} setSummary={ setSummary || null}
+                        ingredients={ ingredients || null} setIngredients={ setIngredients || null}
                         user={ user } currentTab={ currentTab } setCurrentTab={ setCurrentTab } 
                     />
                     )
