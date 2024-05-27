@@ -188,7 +188,7 @@ app.post('/publish-recipe', upload.any(), (req, res) => {
     })
     console.log('new recipe')
     console.log(recipe)
-    uploadFile(recipe, recipeElements, recipeFiles)
+    uploadFile(recipeFiles)
         .then(fileLinks => {
             recipe.recipeImage = fileLinks.recipeImage
             
@@ -225,82 +225,76 @@ app.post('/publish-recipe', upload.any(), (req, res) => {
                 })
         })
         .catch(err => {
-            return res.status(500).json({ message:'Upload error.', err})
+            return res.status(500).json({ message:'File upload error.', err})
         })
 })
 
 async function uploadFile(files){
-    const recipeImage = files.recipeImage
-    const elementFiles = files.elementFiles
+    const recipeImage = files.find(file => file.fieldname === 'recipeImage')
+    const elementFiles = files.filter(file => file.fieldname !== 'recipeImage')
     const fileLinks = { recipeImage: '', elementFiles: [] }
     console.log('1')
-    return uploadFileToStorage(recipeImage)
-            .then(publicUrl => {
+    return await uploadFileToStorage(recipeImage)
+            .then(async publicUrl => {
                 fileLinks.recipeImage = publicUrl
 
-                if (!elementFiles.some(element => 
-                    element.contentType === 'Images' || 
-                    element.contentType === 'Image and Text' || 
-                    element.contentType === 'Video')) {
-                    // log
-                    console.log('Returned')
-                    return
-                }
+                // if (!elementFiles.some(element => 
+                //     element.contentType === 'Images' || 
+                //     element.contentType === 'Image and Text' || 
+                //     element.contentType === 'Video')) {
+                //     // log
+                //     console.log('Returned')
+                //     return
+                // }
 
-                elementFiles.forEach(file => {
-                    if (file.contentType === 'Images' || 
-                        file.contentType === 'Image and Text' || 
-                        file.contentType === 'Video') {
-                        return uploadFileToStorage(file.contents[0])
+                const uploadPromises = elementFiles.map(async file => {
+                    return uploadFileToStorage(file.contents[0])
                             .then(publicUrl => {
                                 fileLinks.elementFiles.push(publicUrl)
                             })
                             .catch(err => {
                                 throw err
                             })
-                    }
-                    
-                    fileLinks.elementFiles.push('')
                 })
+
+                await Promise.all(uploadPromises)
+
+                return fileLinks
             })
             .catch(err => {
-                return res.status(500).json({ message:'Internal server error.', err})
+                return res.status(500).json({ message:'Storage upload error.', err})
             })
 }
 
 function uploadFileToStorage(file) {
     console.log('2')
-    try {
-        return new Promise((resolve, reject)=> {
-            // creates space in the cloud
-            console.log('3')
-            
-                const blob = bucket.file(`media/${ uuidv4() }_${ uuidv4() }`)
-            const blobStream = blob.createWriteStream({
-                metadata: {
-                    contentType: file.mimetype
-                }
-            })
-            console.log(file)
-            
-            console.log('4')
-            blobStream.on('error', err => {
-                reject(err)
-            })
-
-            console.log('5')
-            blobStream.on('finish', () => {
-                const publicUrl = `https://storage.googleapis.com/${ bucket.name }/${ blob.name }`
-                console.log(publicUrl)
-                resolve(publicUrl)
-            })
-            console.log('6')
-            // uploads file to the space in the cloud
-            blobStream.end(file.buffer)
+    return new Promise((resolve, reject) => {
+        console.log('3')
+        const blob = bucket.file(`media/${uuidv4()}_${uuidv4()}`)
+        const blobStream = blob.createWriteStream({
+            metadata: {
+                contentType: file.mimetype
+            }
         })
-    } catch (err) {
-        console.log(err)
-    }
+        
+        console.log(file)
+        console.log('4')
+        
+        blobStream.on('error', err => {
+            reject(err)
+        })
+
+        console.log('5')
+        blobStream.on('finish', () => {
+            const publicUrl = `https://storage.googleapis.com/${bucket.name}/${blob.name}`
+            console.log(publicUrl)
+            resolve(publicUrl)
+        })
+
+        console.log('6')
+        // uploads file to the space in the cloud
+        blobStream.end(file.buffer)
+    })
 }
 
 app.post('/approve-recipe', (req, res) => {

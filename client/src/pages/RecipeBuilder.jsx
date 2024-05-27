@@ -130,18 +130,16 @@ function RecipeBuilder(p) {
                 const preFiles = elementFiles.find(
                     elementContent => elementContent.key === element.key
                 ).value
-                
-                const files = []
+
                 console.log("element files")
                 console.log(preFiles)
                 if (preFiles) {
                     preFiles.forEach((file, arrayIndex) => {
                         formData.append(`files-${ objectIndex }-${ arrayIndex }`, file)
-                        files.push(arrayIndex)
                     })
                 }
                 
-                return { contentType, text, files }
+                return { contentType, text, files: preFiles.length }
             }
         )))
         
