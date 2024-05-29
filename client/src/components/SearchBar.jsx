@@ -4,7 +4,7 @@ import SearchIcon from '../assets/search-icon.png'
 
 function SearchBar(p) {
     return (
-        <div className="fixed grid gap-3 p-3 w-full overflow-hidden pointer-events-none" style={ { gridTemplateColumns: 'repeat(15, minmax(0, 1fr))' } }>
+        <div className="absolute grid gap-3 p-3 w-full overflow-hidden pointer-events-none" style={ { gridTemplateColumns: 'repeat(15, minmax(0, 1fr))' } }>
             <div className="col-span-2"></div>
             <div className={`${ p.currentTab==="Search" && "bg-zinc-900" } flex flex-col col-span-11 rounded-3xl items-center justify-center`}>
                 { 

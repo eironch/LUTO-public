@@ -1,7 +1,5 @@
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
-import axios from 'axios'
-import SearchBar from '../components/SearchBar'
 import SidebarTab from '../components/SidebarTab'
 import SidebarProfile from '../components/SidebarProfile'
 import SidebarBuilder from '../components/SidebarBuilder'
@@ -15,8 +13,7 @@ function NavBar(p) {
     const currentTab = p.currentTab
     const setCurrentTab = p.setCurrentTab
     const user = p.user
-    
-    const recipeImage = p.recipeImage
+
     const setRecipeImage = p.setRecipeImage 
     const summary = p.summary
     const setSummary = p.setSummary
@@ -27,8 +24,6 @@ function NavBar(p) {
     return (
         <div>
             <div className="fixed flex gap-3 flex-col w-full h-svh pointer-events-none">
-                {/* on top of the navbar */}
-                { (currentTab === "Home" || currentTab === "Search" || currentTab === "Settings" ) && <SearchBar currentTab={ currentTab } setCurrentTab={ p.setCurrentTab }/> }
                 {/* navbar */}
                 <div className="p-3 pb-0">
                     <div className="grid gap-3 w-full min-h-16 pointer-events-none" style={ { gridTemplateColumns: 'repeat(15, minmax(0, 1fr))' } }>
@@ -116,7 +111,7 @@ function NavBar(p) {
                         user={ user } currentTab={ currentTab } setCurrentTab={ setCurrentTab } 
                     />
                     )
-                }
+                }                 
             </div>
         </div>
     )
