@@ -15,42 +15,31 @@ function Recipe(p) {
     const [summary, setSummary] = useState()
     const [ingredients, setIngredients] = useState()
     const [recipeElements, setRecipeElements] = useState()
-
-    // const [recipeContents, setRecipeContents] = useState({
-    //     userId: p.user.userId,
-    //     categories: [],
-    //     tags: [],
-    //     recipeImage: '',
-    //     title: title,
-    //     summary: summary,
-    //     ingredients: ingredients.map(ingredient => ingredient.value),
-    //     recipeElements: recipeElements.map(element => element.value),
-    // })
     
     useLayoutEffect(() => {
         axios.get('http://localhost:8080/recipe', { params: { recipeId, userId: user.userId } })
-        .then(response => {
-            console.log('Status Code:' , response.status)
-            console.log('Data:', response.data)
-            console.log(response.data.payload[0].recipeContents.recipeElements)
-            setRecipeContents(response.data.payload[0].recipeContents)
-            setTitle(response.data.payload[0].recipeContents.title)
-            setSummary(response.data.payload[0].recipeContents.summary)
-            console.log(response.data.payload[0].recipeContents.ingredients)
-            setIngredients(response.data.payload[0].recipeContents.ingredients)
-            setRecipeElements(response.data.payload[0].recipeContents.recipeElements)
-            
-        })
-        .catch(err => {
-            if (err.response) {
-                console.log('Error Status:', err.response.status)
-                console.log('Error Data:', err.response.data)
-            } else if (err.request) {
-                console.log('Error Request:', err.request)
-            } else {
-                console.log('Error Message:', err.message)
-            }
-        })
+            .then(response => {
+                console.log('Status Code:' , response.status)
+                console.log('Data:', response.data)
+                console.log(response.data.payload.recipeContents.recipeElements)
+                setRecipeContents(response.data.payload.recipeContents)
+                setTitle(response.data.payload.recipeContents.title)
+                setSummary(response.data.payload.recipeContents.summary)
+                setIngredients(response.data.payload.recipeContents.ingredients)
+                setRecipeElements(response.data.payload.recipeContents.recipeElements)
+                
+            })
+            .catch(err => {
+                console.log("err")
+                if (err.response) {
+                    console.log('Error Status:', err.response.status)
+                    console.log('Error Data:', err.response.data)
+                } else if (err.request) {
+                    console.log('Error Request:', err.request)
+                } else {
+                    console.log('Error Message:', err.message)
+                }
+            })
     }, [recipeId])
 
     useLayoutEffect(() => {
@@ -77,6 +66,7 @@ function Recipe(p) {
                         {
                             recipeElements &&
                             recipeElements.map(element => {
+                                console.log(recipeElements)
                                 if (element.contentType === "Subheading") {
                                     return (
                                         <div className="py-6 px-3 flex flex-col gap-3 mb-3 rounded-3xl bg-zinc-900">
@@ -87,6 +77,22 @@ function Recipe(p) {
                                     return (
                                         <div className="py-6 px-3 flex flex-col gap-3 mb-3 rounded-3xl bg-zinc-900">
                                             <p className="px-3 text-xl w-full text-justify">{ element.contents[0] }</p>
+                                        </div>
+                                    )
+                                } else if (element.contentType === "Images") {
+                                    return (
+                                        <div className="pt-6 pb-3 px-6 flex flex-col justify-center items-center gap-3 mb-3 rounded-3xl overflow-hidden bg-zinc-900">
+                                            <div className="flex flex-row w-full h-full gap-3 justify-start items-center overflow-x-scroll scrollable-div">
+                                                {
+                                                    element.files.map((file, index) => (
+                                                        <div className="w-96 h-96 aspect-w-2 flex-none" key={ index }>
+                                                            <div className="bg-zinc-700 rounded-3xl">
+                                                                <img className="absolute inset-0 w-full h-full rounded-3xl object-cover" src={ file[index] } alt="" />
+                                                            </div>
+                                                        </div>
+                                                    ))
+                                                }
+                                            </div>
                                         </div>
                                     )
                                 }

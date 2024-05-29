@@ -2,7 +2,7 @@ import mongoose from 'mongoose'
 
 const Schema = mongoose.Schema
 
-const approveSchema = new Schema({
+const approvalSchema = new Schema({
     userId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
@@ -15,5 +15,5 @@ const approveSchema = new Schema({
     },
 }, { timestamps: { createdAt: true, updatedAt: false } })
 
-const Approve = mongoose.model('Approve', approveSchema)
-export default Approve
+const Approval = mongoose.model('Approval', approvalSchema)
+export default Approval

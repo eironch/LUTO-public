@@ -4,10 +4,14 @@ import bcrypt from 'bcrypt'
 import cookieParser from 'cookie-parser'
 import jwt from 'jsonwebtoken'
 import mongoose from 'mongoose'
+import multer from 'multer'
+import { db, bucket } from './firebaseAdmin.js'
+import { v4 as uuidv4 } from 'uuid' 
+
 import User from './models/user.js'
 import Recipe from './models/recipe.js'
 import RecipeOverview from './models/recipeOverview.js'
-import Approve from './models/approve.js'
+import Approval from './models/approval.js'
 
 const PORT = 8080
 
@@ -16,13 +20,15 @@ const secretKey = 'luto-app'
 
 // express app
 const app = express()
+const upload = multer({ storage: multer.memoryStorage() })
+
 app.use(express.json())
 app.use(cors({
     origin: 'http://localhost:3000',
     credentials: true
 }))
 
-// cookie for login
+// cookie for logging in
 app.use(cookieParser())
 
 function generateAccessToken(userId, username) {
@@ -152,60 +158,160 @@ app.get('/check-auth', (req, res) => {
 })
 
 
-app.post('/publish-recipe', (req, res) => {
+app.post('/publish-recipe', upload.any(), (req, res) => {
     const { 
         userId,
         categories,
         tags,
-        recipeImage,
         title,
         summary,
-        ingredients,
-        recipeElements
     } = req.body
 
-    const recipe = new Recipe({
+    const recipeFiles = req.files
+
+    // const file = req.files
+    console.log(req.body)
+    console.log(req.files)
+    // uploadFileToStorage(req.files[0])
+    const ingredients = JSON.parse(req.body.ingredients)
+    const recipeElements = JSON.parse(req.body.recipeElements)
+
+    const recipe = {
         userId,
         categories,
         tags,
-        recipeImage, 
+        recipeImage: '',
         title,
         summary,
         ingredients,
         recipeElements,
-    })
+    }
+    console.log('recipe')
+    console.log(recipe)
+    console.log(recipeFiles)
+    try {
+        uploadFile(recipeFiles)
+        .then(fileLinks => {
+            const elementLinks = fileLinks.elementFiles
 
-    recipe.save()
-        .then(savedRecipe => {
-            const recipeOverview = new RecipeOverview({
-                recipeId: savedRecipe._id,
-                userId: savedRecipe.userId,
-                categories: savedRecipe.categories,
-                tags: savedRecipe.tags,
-                recipeImage: savedRecipe.recipeImage, 
-                title: savedRecipe.title,
-                summary: savedRecipe.summary,
+            recipe.recipeImage = fileLinks.recipeImage
+
+            recipeElements.forEach((element) => {
+                for (let x = 0; x < element.filesLength; x++) {
+                    element.files.push(elementLinks[x])
+                }
+
+                elementLinks.splice(0, element.filesLength)
             })
 
-            return recipeOverview.save()
+            console.log('new recipe')
+            console.log(recipe)
+            return recipe
         })
-        .then(() => {
-            return res.status(201).json({ success: true, message:'Recipe published.'})
+        .then(recipeValues => {
+            const recipe = new Recipe(recipeValues)
+
+            recipe.save()
+                .then(savedRecipe => {
+                    const recipeOverview = new RecipeOverview({
+                        recipeId: savedRecipe._id,
+                        userId: savedRecipe.userId,
+                        categories: savedRecipe.categories,
+                        tags: savedRecipe.tags,
+                        recipeImage: savedRecipe.recipeImage, 
+                        title: savedRecipe.title,
+                        summary: savedRecipe.summary,
+                    })
+
+                    return recipeOverview.save()
+                })
+                .then(() => {
+                    return res.status(201).json({ success: true, message:'Recipe published.'})
+                })
         })
-        .catch(err => {
-            return res.status(500).json({ message:'Internal server error.', err})
-        })
+    } catch (err) {
+        return res.status(500).json({ message:'File upload error.', err})
+    }
 })
+
+async function uploadFile(files){
+    const recipeImage = files.find(file => file.fieldname === 'recipeImage')
+    const elementFiles = files.filter(file => file.fieldname !== 'recipeImage')
+    const fileLinks = { recipeImage: '', elementFiles: [] }
+    console.log('1')
+    return fileLinks
+    return await uploadFileToStorage(recipeImage)
+        .then(async recipeUrl => {
+            fileLinks.recipeImage = recipeUrl
+
+            console.log('here!')
+            const uploadPromises = elementFiles.map(async file => {
+                try {
+                    const fileUrl = await uploadFileToStorage(file)
+
+                    const options = {
+                        action: 'read',
+                        expires: Date.now() + 60 * 60 * 1000
+                    }
+                    
+                    const [signedUrl] = await bucket.file(fileUrl).getSignedUrl(options)
+                    console.log('url download:', url)
+                    fileLinks.elementFiles.push(signedUrl)
+                } catch (error) {
+                    console.error('Error uploading element file:', error)
+                }
+            })
+
+            await Promise.all(uploadPromises)
+            console.log('fileLinks')
+            console.log(fileLinks)
+            return fileLinks
+        })
+}
+
+function uploadFileToStorage(file) {
+    return new Promise((resolve, reject) => {
+        if (!file.size) {
+            return resolve('')
+        }
+        console.log('3')
+        const blob = bucket.file(`media/${uuidv4()}_${uuidv4()}`)
+        const blobStream = blob.createWriteStream({
+            metadata: {
+                contentType: file.mimetype
+            }
+        })
+        
+        console.log(file)
+        console.log('4')
+        
+        blobStream.on('error', err => {
+            reject(err)
+        })
+
+        console.log('5')
+        blobStream.on('finish', () => {
+            const publicUrl = `https://storage.googleapis.com/${bucket.name}/${blob.name}`
+            console.log('url')
+            console.log(publicUrl)
+            resolve(publicUrl)
+        })
+
+        console.log('6')
+        // uploads file to the space in the cloud
+        blobStream.end(file.buffer)
+    })
+}
 
 app.post('/approve-recipe', (req, res) => {
     const { userId, recipeId } = req.body
 
-    const approve = new Approve({
+    const approval = new Approval({
         userId,
         recipeId,
     })
 
-    Approve.find({ userId, recipeId })
+    Approval.find({ userId, recipeId })
         .then(async isApproved => {
             if (isApproved.length) {
                 return await Approve.deleteOne({ userId, recipeId })
@@ -214,7 +320,7 @@ app.post('/approve-recipe', (req, res) => {
                     })
             }
 
-            return await approve.save()
+            return await approval.save()
                 .then(() => {
                     return res.status(201).json({ success: true, message:'Recipe approved.'})
                 })
@@ -239,7 +345,7 @@ app.get('/feed-recipes', (req, res) => {
             }
 
             const approvalPromises = recipes.map(async recipe => {
-                const isApproved = await Approve.find({ userId, recipeId: recipe.recipeId })
+                const isApproved = await Approval.find({ userId, recipeId: recipe.recipeId })
                     .then(isApproved => isApproved.length > 0)
                     .catch(err => {
                         throw err
@@ -258,29 +364,27 @@ app.get('/feed-recipes', (req, res) => {
         })
 })
 
-app.get('/recipe', (req, res) => {
+app.get('/recipe', async (req, res) => {
     const { recipeId, userId } = req.query
+    console.log(req.query)
+    try {
+        const recipe = await Recipe.findById( recipeId ).lean()
+        
+        if (!recipe) {
+            return res.status(400).json({ message: 'No such recipe found.' })
+        }
 
-    Recipe.findById( recipeId )
-        .then(async recipe => {
-            if (!recipe) {
-                return res.status(400).json({ message: 'No such recipe found.' })
-            }
+        const isApproved = await Approval.find({ userId, recipeId: recipe.recipeId }).lean()
+        const approvalStatus = isApproved.length > 0
 
-            async function approvalPromises() {
-                const isApproved = await Approve.find({ userId, recipeId: recipe.recipeId })
-                    .then(isApproved => isApproved.length > 0)
-                    .catch(err => {
-                        throw err
-                    })
-                
-                    return { recipeContents: { ...recipe.toObject()}, appprovalStatus: {isApproved} }
-            }
-            
-            return Promise.all([approvalPromises()])
-                .then(recipe => {
-                    return res.status(200).json({ success: true, payload: recipe })
-                })
-        })
- 
+        const response = {
+            recipeContents: { ...recipe },
+            approvalStatus: { isApproved: approvalStatus },
+        }
+
+        return res.status(200).json({ success: true, payload: response })
+    } catch (err) {
+        console.log(err)
+        return res.status(500).json({ message: 'Internal server error.', err })
+    }
 })
