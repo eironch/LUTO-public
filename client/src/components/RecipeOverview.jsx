@@ -20,13 +20,13 @@ function RecipeOverview(p) {
     }
 
     return (
-        <div className="grid grid-cols-12 min-h-auto mb-3 rounded-3xl bg-zinc-900 overflow-hidden">
+        <div className="grid grid-cols-12 mb-3 rounded-3xl bg-zinc-900 overflow-hidden">
             {/* recipe image */}
             <Link to={`/recipe/${ recipeId }`}  className="flex col-span-4 rounded-3xl p-2 shadow-zinc-950 shadow-right bg-gradient-to-br from-orange-600 to-orange-400">
                 <div className="w-full aspect-w-1 aspect-h-1 overflow-hidden">
                     <img className="w-full h-full rounded-3xl object-cover" src={ Image } alt="" />
                 </div>
-            </Link>  
+            </Link>
             {/* recipe content */}
             <div className="col-span-8 flex flex-col">
                 <div className="flex flex-col w-full min-h-64 gap-3">

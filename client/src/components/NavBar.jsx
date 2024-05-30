@@ -14,6 +14,7 @@ function NavBar(p) {
     const setCurrentTab = p.setCurrentTab
     const user = p.user
 
+    const recipeImage = p.recipeImage
     const setRecipeImage = p.setRecipeImage 
     const summary = p.summary
     const setSummary = p.setSummary
@@ -95,21 +96,20 @@ function NavBar(p) {
                     currentTab === "Builder" &&
                     (
                         <SidebarBuilder
-                        setRecipeImage={ setRecipeImage || null }
-                        summary={ summary || null} setSummary={ setSummary || null}
-                        ingredients={ ingredients || null} setIngredients={ setIngredients || null}
-                        user={ user } currentTab={ currentTab } setCurrentTab={ setCurrentTab } 
-                    />
+                            setRecipeImage={ setRecipeImage || null }
+                            summary={ summary || null } setSummary={ setSummary || null }
+                            ingredients={ ingredients || null } setIngredients={ setIngredients || null }
+                            user={ user } currentTab={ currentTab } setCurrentTab={ setCurrentTab } 
+                        />
                     )
                 }
                 { 
                     currentTab === "Recipe" &&
                     (
                         <SidebarRecipe
-                        summary={ summary || null} setSummary={ setSummary || null}
-                        ingredients={ ingredients || null} setIngredients={ setIngredients || null}
-                        user={ user } currentTab={ currentTab } setCurrentTab={ setCurrentTab } 
-                    />
+                            summary={ summary || null } recipeImage={ recipeImage || null }
+                            ingredients={ ingredients || null } user={ user } currentTab={ currentTab }
+                        />
                     )
                 }                 
             </div>

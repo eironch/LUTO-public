@@ -90,7 +90,7 @@ function RecipeBuilder(p) {
 
     function addElement(contentType) {
         const keyIndex = uuidv4()
-
+        console.log(keyIndex + " new index")
         setShowModal(false)
         setElementTexts([...elementTexts, { key: keyIndex, value: '' }])
         setElementFiles([...elementFiles, { key: keyIndex, value: [''] }])
@@ -135,7 +135,9 @@ function RecipeBuilder(p) {
                 console.log(preFiles)
                 if (preFiles) {
                     preFiles.forEach((file, arrayIndex) => {
+                       if (file !== '') {
                         formData.append(`files-${ objectIndex }-${ arrayIndex }`, file)
+                       }
                     })
                 }
                 console.log(preFiles.length)
