@@ -7,7 +7,12 @@ const elementSchema = new Schema({
         type: String,
         require: true,
     },
-    contents: [String],
+    text: {
+        type: String,
+    },
+    files: {
+        type: [String],
+    },
 }, { _id: false })
 
 const recipeSchema = new Schema({
