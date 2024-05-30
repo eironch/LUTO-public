@@ -238,31 +238,37 @@ async function uploadFile(files){
     const recipeImage = files.find(file => file.fieldname === 'recipeImage')
     const elementFiles = files.filter(file => file.fieldname !== 'recipeImage')
     const fileLinks = { recipeImage: '', elementFiles: [] }
+    const options = {
+        action: 'read',
+    }
+
     console.log('1')
-    return fileLinks
+    
     return await uploadFileToStorage(recipeImage)
         .then(async recipeUrl => {
-            fileLinks.recipeImage = recipeUrl
-
+            if (!recipeUrl) {
+                return
+            }
+            console.log('here?')
+            const [signedUrl] = await bucket.file(recipeUrl).getSignedUrl(options)
+            console.log('where')
+            fileLinks.recipeImage = signedUrl
+        })
+        .then(async () => {
             console.log('here!')
             const uploadPromises = elementFiles.map(async file => {
                 try {
                     const fileUrl = await uploadFileToStorage(file)
 
-                    const options = {
-                        action: 'read',
-                        expires: Date.now() + 60 * 60 * 1000
-                    }
-                    
-                    const [signedUrl] = await bucket.file(fileUrl).getSignedUrl(options)
-                    console.log('url download:', url)
-                    fileLinks.elementFiles.push(signedUrl)
+                    // const [signedUrl] = await bucket.file(fileUrl).getSignedUrl(options)
+                    console.log('url download:', fileUrl)
+                    return fileUrl
                 } catch (error) {
                     console.error('Error uploading element file:', error)
                 }
             })
 
-            await Promise.all(uploadPromises)
+            fileLinks.elementFiles = await Promise.all(uploadPromises)
             console.log('fileLinks')
             console.log(fileLinks)
             return fileLinks
@@ -290,11 +296,16 @@ function uploadFileToStorage(file) {
         })
 
         console.log('5')
-        blobStream.on('finish', () => {
-            const publicUrl = `https://storage.googleapis.com/${bucket.name}/${blob.name}`
-            console.log('url')
-            console.log(publicUrl)
-            resolve(publicUrl)
+        blobStream.on('finish', async () => {
+            try {
+                await blob.makePublic()
+                const publicUrl = `https://storage.googleapis.com/${bucket.name}/${blob.name}`
+                console.log('url')
+                console.log(publicUrl)
+                resolve(publicUrl)
+            } catch (err) {
+                reject(err)
+            }
         })
 
         console.log('6')

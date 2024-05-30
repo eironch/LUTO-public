@@ -1,28 +1,27 @@
-import React, { useState, useLayoutEffect } from 'react'
-import { v4 as uuidv4 } from 'uuid'
+import React from 'react'
 import { Link } from 'react-router-dom'
-import Feedback from '../components/Feedback'
-import Textarea from '../components/Textarea'
 import ProfilePicture from '../assets/profile-picture.png'
-import Image from '../assets/placeholder-img.png'
 import ApproveIcon from '../assets/approve-icon.png'
 import DiscussionIcon from '../assets/discussion-icon.png'
-import AddIngredient from '../assets/add-icon.png'
 
 function SidebarRecipe(p) {
     const user = p.user
+    const recipeImage = p.recipeImage
     const summary = p.summary
-    const setSummary = p.setSummary
     const ingredients = p.ingredients
-    const setIngredients = p.setIngredients
 
+    console.log('recipeImage')
+    console.log(recipeImage)
     return (
         <div className="pl-3 grid w-full h-full overflow-hidden" style={ { gridTemplateColumns: 'repeat(15, minmax(0, 1fr))' } }>
             <div className="flex overflow-x-hidden overflow-y-scroll h-full scrollable-div flex-col text-zinc-100 col-span-4 pointer-events-auto">
                 {/* Recipe Image */}
                 <div className="p-2 mb-3 rounded-3xl bg-gradient-to-tr from-orange-500 to-orange-400">
-                    <div className="relative w-full h-auto aspect-w-2 aspect-h-2 bg-white rounded-3xl">
-                        <img className="absolute inset-0 w-full h-full rounded-3xl object-cover" src={ Image } alt="" />
+                    <div className="relative w-full h-auto aspect-w-2 aspect-h-2 rounded-3xl">
+                        {
+                            recipeImage &&
+                            <img className="absolute inset-0 w-full h-full rounded-3xl object-cover" src={ recipeImage } alt="" />
+                        }
                     </div>
                     <div className="grid grid-cols-2 pt-2">
                         <div className="flex">
