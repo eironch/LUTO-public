@@ -1,0 +1,124 @@
+.header {
+    display: flex;
+    justify-content: space-between;
+    margin: 20px;
+
+  }
+  
+  .logo {
+    background: #212121;
+    width: 200px;
+    height: 60px;
+    border-radius: 20px;
+    padding-left: 30px;
+    padding-top: 5px;
+  }
+  .logo img{
+    height: 50px;
+    padding: 10px;
+  }
+  
+  .search-bar {
+    background: #212121;
+    width: 950px;
+    height: 200px;
+    border-radius: 20px;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .search-bar .input {
+    display: flex;
+    align-items: center;
+    width: 650px;
+    background: #575757;
+    border-radius: 20px;
+    margin-top: 60px;
+  }
+  
+  .search-bar img {
+    height: 30px;
+    margin-right: 10px;
+    margin-left: 10px;
+  }
+  
+  .search-bar input {
+    outline: none;
+    text-decoration: none;
+    border: none;
+    color: white;
+    background: #575757;
+    border-radius: 20px;
+    padding: 10px;
+    height: 40px;
+    width: 600px;
+    
+  }
+  
+  .search-bar h1{
+    color: #575757;
+    position: absolute;
+    font-size: 30px;
+    top: 60px;
+    left: 550px;
+  }
+  
+  .user-button {
+    background: #212121;
+    width: 200px;
+    height: 60px;
+    border-radius: 20px;
+    padding: 10px;
+  }
+  .user-button button{
+    display: flex;
+    align-items: center;
+  }
+  .user-button button h1{
+    margin: 0;
+    margin-left: 20px;
+    font-size: 20px;
+    color: white;
+  }
+  .user-button button img{
+    margin-left: 70px;
+    height: 40px;
+  }
+  .content{
+    width: 950px;
+    background: #212121;
+    margin-left: 240px;
+    height: 65vh;
+    border-radius: 20px;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr; 
+    gap: 1px; 
+    justify-content: center;
+  }
+  .content h1{
+    color: white;
+    position: absolute;
+    font-size: 35px;
+    margin: 30px;
+    margin-left: 60px;
+    font-weight: 600;
+  }
+  .items {
+    border-radius: 20px;
+    margin-left: 50px;
+    height: 5px;
+  }
+  .items img {
+    height: 150px;
+    width: 220px;
+    margin-top: 90px;
+    transition: transform 0.3s;
+  }
+  .items img:hover{
+    transform: scale(1.01); 
+    opacity: .5;
+  }
+  
+  

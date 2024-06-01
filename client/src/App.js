@@ -9,6 +9,7 @@ import Search from './pages/Search'
 import Recipe from './pages/Recipe'
 import RecipeBuilder from './pages/RecipeBuilder'
 import Modal from './components/Modal'
+import SearchPage from './pages/SearchPage'
 
 
 function App() {
@@ -65,30 +66,8 @@ function App() {
 
   return (
     <>
-      {
-        isLoading? 
-        <></>
-        :
-        isAuthenticated ?
-        <>
-          <BrowserRouter>
-            <Routes>
-              <Route path="/" element={ <Home setIsAuthenticated={ setIsAuthenticated } user={ user } currentTab={ currentTab } setCurrentTab={ setCurrentTab } postApproveRecipe={ postApproveRecipe } /> } />
-              <Route path={`/${ user.username }`} element={ <Profile user={ user } currentTab={ currentTab } setCurrentTab={ setCurrentTab } /> } />
-              <Route path="/settings" element={ <Settings user={ user } currentTab={ currentTab } setCurrentTab={ setCurrentTab } /> } />
-              <Route path="/search" element={ <Search user={ user } currentTab={ currentTab } setCurrentTab={ setCurrentTab } /> } />
-              <Route path="/recipe-builder" element={ <RecipeBuilder user={ user } currentTab={ currentTab } setCurrentTab={ setCurrentTab } /> } />
-              <Route path="/recipe/:recipeId" element={ <Recipe user={ user } currentTab={ currentTab } setCurrentTab={ setCurrentTab } /> } />
-            </Routes>
-          </BrowserRouter>
-        </>
-        :
-        <Auth 
-          isAuthenticated={ isAuthenticated } setIsAuthenticated={ setIsAuthenticated } user={ user } setUser={ setUser }
-          showModal={ showModal } setShowModal={ setShowModal } modalMessage={ modalMessage } setModalMessage={ setModalMessage }     
-        />
-      }
-      <Modal showModal={ showModal } setShowModal={ setShowModal } modalMessage={ modalMessage } setModalMessage={ setModalMessage } />
+    <SearchPage />
+      
     </>
   )
 }
