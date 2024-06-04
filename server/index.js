@@ -117,7 +117,7 @@ app.post('/sign-in', (req, res) => {
                         }
                     )
 
-                    return res.status(200).json({ success: true, message: 'User signed in.' })
+                    return res.status(200).json({ success: true, payload: { username: user.username, userId: user._id }, message: 'User signed in.' })
                 })
                 .catch(err => {
                     console.error('Password comparison error')
@@ -238,21 +238,11 @@ async function uploadFile(files){
     const recipeImage = files.find(file => file.fieldname === 'recipeImage')
     const elementFiles = files.filter(file => file.fieldname !== 'recipeImage')
     const fileLinks = { recipeImage: '', elementFiles: [] }
-    const options = {
-        action: 'read',
-    }
-
+   
     console.log('1')
-    
     return await uploadFileToStorage(recipeImage)
         .then(async recipeUrl => {
-            if (!recipeUrl) {
-                return
-            }
-            console.log('here?')
-            const [signedUrl] = await bucket.file(recipeUrl).getSignedUrl(options)
-            console.log('where')
-            fileLinks.recipeImage = signedUrl
+            fileLinks.recipeImage = recipeUrl
         })
         .then(async () => {
             console.log('here!')
@@ -341,59 +331,96 @@ app.post('/approve-recipe', (req, res) => {
         })
 })
 
-app.get('/feed-recipes', (req, res) => {
+app.get('/feed-recipes', async(req, res) => {
     const { userId } = req.query
 
-    RecipeOverview.find()
-        .populate({
+    try {
+        const recipes = await RecipeOverview.find().populate({
             path: 'userId',
             model: 'User',
             select: 'username'
         })
-        .then(async recipes => {
-            if (!recipes.length) {
-                return res.status(400).json({ message: 'No recipes found.' });
-            }
 
-            const approvalPromises = recipes.map(async recipe => {
-                const isApproved = await Approval.find({ userId, recipeId: recipe.recipeId })
-                    .then(isApproved => isApproved.length > 0)
-                    .catch(err => {
-                        throw err
-                    })
-            
-                return { ...recipe.toObject(), isApproved }
+        if (!recipes.length) {
+            return res.status(400).json({ message: 'No recipes found.' })
+        }
+
+        const approvalPromises = recipes.map(async recipe => {
+            const isApproved = await Approval.find({ userId, recipeId: recipe.recipeId })
+                .then(isApproved => isApproved.length > 0)
+        
+            return { ...recipe.toObject(), isApproved }
+        })
+        
+        return Promise.all(approvalPromises)
+            .then(recipes => {
+                console.log(recipes)
+                return res.status(200).json({ success: true, payload: recipes })
             })
-            
-            return Promise.all(approvalPromises)
-                .then(recipes => {
-                    return res.status(200).json({ success: true, payload: recipes })
-                })
-        })
-        .catch(err => {
-            return res.status(500).json({ message: 'Internal server error.', err })
-        })
+    } catch (err) {
+        console.log(err)
+        return res.status(500).json({ message: 'Internal server error.', err })
+    }
 })
 
 app.get('/recipe', async (req, res) => {
     const { recipeId, userId } = req.query
     console.log(req.query)
     try {
-        const recipe = await Recipe.findById( recipeId ).lean()
+        const recipe = await Recipe.findById( recipeId ).populate({
+            path: 'userId',
+            model: 'User',
+            select: 'username'
+        }).lean()
         
         if (!recipe) {
             return res.status(400).json({ message: 'No such recipe found.' })
         }
 
         const isApproved = await Approval.find({ userId, recipeId: recipe.recipeId }).lean()
-        const approvalStatus = isApproved.length > 0
+            .then(isApproved => isApproved.length > 0)
 
         const response = {
+            userInfo: { username: recipe.userId.username },
             recipeContents: { ...recipe },
-            approvalStatus: { isApproved: approvalStatus },
+            approvalStatus: { isApproved },
         }
 
         return res.status(200).json({ success: true, payload: response })
+    } catch (err) {
+        console.log(err)
+        return res.status(500).json({ message: 'Internal server error.', err })
+    }
+})
+
+app.get('/user-recipes', async (req, res) => {
+    const { authorName, userId } = req.query
+    console.log(userId)
+    try {
+        const user = await User.find({ username: authorName })
+
+        if (!user.length) {
+            return res.status(400).json({ message: 'No such user found.' })
+        }
+
+        const recipes = await Recipe.find({ userId: user[0]._id })
+        
+        if (!recipes.length) {
+            return res.status(400).json({ message: 'No recipes found.' })
+        }
+
+        const approvalPromises = recipes.map(async recipe => {
+            const isApproved = await Approval.find({ userId, recipeId: recipe._id })
+                .then(isApproved => isApproved.length > 0)
+            
+            return { ...recipe.toObject(), isApproved }
+        })
+
+        return Promise.all(approvalPromises)
+            .then(recipes => {
+
+                return res.status(200).json({ success: true, payload: recipes })
+            })
     } catch (err) {
         console.log(err)
         return res.status(500).json({ message: 'Internal server error.', err })

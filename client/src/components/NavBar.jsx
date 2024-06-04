@@ -13,9 +13,11 @@ function NavBar(p) {
     const currentTab = p.currentTab
     const setCurrentTab = p.setCurrentTab
     const user = p.user
+    const authorName = p.authorName 
 
     const recipeImage = p.recipeImage
     const setRecipeImage = p.setRecipeImage 
+    const title = p.title
     const summary = p.summary
     const setSummary = p.setSummary
     const ingredients = p.ingredients
@@ -35,42 +37,62 @@ function NavBar(p) {
                                 <img className="px-4 w-48" src={ Logo } alt="" />
                             </Link>
                         }
-                        {/* publish/create navbar */}
+                        {/* publish/create navbar `*/}
                         {
                             (currentTab === "Profile" || currentTab === "Builder" || currentTab === "Recipe") &&
                             <>
                                 <Link to="/" className="col-span-2 items-center gap-4 bg-zinc-900 pointer-events-auto flex flex-row justify-center w-full h-full rounded-3xl overflow-hidden hover:bg-zinc-500">
                                     <img className="px-4 w-48 " src={ Logo } alt="" />
                                 </Link>
-                                <div className="col-span-2 flex items-center bg-orange-500 hover:bg-orange-400 pointer-events-auto w-full h-full rounded-3xl overflow-hidden">
+                                <div className="col-span-2 flex items-center pointer-events-auto w-full h-full rounded-3xl overflow-hidden">
                                     {
                                         currentTab === "Profile" &&
-                                        <Link to="/recipe-builder" className="flex items-center p-4 gap-4 w-full h-full overflow-hidden">
+                                        <Link to="/recipe-builder" className="flex items-center p-4 gap-4 w-full h-full bg-orange-500 hover:bg-orange-400 overflow-hidden">
                                             <p className="flex text-zinc-100 text-lg w-full font-semibold">Create</p>
                                             <img className="w-8" src={ CreateIcon } alt="" />
                                         </Link>
                                     }
                                     {
                                         currentTab === "Builder" &&
-                                        <button className="flex items-center p-4 gap-4 w-full h-full overflow-hidden" onClick={ () => { publishRecipe() } }>
-                                            <p className="flex text-zinc-100 text-lg w-full font-semibold">Publish</p>
+                                        <button className="flex items-center p-4 gap-4 w-full h-full bg-zinc-900 hover:bg-zinc-500 overflow-hidden">
+                                            <p className="flex text-zinc-100 text-lg w-full font-semibold">Drafts</p>
                                             <img className="w-8" src={ CreateIcon } alt="" />
                                         </button>
                                     }
                                     {
                                         currentTab === "Recipe" &&
-                                        <button className="flex items-center p-4 gap-4 w-full h-full overflow-hidden" onClick={ () => { publishRecipe() } }>
+                                        <button className="flex items-center p-4 gap-4 w-full h-full bg-orange-500 hover:bg-orange-400 overflow-hidden" onClick={ () => { publishRecipe() } }>
                                             <p className="flex text-zinc-100 text-lg w-full font-semibold">Save</p>
                                             <img className="w-8" src={ SaveIcon } alt="" />
                                         </button>
                                     }
-                                </div>                               
+                                </div>
+                                {
+                                    currentTab === "Builder" &&
+                                    <>
+                                        <div className="col-span-9">
+
+                                        </div>
+                                        <div className="col-span-2 flex items-center pointer-events-auto w-full h-full rounded-3xl overflow-hidden">
+                                            <button className={`${ (title && recipeImage.size && summary && (ingredients.length === 1  && ingredients[0].value)) && "bg-orange-500 hover:bg-orange-400" } 
+                                                    flex items-center p-4 gap-4 w-full h-full disabled:bg-zinc-900 disabled:cursor-not-allowed overflow-hidden`
+                                                } 
+                                                onClick={ () => { publishRecipe() } } disabled={ !(title && recipeImage.size && summary && (ingredients.length === 1  && ingredients[0].value)) }
+                                            >
+                                                <p className="flex text-zinc-100 text-lg w-full font-semibold">Publish</p>
+                                                <img className="w-8" src={ CreateIcon } alt="" />
+                                            </button>
+                                        </div>
+                                    </>
+                                }                               
                             </>
                         }
                         {/* logo navbar middle */}
                         {
                             (currentTab === "Home" || currentTab === "Search" || currentTab === "Settings" ) &&
-                            <div className={`${ (currentTab!=="Home" && currentTab!=="Profile" && currentTab!=="Search") && "bg-zinc-900" } rounded-3xl flex items-center justify-center`} style={ { gridColumn: (currentTab === "Home" || currentTab === "Search" || currentTab === "Settings" ) ? "span 11" : "span 13" } }>
+                            <div className={`${ (currentTab!=="Home" && currentTab!=="Profile" && currentTab!=="Search") && "bg-zinc-900" } rounded-3xl flex items-center justify-center`} 
+                                style={ { gridColumn: (currentTab === "Home" || currentTab === "Search" || currentTab === "Settings" ) ? "span 11" : "span 13" } }
+                            >
                                 { 
                                     (currentTab !== "Home" && currentTab !== "Search" && currentTab !== "Profile") &&
                                     <Link to="/" className="fixed flex items-center pointer-events-auto left-1/2 transform -translate-x-1/2">
@@ -83,15 +105,25 @@ function NavBar(p) {
                         {
                             (currentTab === "Home" || currentTab === "Search" || currentTab === "Settings" ) &&
                             <Link to={`/${ user.username }`} className="col-span-2 flex items-center justify-end rounded-3xl bg-zinc-900 pointer-events-auto hover:bg-zinc-500">
-                                { currentTab!=="Profile" && <p className="text-zinc-100 text-end w-full ml-3 text-xl font-semibold overflow-hidden">{ user.username }</p> }
+                                { 
+                                    currentTab!=="Profile" && <p className="text-zinc-100 text-end w-full ml-3 text-xl font-semibold overflow-hidden">
+                                        { user.username }
+                                    </p> 
+                                }
                                 <img className="m-3 w-10" src={ ProfilePicture } alt="" />
                             </Link>
                         }
                     </div>
                 </div>
                 {/* content */}
-                { (currentTab === "Home" || currentTab === "Search" || currentTab === "Settings" ) && <SidebarTab currentTab={ currentTab } setCurrentTab={ setCurrentTab } /> }
-                { currentTab === "Profile" && <SidebarProfile user={ user } /> }
+                { 
+                    (currentTab === "Home" || currentTab === "Search" || currentTab === "Settings" ) && 
+                    <SidebarTab currentTab={ currentTab } setCurrentTab={ setCurrentTab } /> 
+                }
+                { 
+                    currentTab === "Profile" && 
+                    <SidebarProfile authorName={ authorName } />
+                }
                 { 
                     currentTab === "Builder" &&
                     (
@@ -108,7 +140,7 @@ function NavBar(p) {
                     (
                         <SidebarRecipe
                             summary={ summary || null } recipeImage={ recipeImage || null }
-                            ingredients={ ingredients || null } user={ user } currentTab={ currentTab }
+                            ingredients={ ingredients || null } authorName={ authorName || null } currentTab={ currentTab }
                         />
                     )
                 }                 

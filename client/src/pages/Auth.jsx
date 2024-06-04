@@ -11,15 +11,15 @@ function Auth(p) {
 
     function createAccount() {
         axios.post(`http://localhost:8080/create-account`, { username: p.user.username, password } )
-            .then(response => {
-                console.log('Status Code:' , response.status)
-                console.log('Data:', response.data)
+            .then(res => {
+                console.log('Status Code:' , res.status)
+                console.log('Data:', res.data)
                 
-                if (response.status === 202) {
+                if (res.status === 202) {
                     p.setShowModal(true)
                     p.setModalMessage('Username already exists. Please choose a different username.')
                     setIsCredsCorrect(false)    
-                } else if (response.status === 201) {
+                } else if (res.status === 201) {
                     p.setUser({ username: '', userId: '' })
                     setPassword('')
                     p.setShowModal(true)
@@ -29,35 +29,30 @@ function Auth(p) {
                 }
             })
             .catch(err => {
-                if (err.response) {
-                    console.log('Error Status:', err.response.status)
-                    console.log('Error Data:', err.response.data)
-                } else if (err.request) {
-                    console.log('Error Request:', err.request)
-                } else {
-                    console.log('Error Message:', err.message)
-                }
+                console.log('Error Status:', err.response.status)
+                console.log('Error Data:', err.response.data)
             })
     }
 
     function signIn() {
         axios.post(`http://localhost:8080/sign-in`, { username: p.user.username, password }, { withCredentials: true })
-            .then(response => {
-                console.log('Status Code:' , response.status)
-                console.log('Data:', response.data)
+            .then(res => {
+                console.log('Status Code:' , res.status)
+                console.log('Data:', res.data)
                 
-                if (response.status === 202) {
+                if (res.status === 202) {
                     p.setShowModal(true)
                     p.setModalMessage('Incorrect username or password. Please try again.')
                     setIsCredsCorrect(false)
-                } else if (response.status === 200) {
+                } else if (res.status === 200) {
+                    p.setUser({ username: res.data.payload.username, userId: res.data.payload.userId })
                     p.setIsAuthenticated(true)
                 }
             })
             .catch(error => {
-                if (error.response) {
-                    console.log('Error Status:', error.response.status)
-                    console.log('Error Data:', error.response.data)
+                if (error.res) {
+                    console.log('Error Status:', error.res.status)
+                    console.log('Error Data:', error.res.data)
                 } else if (error.request) {
                     console.log('Error Request:', error.request)
                 } else {

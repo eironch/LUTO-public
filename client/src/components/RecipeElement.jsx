@@ -145,10 +145,6 @@ function Images(p) {
         }))
     }
 
-    useLayoutEffect(() => {
-        console.log(keyIndex)
-    },[isHovered])
-
     return (
         <div className="pt-6 pb-3 px-6 flex flex-col justify-center items-center gap-3 mb-3 rounded-3xl overflow-hidden bg-zinc-900" onMouseEnter={() => { setIsHovered(true) }} onMouseLeave={() => { setIsHovered(false) }}>
             <div className="flex flex-row w-full h-full gap-3 justify-start items-center overflow-x-scroll scrollable-div" ref={ scrollableDivRef }>
@@ -192,8 +188,7 @@ function RecipeElement(p) {
         setElementFiles(elementFiles.filter(element => element.key !== keyIndex))
         setRecipeElements(recipeElements.filter(element => element.key !== keyIndex))
     }
-    console.log("recipe files")
-    console.log(elementFiles.map(elements => elements))
+
     if (contentType === 'Subheading') {
         return <Subheading
             key={ keyIndex }

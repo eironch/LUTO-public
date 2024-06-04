@@ -108,7 +108,7 @@ function RecipeBuilder(p) {
             ingredients,
             recipeElements,
         })
-
+        
         const formData = new FormData()
         formData.append('userId', p.user.userId)
         formData.append('categories', [])
@@ -154,21 +154,16 @@ function RecipeBuilder(p) {
                 console.log('Data:', response.data)
             })
             .catch(err => {
-                if (err.response) {
-                    console.log('Error Status:', err.response.status)
-                    console.log('Error Data:', err.response.data)
-                } else if (err.request) {
-                    console.log('Error Request:', err.request)
-                } else {
-                    console.log('Error Message:', err.message)
-                }
+                console.log('Error Status:', err.response.status)
+                console.log('Error Data:', err.response.data)
             })
     }
 
     return (
         <div>
-            <NavBar 
-                ingredients={ ingredients } setIngredients={ setIngredients } 
+            <NavBar
+                title={ title }
+                ingredients={ ingredients } setIngredients={ setIngredients }
                 recipeImage={ recipeImage } setRecipeImage={ setRecipeImage }
                 summary={ summary } setSummary={ setSummary } publishRecipe={ publishRecipe }
                 user={ user } currentTab={ currentTab } setCurrentTab={ setCurrentTab } 

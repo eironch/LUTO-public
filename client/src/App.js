@@ -25,14 +25,8 @@ function App() {
         console.log('Data:', response.data)
       })
       .catch(err => {
-        if (err.response) {
-            console.log('Error Status:', err.response.status)
-            console.log('Error Data:', err.response.data)
-        } else if (err.request) {
-            console.log('Error Request:', err.request)
-        } else {
-            console.log('Error Message:', err.message)
-        }
+        console.log('Error Status:', err.response.status)
+        console.log('Error Data:', err.response.data)
       })
   }
 
@@ -73,7 +67,7 @@ function App() {
           <BrowserRouter>
             <Routes>
               <Route path="/" element={ <Home setIsAuthenticated={ setIsAuthenticated } user={ user } currentTab={ currentTab } setCurrentTab={ setCurrentTab } postApproveRecipe={ postApproveRecipe } /> } />
-              <Route path={`/${ user.username }`} element={ <Profile user={ user } currentTab={ currentTab } setCurrentTab={ setCurrentTab } /> } />
+              <Route path="/:authorName" element={ <Profile user={ user } currentTab={ currentTab } setCurrentTab={ setCurrentTab } /> } postApproveRecipe={ postApproveRecipe } />
               <Route path="/settings" element={ <Settings user={ user } currentTab={ currentTab } setCurrentTab={ setCurrentTab } /> } />
               <Route path="/search" element={ <Search user={ user } currentTab={ currentTab } setCurrentTab={ setCurrentTab } /> } />
               <Route path="/recipe-builder" element={ <RecipeBuilder user={ user } currentTab={ currentTab } setCurrentTab={ setCurrentTab } /> } />

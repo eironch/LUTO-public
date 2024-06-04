@@ -1,15 +1,16 @@
 import React, { useState, useLayoutEffect } from 'react'
 import { useParams } from 'react-router-dom'
 import axios from 'axios'
-import Textarea from '../components/Textarea'
+
 import NavBar from '../components/NavBar'
 
 function Recipe(p) {
-    const { recipeId } = useParams()
     const user = p.user
     const currentTab = p.currentTab
     const setCurrentTab = p.setCurrentTab
 
+    const { recipeId } = useParams()
+    const [authorName, setAuthorName] = useState()
     const [recipeImage, setRecipeImage] = useState()
     const [title, setTitle] = useState()
     const [summary, setSummary] = useState()
@@ -18,27 +19,20 @@ function Recipe(p) {
     
     useLayoutEffect(() => {
         axios.get('http://localhost:8080/recipe', { params: { recipeId, userId: user.userId } })
-            .then(response => {
-                console.log('Status Code:' , response.status)
-                console.log('Data:', response.data)
+            .then(res => {
+                console.log('Status Code:' , res.status)
+                console.log('Data:', res.data)
   
-                setRecipeImage(response.data.payload.recipeContents.recipeImage)
-                setTitle(response.data.payload.recipeContents.title)
-                setSummary(response.data.payload.recipeContents.summary)
-                setIngredients(response.data.payload.recipeContents.ingredients)
-                setRecipeElements(response.data.payload.recipeContents.recipeElements)
-                
+                setAuthorName(res.data.payload.userInfo.username)
+                setRecipeImage(res.data.payload.recipeContents.recipeImage)
+                setTitle(res.data.payload.recipeContents.title)
+                setSummary(res.data.payload.recipeContents.summary)
+                setIngredients(res.data.payload.recipeContents.ingredients)
+                setRecipeElements(res.data.payload.recipeContents.recipeElements)
             })
             .catch(err => {
-                console.log("err")
-                if (err.response) {
-                    console.log('Error Status:', err.response.status)
-                    console.log('Error Data:', err.response.data)
-                } else if (err.request) {
-                    console.log('Error Request:', err.request)
-                } else {
-                    console.log('Error Message:', err.message)
-                }
+                console.log('Error Status:', err.response.status)
+                console.log('Error Data:', err.response.data)
             })
     }, [recipeId])
 
@@ -49,18 +43,19 @@ function Recipe(p) {
     return (
         <div>
             <NavBar 
-                recipeImage = { recipeImage }
+                recipeImage = { recipeImage } title={ title }
                 summary={ summary } setSummary={ setSummary }
                 ingredients={ ingredients } setIngredients={ setIngredients }
-                user={ user } currentTab={ currentTab } setCurrentTab={ setCurrentTab } 
+                authorName = { authorName } user={ user } 
+                currentTab={ currentTab } setCurrentTab={ setCurrentTab } 
             />
             <div className="pr-0 flex flex-col gap-3 p-3 pb-0 h-svh overflow-y-scroll scrollable-div bg-zinc-950">
                 <div className="grid w-full gap-3" style={ { gridTemplateColumns: 'repeat(15, minmax(0, 1fr))' } }>
                     <div className="col-span-4"></div>
                     <div className="col-span-11 flex flex-col rounded-3xl text-zinc-100">
-                        <div className="flex flex-col items-center w-full mb-3 py-6 px-3 rounded-3xl bg-zinc-900">
-                            <p attribut="px-3 text-3xl font-bold w-full text-center focus:bg-zinc-700">
-                            { title }
+                        <div className="flex flex-col items-center w-full mb-3 p-6 rounded-3xl bg-zinc-900">
+                            <p className="text-3xl font-bold w-full text-center">
+                                { title }
                             </p>
                         </div>
                         {

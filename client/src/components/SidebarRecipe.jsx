@@ -5,7 +5,7 @@ import ApproveIcon from '../assets/approve-icon.png'
 import DiscussionIcon from '../assets/discussion-icon.png'
 
 function SidebarRecipe(p) {
-    const user = p.user
+    const authorName = p.authorName
     const recipeImage = p.recipeImage
     const summary = p.summary
     const ingredients = p.ingredients
@@ -41,9 +41,9 @@ function SidebarRecipe(p) {
                     </div>
                 </div>
                 {/* User */}
-                <Link to={`/${ user.username }`} className="flex gap-6 flex-row items-center mb-3 p-6 rounded-3xl bg-zinc-900 hover:bg-zinc-500">
+                <Link to={`/${ authorName }`} className="flex gap-6 flex-row items-center mb-3 p-6 rounded-3xl bg-zinc-900 hover:bg-zinc-500">
                     <img className="w-14" src={ ProfilePicture } alt="" />
-                    <p className="text-xl font-semibold">{ user.username }</p>
+                    <p className="text-xl font-semibold">{ authorName }</p>
                 </Link>
                 {/* Summary */}
                 <div className="flex flex-col p-6 gap-6 mb-3 rounded-3xl bg-zinc-900">
@@ -57,8 +57,8 @@ function SidebarRecipe(p) {
                     <ul className="text-lg flex flex-col gap-3">
                         {
                             ingredients &&
-                            ingredients.map(ingredient => 
-                                <li className="flex rounded-3xl text-center items-center">
+                            ingredients.map((ingredient, index) => 
+                                <li className="flex rounded-3xl text-center items-center" key={ index }>
                                     <p className="pr-3  text-2xl font-bold">•</p>
                                     <p className="text-lg">{ ingredient }</p>      
                                 </li>
