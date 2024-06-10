@@ -18,11 +18,13 @@ function App() {
   const [showModal, setShowModal] = useState(false)
   const [currentTab, setCurrentTab] = useState('Home')
   
-  function postApproveRecipe(userId, recipeId) {
-    axios.post('http://localhost:8080/approve-recipe', { userId, recipeId })
+  async function postApproveRecipe(userId, recipeId) {
+    return await axios.post('http://localhost:8080/approve-recipe', { userId, recipeId })
       .then(response => {
         console.log('Status Code:' , response.status)
         console.log('Data:', response.data)
+
+        return { isApproved: response.data.payload.isApproved, approvalCount: response.data.payload.approvalCount.approvalCount }
       })
       .catch(err => {
         console.log('Error Status:', err.response.status)
@@ -67,10 +69,10 @@ function App() {
           <BrowserRouter>
             <Routes>
               <Route path="/" element={ <Home setIsAuthenticated={ setIsAuthenticated } user={ user } currentTab={ currentTab } setCurrentTab={ setCurrentTab } postApproveRecipe={ postApproveRecipe } /> } />
-              <Route path="/:authorName" element={ <Profile user={ user } currentTab={ currentTab } setCurrentTab={ setCurrentTab } /> } postApproveRecipe={ postApproveRecipe } />
+              <Route path="/:authorName" element={ <Profile user={ user } currentTab={ currentTab } setCurrentTab={ setCurrentTab } postApproveRecipe={ postApproveRecipe } /> }/>
               <Route path="/settings" element={ <Settings user={ user } currentTab={ currentTab } setCurrentTab={ setCurrentTab } /> } />
               <Route path="/search" element={ <Search user={ user } currentTab={ currentTab } setCurrentTab={ setCurrentTab } /> } />
-              <Route path="/recipe-builder" element={ <RecipeBuilder user={ user } currentTab={ currentTab } setCurrentTab={ setCurrentTab } /> } />
+              <Route path="/create" element={ <RecipeBuilder user={ user } currentTab={ currentTab } setCurrentTab={ setCurrentTab } /> } />
               <Route path="/recipe/:recipeId" element={ <Recipe user={ user } currentTab={ currentTab } setCurrentTab={ setCurrentTab } /> } />
             </Routes>
           </BrowserRouter>

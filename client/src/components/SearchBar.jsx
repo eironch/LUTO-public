@@ -13,9 +13,13 @@ function SearchBar(p) {
                         What are you looking up?
                     </p> 
                 }
-                <div className={`${ p.currentTab==="Search" && "my-10" } flex items-center justify-center shadow-sm shadow-zinc-950 rounded-3xl pointer-events-auto m-3 w-8/12 h-10 bg-zinc-700`}>
-                    <div className="flex items-center justify-center ml-2 w-12 h-full"><img className="w-6" src={ SearchIcon } alt="" /></div>
-                    <input className="w-full h-10 mx-2 rounded-3xl bg-transparent text-zinc-400 text-center" src={ SearchIcon } type="text" placeholder="Search"/>
+                <div className={`${ p.currentTab==="Search" && "my-10" } flex items-center justify-center shadow-md shadow-zinc-950 rounded-3xl pointer-events-auto m-3 w-8/12 h-10 bg-zinc-700`}>
+                    <div className="flex items-center justify-center ml-2 w-12 h-full">
+                        <img className="w-6" src={ SearchIcon } alt="" />
+                    </div>
+                    <input className="w-full h-10 mx-2 rounded-3xl bg-transparent text-zinc-400 text-center" 
+                        type="text" placeholder="Search LUTO"
+                    />
                     <Link to="/search" className={`${ p.currentTab==="Search" ? "bg-zinc-700 pointer-events-none" : "bg-zinc-500 hover:bg-zinc-600" } flex flex-row items-center justify-center rounded-3xl mr-2 w-12 h-8 text-zinc-100`}>
                         <button onClick={ () => {  p.currentTab!=="Search" && p.setCurrentTab("Search") } }>
                             •••

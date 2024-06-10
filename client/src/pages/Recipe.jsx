@@ -15,6 +15,7 @@ function Recipe(p) {
     const [title, setTitle] = useState()
     const [summary, setSummary] = useState()
     const [ingredients, setIngredients] = useState()
+    const [tags, setTags] = useState()
     const [recipeElements, setRecipeElements] = useState()
     
     useLayoutEffect(() => {
@@ -28,6 +29,7 @@ function Recipe(p) {
                 setTitle(res.data.payload.recipeContents.title)
                 setSummary(res.data.payload.recipeContents.summary)
                 setIngredients(res.data.payload.recipeContents.ingredients)
+                setTags(JSON.parse(res.data.payload.recipeContents.tags))
                 setRecipeElements(res.data.payload.recipeContents.recipeElements)
             })
             .catch(err => {
@@ -44,8 +46,7 @@ function Recipe(p) {
         <div>
             <NavBar 
                 recipeImage = { recipeImage } title={ title }
-                summary={ summary } setSummary={ setSummary }
-                ingredients={ ingredients } setIngredients={ setIngredients }
+                summary={ summary } ingredients={ ingredients } tags={ tags }
                 authorName = { authorName } user={ user } 
                 currentTab={ currentTab } setCurrentTab={ setCurrentTab } 
             />
@@ -91,7 +92,7 @@ function Recipe(p) {
                                         </div>
                                     )
                                 }
-                                
+
                                 return null
                             })
                         }

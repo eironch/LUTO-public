@@ -2,26 +2,40 @@ import React, { useState, useLayoutEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { format, getYear } from 'date-fns'
 
-import Image from '../assets/placeholder-img.png'
-import DiscussionIcon from '../assets/discussion-icon.png'
+import FeedbackIcon from '../assets/feedback-icon.png'
 import ApproveIcon from '../assets/approve-icon.png'
 import ApprovedIcon from '../assets/approved-icon.png'
 
 function RecipeOverview(p) {
     const user = p.user
+    const recipes = p.recipes
+    const setRecipes = p.setRecipes
     const authorName = p.authorName
     const recipeId = p.recipeId
     const title = p.title
     const summary = p.summary
+    const recipeImage = p.recipeImage
+    const approvalCount = p.approvalCount
     const postApproveRecipe = p.postApproveRecipe
-    
+
     const dateCreated = new Date(p.dateCreated)
     const [isApproved, setIsApproved] = useState(p.isApproved)
     const [formattedDate, setFormattedDate] = useState('')
     
-    function approveRecipe() {
-        postApproveRecipe(user.userId, recipeId)
-        setIsApproved(!isApproved)
+    async function approveRecipe() {
+        console.log(recipeId)
+        const { isApproved, approvalCount } = await postApproveRecipe(user.userId, recipeId)
+        console.log('approvalCount ' + approvalCount)
+        
+        setRecipes(recipes.map(recipe => {
+            if (recipe.recipeId._id === recipeId) {
+                recipe.recipeId.approvalCount = approvalCount
+            }
+
+            return recipe
+        }))
+        
+        setIsApproved(isApproved)
     }
 
     function calculateDiffInTime(dateNow, pastDate, unitsOfTime) {
@@ -35,12 +49,12 @@ function RecipeOverview(p) {
         const dateNow = new Date()
 
         if (getYear(dateCreated) > getYear(dateNow)) {
-            return setFormattedDate(format(new Date(dateCreated, 'PP')))
+            return setFormattedDate(format(dateCreated, 'PP'))
         }
-
+        
         const diffInDays = calculateDiffInTime(dateNow, dateCreated, 60 * 60 * 24)
         if (diffInDays >= 7) {
-            return format(new Date(dateCreated, 'MMMM dd'))
+            return format(dateCreated, 'MMMM dd')
         }
 
         if (diffInDays > 0) {
@@ -49,8 +63,6 @@ function RecipeOverview(p) {
         
         const diffInHours = calculateDiffInTime(dateNow, dateCreated, 60 * 60)
         if (diffInHours > 0) {
-            console.log("datsse")
-            console.log(diffInHours)
             return `${ diffInHours } ${ diffInHours === 1 ? 'hour ago' : 'hours ago' }`
         }
 
@@ -74,7 +86,7 @@ function RecipeOverview(p) {
             {/* recipe image */}
             <Link to={`/recipe/${ recipeId }`}  className="flex col-span-4 rounded-3xl p-2 shadow-zinc-950 shadow-right bg-gradient-to-br from-orange-600 to-orange-400">
                 <div className="w-full aspect-w-1 aspect-h-1 overflow-hidden">
-                    <img className="w-full h-full rounded-3xl object-cover" src={ Image } alt="" />
+                    <img className="w-full h-full rounded-3xl object-cover" src={ recipeImage } alt="" />
                 </div>
             </Link>
             {/* recipe content */}
@@ -99,13 +111,13 @@ function RecipeOverview(p) {
                 <div className="flex mb-6 ml-6 h-full gap-6">
                     <div className="flex items-end w-full text-zinc-100 text-lg overflow-hidden">
                         <button className="flex items-center px-4 py-2 gap-4 rounded-3xl hover:bg-zinc-500">
-                            <img className="w-10" src={ DiscussionIcon } alt="" />
+                            <img className="w-10" src={ FeedbackIcon } alt="" />
                             <p>1.1k</p>
                         </button>
                     </div>
                     <div className="flex justify-end items-end w-full mr-6 gap-4 text-zinc-100 text-lg overflow-hidden">
                         <button className="flex justify-end items-center px-4 py-2 gap-4 rounded-3xl hover:bg-zinc-500" onClick={ () => { approveRecipe() } }>
-                            <p>1.1k</p>
+                            <p>{ approvalCount > 0 && approvalCount }</p>
                             <img className="w-10" src={ isApproved ? ApprovedIcon : ApproveIcon } alt="" />
                         </button>
                     </div>

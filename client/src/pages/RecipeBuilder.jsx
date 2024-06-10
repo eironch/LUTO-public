@@ -2,10 +2,12 @@ import React, { useState, useRef, useLayoutEffect } from 'react'
 import axios from 'axios'
 import { v4 as uuidv4 } from 'uuid'
 import { Link } from 'react-router-dom'
+
 import Textarea from '../components/Textarea'
 import NavBar from '../components/NavBar'
 import RecipeElement from '../components/RecipeElement'
-import AddElement from '../assets/add-icon.png'
+
+import AddIcon from '../assets/add-icon.png'
 
 function ElementsModal(p) {
     const setShowModal = p.setShowModal
@@ -70,6 +72,7 @@ function RecipeBuilder(p) {
     const [summary, setSummary] = useState('')
     const [ingredients, setIngredients] = useState([{ key: uuidv4() }])
     const [title, setTitle] = useState('')
+    const [tags, setTags] = useState([])
     const [elementTexts, setElementTexts] = useState([])
     const [elementFiles, setElementFiles] = useState([])
     const [recipeElements, setRecipeElements] = useState([])
@@ -108,17 +111,17 @@ function RecipeBuilder(p) {
             ingredients,
             recipeElements,
         })
-        
+
         const formData = new FormData()
         formData.append('userId', p.user.userId)
-        formData.append('categories', [])
-        formData.append('tags', [])
+        formData.append('recipeImage', recipeImage)
         formData.append('title', title)
         formData.append('summary', summary)
         formData.append('ingredients', JSON.stringify(
-            ingredients.filter(ingredient => ingredient.value !== '').map(ingredient => ingredient.value)
+            ingredients.filter(ingredient => ingredient.value !== '')
+                .map(ingredient => ingredient.value)
         ))
-        formData.append('recipeImage', recipeImage)
+        formData.append('tags', JSON.stringify(tags))
         formData.append('recipeElements', JSON.stringify(
             recipeElements.map((element, objectIndex) => {
                 const contentType = recipeElements.find(
@@ -163,16 +166,18 @@ function RecipeBuilder(p) {
         <div>
             <NavBar
                 title={ title }
-                ingredients={ ingredients } setIngredients={ setIngredients }
                 recipeImage={ recipeImage } setRecipeImage={ setRecipeImage }
-                summary={ summary } setSummary={ setSummary } publishRecipe={ publishRecipe }
+                summary={ summary } setSummary={ setSummary } 
+                ingredients={ ingredients } setIngredients={ setIngredients }
+                tags={ tags } setTags={ setTags }
+                publishRecipe={ publishRecipe }
                 user={ user } currentTab={ currentTab } setCurrentTab={ setCurrentTab } 
             />
             <div className="pr-0 flex flex-col gap-3 p-3 h-svh overflow-y-scroll scrollable-div bg-zinc-950">
                 <div className="grid w-full gap-3" style={ { gridTemplateColumns: 'repeat(15, minmax(0, 1fr))' } }>
                     <div className="col-span-4"></div>
                     <div className="col-span-11 flex flex-col rounded-3xl text-zinc-100">
-                        <p className="text-2xl font-bold h-16 mb-3 p-6 flex items-center text-zinc-400">
+                        <p className="text-3xl font-bold h-16 mb-3 p-6 flex items-center text-zinc-400">
                             What are you cooking?
                         </p>
                         <div className="flex flex-col items-center w-full mb-3 py-6 px-3 rounded-3xl bg-zinc-900">
@@ -195,7 +200,7 @@ function RecipeBuilder(p) {
                         }
                         <button className="flex items-center w-full mb-3 p-6 rounded-3xl bg-orange-500 hover:bg-orange-400" onClick={ () => { setShowModal(true) } }>
                             <div className="flex w-full justify-center">
-                                <img className="w-8" src={ AddElement } alt=""/>
+                                <img className="w-8" src={ AddIcon } alt=""/>
                             </div>
                         </button>
                     </div>     

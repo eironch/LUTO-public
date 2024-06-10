@@ -304,51 +304,59 @@ function uploadFileToStorage(file) {
     })
 }
 
-app.post('/approve-recipe', (req, res) => {
+app.post('/approve-recipe', async (req, res) => {
     const { userId, recipeId } = req.body
 
-    const approval = new Approval({
-        userId,
-        recipeId,
-    })
+    try {
+        const existingLike = await Approval.findOne({ userId, recipeId })
 
-    Approval.find({ userId, recipeId })
-        .then(async isApproved => {
-            if (isApproved.length) {
-                return await Approve.deleteOne({ userId, recipeId })
-                    .then(() => {
-                        return res.status(200).json({ success: true, message:'Recipe unapproved.'})
-                    })
-            }
+        if (existingLike) {
+            await Approval.deleteOne({ userId, recipeId })
+            
+            await Recipe.findByIdAndUpdate(recipeId, { $inc: { approvalCount: -1 } })
 
-            return await approval.save()
-                .then(() => {
-                    return res.status(201).json({ success: true, message:'Recipe approved.'})
-                })
-        })
-        .catch(err => {
-            return res.status(500).json({ success: true, message:'Internal server error.', err})
-        })
+            const approvalCount = await Recipe.findById(recipeId).select('approvalCount')
+            console.log(approvalCount)
+            return res.status(200).json({ success: true, message:'Recipe unapproved.', payload: { isApproved: false, approvalCount } })
+        }
+
+        await Approval.updateOne(
+            { userId, recipeId },
+            { $setOnInsert: { userId, recipeId } },
+            { upsert: true }
+        )
+
+        await Recipe.findByIdAndUpdate(recipeId, { $inc: { approvalCount: 1 } })
+
+        const approvalCount = await Recipe.findById(recipeId).select('approvalCount')
+        console.log(approvalCount)
+        return res.status(201).json({ success: true, message:'Recipe approved.', payload: { isApproved: true, approvalCount } })
+    } catch (err) {
+        console.log(err)
+        return res.status(500).json({ success: true, message:'Internal server error.', err})
+    }
 })
 
-app.get('/feed-recipes', async(req, res) => {
+app.get('/feed-recipes', async (req, res) => {
     const { userId } = req.query
 
     try {
-        const recipes = await RecipeOverview.find().populate({
-            path: 'userId',
-            model: 'User',
-            select: 'username'
-        })
+        const recipes = await RecipeOverview.find()
+            .populate({
+                path: 'userId',
+                select: 'username',
+            }).populate({
+                path: 'recipeId',
+                select: 'approvalCount',
+            }).sort({ createdAt: -1 })
 
         if (!recipes.length) {
             return res.status(400).json({ message: 'No recipes found.' })
         }
 
         const approvalPromises = recipes.map(async recipe => {
-            const isApproved = await Approval.find({ userId, recipeId: recipe.recipeId })
-                .then(isApproved => isApproved.length > 0)
-        
+            const isApproved = await Approval.findOne({ userId, recipeId: recipe.recipeId }) !== null
+    
             return { ...recipe.toObject(), isApproved }
         })
         
@@ -367,18 +375,19 @@ app.get('/recipe', async (req, res) => {
     const { recipeId, userId } = req.query
     console.log(req.query)
     try {
-        const recipe = await Recipe.findById( recipeId ).populate({
-            path: 'userId',
-            model: 'User',
-            select: 'username'
-        }).lean()
+        const recipe = await Recipe.findById( recipeId )
+            .populate({
+                path: 'userId',
+                model: 'User',
+                select: 'username'
+            })
+            .lean()
         
         if (!recipe) {
             return res.status(400).json({ message: 'No such recipe found.' })
         }
 
-        const isApproved = await Approval.find({ userId, recipeId: recipe.recipeId }).lean()
-            .then(isApproved => isApproved.length > 0)
+        const isApproved = await Approval.findOne({ userId, recipeId: recipe.recipeId }).lean() !== null
 
         const response = {
             userInfo: { username: recipe.userId.username },
@@ -403,22 +412,26 @@ app.get('/user-recipes', async (req, res) => {
             return res.status(400).json({ message: 'No such user found.' })
         }
 
-        const recipes = await Recipe.find({ userId: user[0]._id })
-        
+        const recipes = await RecipeOverview.find().populate({
+            path: 'userId',
+            select: 'username'
+        }).populate({
+            path: 'recipeId',
+            select: 'approvalCount',
+        }).sort({ createdAt: -1 })
+
         if (!recipes.length) {
             return res.status(400).json({ message: 'No recipes found.' })
         }
 
         const approvalPromises = recipes.map(async recipe => {
-            const isApproved = await Approval.find({ userId, recipeId: recipe._id })
-                .then(isApproved => isApproved.length > 0)
-            
+            const isApproved = await Approval.findOne({ userId, recipeId: recipe.recipeId }) !== null
+  
             return { ...recipe.toObject(), isApproved }
         })
 
         return Promise.all(approvalPromises)
             .then(recipes => {
-
                 return res.status(200).json({ success: true, payload: recipes })
             })
     } catch (err) {

@@ -7,10 +7,9 @@ import SearchBar from '../components/SearchBar'
 function Home(p) {
     const [feedRecipes, setFeedRecipes] = useState([])
 
+    const user = p.user
     const currentTab = p.currentTab
     const setCurrentTab = p.setCurrentTab
-    const user = p.user
-    console.log(user)
     const postApproveRecipe = p.postApproveRecipe
 
     function getFeedRecipes() {
@@ -51,11 +50,14 @@ function Home(p) {
                             { 
                                 feedRecipes.map(recipe => {
                                     return <RecipeOverview 
-                                        key={ recipe.recipeId } recipeId={ recipe.recipeId } 
-                                        title={ recipe.title } summary={ recipe.summary } 
-                                        authorName={ recipe.userId.username } isApproved={ recipe.isApproved } 
-                                        dateCreated={ recipe.createdAt }
-                                        user={ user } postApproveRecipe={ postApproveRecipe }
+                                        key={ recipe.recipeId._id } user={ user }
+                                        recipeId={ recipe.recipeId._id }
+                                        recipeImage={ recipe.recipeImage }title={ recipe.title } 
+                                        summary={ recipe.summary }authorName={ recipe.userId.username } 
+                                        isApproved={ recipe.isApproved } approvalCount={ recipe.recipeId.approvalCount } 
+                                        recipes={ feedRecipes } setRecipes={ setFeedRecipes }
+                                        dateCreated={ recipe.createdAt } 
+                                        postApproveRecipe={ postApproveRecipe }
                                     />
                                 })
                             }
