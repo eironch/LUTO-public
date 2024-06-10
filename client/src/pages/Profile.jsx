@@ -13,13 +13,13 @@ function Profile(p) {
 
     const { authorName } = useParams()
     const [userRecipes, setUserRecipes] = useState([])
-
+    
     useLayoutEffect(() => {
         axios.get('http://localhost:8080/user-recipes', { params: { authorName, userId: user.userId } })
             .then(res => {
                 console.log('Status Code:', res.status)
                 console.log('Data:', res.data)
-
+                
                 setUserRecipes(res.data.payload)
             })
             .catch(err => {
@@ -46,11 +46,14 @@ function Profile(p) {
                         { 
                             userRecipes.map((recipe, index) => {
                                 return <RecipeOverview 
-                                    key={ index } recipeId={ recipe.recipeId } 
-                                    title={ recipe.title } summary={ recipe.summary } 
-                                    authorName={ authorName } isApproved={ recipe.isApproved } 
+                                    key={ index } user={ user } 
+                                    recipeId={ recipe.recipeId._id }
+                                    recipeImage={ recipe.recipeImage } title={ recipe.title } 
+                                    summary={ recipe.summary } authorName={ authorName }
+                                    isApproved={ recipe.isApproved } approvalCount={ recipe.recipeId.approvalCount } 
+                                    recipes={ userRecipes } setRecipes={ setUserRecipes }
                                     dateCreated={ recipe.createdAt }
-                                    user={ user } postApproveRecipe={ postApproveRecipe }
+                                    postApproveRecipe={ postApproveRecipe }
                                 />
                             })
                         }

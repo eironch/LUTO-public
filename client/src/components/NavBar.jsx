@@ -22,8 +22,10 @@ function NavBar(p) {
     const setSummary = p.setSummary
     const ingredients = p.ingredients
     const setIngredients = p.setIngredients
+    const tags = p.tags
+    const setTags = p.setTags
     const publishRecipe = p.publishRecipe
-    
+    console.log(tags + currentTab)
     return (
         <div>
             <div className="fixed flex gap-3 flex-col w-full h-svh pointer-events-none">
@@ -47,14 +49,14 @@ function NavBar(p) {
                                 <div className="col-span-2 flex items-center pointer-events-auto w-full h-full rounded-3xl overflow-hidden">
                                     {
                                         currentTab === "Profile" &&
-                                        <Link to="/recipe-builder" className="flex items-center p-4 gap-4 w-full h-full bg-orange-500 hover:bg-orange-400 overflow-hidden">
+                                        <Link to="/create" className="flex items-center p-4 gap-4 w-full h-full bg-orange-500 hover:bg-orange-400 overflow-hidden">
                                             <p className="flex text-zinc-100 text-lg w-full font-semibold">Create</p>
                                             <img className="w-8" src={ CreateIcon } alt="" />
                                         </Link>
                                     }
                                     {
                                         currentTab === "Builder" &&
-                                        <button className="flex items-center p-4 gap-4 w-full h-full bg-zinc-900 hover:bg-zinc-500 overflow-hidden">
+                                        <button className="flex items-center p-4 gap-4 w-full h-full bg-zinc-700 hover:bg-zinc-500 overflow-hidden">
                                             <p className="flex text-zinc-100 text-lg w-full font-semibold">Drafts</p>
                                             <img className="w-8" src={ CreateIcon } alt="" />
                                         </button>
@@ -118,7 +120,7 @@ function NavBar(p) {
                 {/* content */}
                 { 
                     (currentTab === "Home" || currentTab === "Search" || currentTab === "Settings" ) && 
-                    <SidebarTab currentTab={ currentTab } setCurrentTab={ setCurrentTab } /> 
+                    <SidebarTab currentTab={ currentTab } /> 
                 }
                 { 
                     currentTab === "Profile" && 
@@ -131,6 +133,7 @@ function NavBar(p) {
                             setRecipeImage={ setRecipeImage || null }
                             summary={ summary || null } setSummary={ setSummary || null }
                             ingredients={ ingredients || null } setIngredients={ setIngredients || null }
+                            tags={ tags || null } setTags={ setTags || null }
                             user={ user } currentTab={ currentTab } setCurrentTab={ setCurrentTab } 
                         />
                     )
@@ -140,7 +143,8 @@ function NavBar(p) {
                     (
                         <SidebarRecipe
                             summary={ summary || null } recipeImage={ recipeImage || null }
-                            ingredients={ ingredients || null } authorName={ authorName || null } currentTab={ currentTab }
+                            ingredients={ ingredients || null } tags={ tags || null }
+                            authorName={ authorName || null } currentTab={ currentTab }
                         />
                     )
                 }                 

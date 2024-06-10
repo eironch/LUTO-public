@@ -21,12 +21,6 @@ const recipeSchema = new Schema({
         ref: 'User',
         require: true,
     },
-    categories: {
-        type: [String],
-    },
-    tags: {
-        type: [String],
-    },
     recipeImage:{
         type: String,
         require: true,
@@ -41,8 +35,15 @@ const recipeSchema = new Schema({
     ingredients: {
         type: [String],
     },
+    tags: {
+        type: [String],
+    },
     recipeElements: {
         type: [elementSchema]
+    },
+    approvalCount: {
+        type: Number,
+        default: 0,
     },
 }, { timestamps: true })
 

@@ -1,20 +1,25 @@
 import React, { useState, useLayoutEffect } from 'react'
-import { v4 as uuidv4 } from 'uuid'
 import { Link } from 'react-router-dom'
+import { v4 as uuidv4 } from 'uuid'
+import debounce from 'lodash.debounce'
+
 import Feedback from '../components/Feedback'
 import Textarea from '../components/Textarea'
+
 import ProfilePicture from '../assets/profile-picture.png'
 import ApproveIcon from '../assets/approve-icon.png'
-import DiscussionIcon from '../assets/discussion-icon.png'
-import AddIngredient from '../assets/add-icon.png'
+import FeedbackIcon from '../assets/feedback-icon.png'
+import AddIcon from '../assets/add-icon.png'
+import SearchIcon from '../assets/search-icon.png'
+import TagIcon from '../assets/tag-icon.png'
+import IngredientsIcon from '../assets/ingredients-icon.png'
 
 function IngredientForm(p) {
-    const [ingredientValue, setIngredientValue] = useState('')
-
     const keyIndex = p.keyIndex
     const ingredients = p.ingredients
     const setIngredients = p.setIngredients
 
+    const [ingredientValue, setIngredientValue] = useState('')
     const ingredient = ingredients.find(ingredient => ingredient.key === keyIndex).value
 
     useLayoutEffect(() => {
@@ -31,7 +36,10 @@ function IngredientForm(p) {
     return (
         <li className="flex rounded-3xl text-center items-center">
             <p className="flex items-center pr-3 text-2xl font-bold">•</p>
-            <input className={`${ (ingredient === "") ? "bg-zinc-700" : "bg-zinc-900" } p-3 w-full  rounded-3xl focus:bg-zinc-700 hover:bg-zinc-700`} value={ ingredientValue } onChange={ e => { setIngredientValue(e.target.value) } } placeholder="What Ingredient?" />
+            <input className={`${ (ingredient === "") ? "bg-zinc-700" : "bg-zinc-900" } p-3 w-full  rounded-3xl focus:bg-zinc-700 hover:bg-zinc-700`} 
+                value={ ingredientValue } onChange={ e => setIngredientValue(e.target.value) } 
+                placeholder="What Ingredient?" 
+            />
         </li>
     )
 }
@@ -44,7 +52,45 @@ function SidebarBuilder(p) {
     const setSummary = p.setSummary
     const ingredients = p.ingredients
     const setIngredients = p.setIngredients
+    const tags = p.tags
+    const setTags = p.setTags
+
     const [preRecipeImage, setPreRecipeImage] = useState()
+    const [searchValue, setSearchValue] = useState('')
+    const [tagChoices, setTagChoices] = useState([])
+    const systemTags = ['Vegetarian',
+        'Vegan',
+        'Pescatarian',
+        'Flexitarian',
+        'Paleo',
+        'Keto',
+        'Low-Carb',
+        'Low-Fat',
+        'High-Protein',
+        'Gluten-Free',
+        'Dairy-Free',
+        'Nut-Free',
+        'Soy-Free',
+        'Sugar-Free',
+        'Low-Sodium',
+        'Whole30',
+    ]
+
+    function addTag(e) {
+        const index = e.target.id
+        const tag = tagChoices[index]
+
+        if (!tags.includes(tag)) {
+            setTags([...tags, tag])
+        }
+    }
+
+    function removeTag(e) {
+        const index = e.target.id
+        const tag = tags[index]
+
+        setTags(tags.filter(recipeTag => recipeTag !== tag))
+    }
 
     function addIngredient() {
         const newIngredients = [...ingredients]
@@ -63,6 +109,29 @@ function SidebarBuilder(p) {
         setPreRecipeImage(file)
         setRecipeImage(file)
     }
+
+    const handleTagSearch = debounce(input => {
+        console.log(input)
+        if (!input) {
+            return handlePopularTags()
+        }
+        
+        setTagChoices(systemTags.filter(tag => 
+            new RegExp(`.*${ input }.*`, 'i').test(tag)
+        ))
+    }, 300)
+
+    function handlePopularTags() {
+        setTagChoices(systemTags)
+    }
+
+    useLayoutEffect(() => {
+        handleTagSearch(searchValue)
+    }, [searchValue])
+
+    useLayoutEffect(() => {
+        handlePopularTags()
+    }, [])
     
     return (
         <div className="pl-3 grid w-full h-full overflow-hidden" style={ { gridTemplateColumns: 'repeat(15, minmax(0, 1fr))' } }>
@@ -85,7 +154,7 @@ function SidebarBuilder(p) {
                         <div className="flex">
                             <div className="flex gap-3 px-4 py-2 items-center justify-start rounded-3xl hover:bg-orange-400">
                                 <button className="hover:underline">
-                                    <img className="w-10" src={ DiscussionIcon } alt="" />
+                                    <img className="w-10" src={ FeedbackIcon } alt="" />
                                 </button>
                             </div>
                         </div>
@@ -113,8 +182,11 @@ function SidebarBuilder(p) {
                     <p className="p-3 w-full flex justify-end">{`${ summary ? summary.length : "0" }/300`}</p>
                 </div>
                 {/* Ingredients */}
-                <div className="flex flex-col gap-3 p-3 mb-3 rounded-3xl bg-zinc-900">
-                    <p className="text-2xl p-3 pb-0 font-semibold">Ingredients</p>
+                <div className="flex flex-col gap-3 p-6 mb-3 rounded-3xl bg-zinc-900">
+                    <div className="flex flex-row items-center gap-6">
+                        <img className="w-10" src={ IngredientsIcon } alt="" />
+                        <p className="text-2xl font-semibold">Ingredients</p>
+                    </div>
                     <ul className="text-lg flex flex-col gap-1 px-3">
                         {
                             ingredients &&
@@ -125,17 +197,54 @@ function SidebarBuilder(p) {
                                 />
                             )
                         }
-                        <button className="flex justify-center p-3 my-3 rounded-3xl bg-zinc-700 hover:bg-zinc-500" onClick={ () => addIngredient() }>
-                            <img className="w-5" src={ AddIngredient } alt="" />
+                        <button className="flex justify-center p-3 my-3 rounded-3xl shadow-md shadow-zinc-950 bg-zinc-700 hover:bg-zinc-500" onClick={ () => addIngredient() }>
+                            <img className="w-5" src={ AddIcon } alt="" />
                         </button>
                     </ul>
                 </div>
-                {/* Feedbacks */}
-                <div className="flex flex-col gap-6 p-6 mb-3 rounded-3xl bg-zinc-900">
+                {/* Tags */}
+                <div className="flex flex-col gap-3 p-6 mb-3 rounded-3xl bg-zinc-900">
                     <div className="flex flex-row items-center gap-6">
-                        <img className="w-10" src={ DiscussionIcon } alt="" />
-                        <p className="text-2xl font-semibold">Feedbacks</p>
-                        <p className="flex text-xl font-semibold justify-end w-full"></p>
+                        <img className="w-10" src={ TagIcon } alt="" />
+                        <p className="text-2xl font-semibold">Tags</p>
+                    </div>
+                    <div className="block text-md font-semibold w-full">
+                        {
+                            tags &&
+                            tags.map((tag, index) => 
+                                <button className="m-1 px-3 py-1 w-fit bg-zinc-700 rounded-3xl hover:bg-zinc-500" key={ index } id={ index } onClick={ e => { removeTag(e) } }>
+                                    { tag }
+                                </button>
+                            )
+                        }
+                    </div>
+                    <div className="flex flex-row gap-3 items-center">
+                        {
+                            !searchValue && <p className="text-xl font-bold">Popular</p>
+                        }
+                        <div className="flex w-full items-center justify-center rounded-3xl shadow-md shadow-zinc-950 bg-zinc-700">
+                            <div className="flex items-center justify-center ml-2 w-12 h-full">
+                                <img className="w-6" src={ SearchIcon } alt="" />
+                            </div>
+                            <input className="w-full h-10 ml-2 p-3 rounded-3xl bg-transparent text-zinc-100 text-start"
+                                value={ searchValue } onChange={ e => setSearchValue(e.target.value) } type="text" placeholder="Search Tags"
+                            />
+                        </div>
+                    </div>
+                    <div className="block text-md font-semibold w-full">
+                        {
+                            tagChoices.map((tag, index) => {
+                                const isAdded = tags.find(recipeTag => recipeTag === tag)
+
+                                return (
+                                    <button className={`${ isAdded ? "bg-zinc-800" : "bg-zinc-700 hover:bg-zinc-500" } m-1 px-3 py-1 w-fit rounded-3xl`} 
+                                        disabled={ isAdded } key={ index } id={ index } onClick={ e => { addTag(e) } }
+                                    >
+                                        { tag }
+                                    </button>
+                                )
+                            })
+                        }
                     </div>
                 </div>
             </div>

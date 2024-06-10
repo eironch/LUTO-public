@@ -15,5 +15,10 @@ const approvalSchema = new Schema({
     },
 }, { timestamps: { createdAt: true, updatedAt: false } })
 
+approvalSchema.index(
+    { userId: 1, recipeId: 1 },
+    { unique: true }
+)
+
 const Approval = mongoose.model('Approval', approvalSchema)
 export default Approval
