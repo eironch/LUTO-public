@@ -1,40 +1,65 @@
-import React, { useState, useLayoutEffect } from 'react'
+import React, { useState, useCallback, useLayoutEffect } from 'react'
 import axios from 'axios'
+import { debounce } from 'lodash'
+
 import NavBar from '../components/NavBar'
 import RecipeOverview from '../components/RecipeOverview'
 import SearchBar from '../components/SearchBar'
 
-function Home(p) {
-    const [feedRecipes, setFeedRecipes] = useState([])
-
+function Home(p) {    
     const user = p.user
     const currentTab = p.currentTab
     const setCurrentTab = p.setCurrentTab
+    const filters = p.filters
+    const setFilters = p.setFilters
+    const filtersRef = p.filtersRef
     const postApproveRecipe = p.postApproveRecipe
 
-    function getFeedRecipes() {
-        axios.get('http://localhost:8080/feed-recipes', { params: { userId: user.userId } })
+    const [feedRecipes, setFeedRecipes] = useState([])
+    
+    function fetchFeedRecipes(filters) {
+        axios.get('http://localhost:8080/feed-recipes', { params: { userId: user.userId, filters } })
             .then(res => {
                 console.log('Status Code:' , res.status)
                 console.log('Data:', res.data)
-
+                
                 setFeedRecipes(res.data.payload)
             })
             .catch(err => {
                 console.log('Error Status:', err.response.status)
                 console.log('Error Data:', err.response.data)
+
+                if (err.response.status === 400) {
+                    return setFeedRecipes([])
+                }
             })
     }
-    
+
+    const debouncedFetch = useCallback(
+        debounce(() => {
+            fetchFeedRecipes(filtersRef.current)
+        }, 300), []
+    )
+
+    useLayoutEffect(() => {
+        filtersRef.current = filters
+    }, [filters])
+
+    useLayoutEffect(() => {
+        debouncedFetch()
+    }, [filters, debouncedFetch])
+
     useLayoutEffect(() => {
         setCurrentTab("Home")
-        getFeedRecipes()
     }, [])
-
 
     return (
         <div className="scrollable-div overflow-y-scroll">
-            <NavBar user={ user } currentTab={ currentTab } setCurrentTab={ setCurrentTab } />
+            <NavBar 
+                user={ user } 
+                filters={ filters } setFilters={ setFilters }
+                currentTab={ currentTab } setCurrentTab={ setCurrentTab } 
+            />
             <div className="flex flex-col pr-0 gap-3 h-svh">
                 <div className="flex flex-col gap-3 p-3 pr-0">
                     {/* space for top navbar */}

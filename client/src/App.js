@@ -1,5 +1,5 @@
-import React, { useState, useLayoutEffect } from 'react'
-import { Routes, Route, BrowserRouter } from 'react-router-dom'
+import React, { useState, useRef, useLayoutEffect } from 'react'
+import { Routes, Route, BrowserRouter, Navigate } from 'react-router-dom'
 import axios from 'axios'
 import Auth from './pages/Auth'
 import Home from './pages/Home'
@@ -7,7 +7,7 @@ import Profile from './pages/Profile'
 import Settings from './pages/Settings'
 import Search from './pages/Search'
 import Recipe from './pages/Recipe'
-import RecipeBuilder from './pages/RecipeBuilder'
+import Create from './pages/Create'
 import Modal from './components/Modal'
 
 function App() {
@@ -17,6 +17,8 @@ function App() {
   const [modalMessage, setModalMessage] = useState('')
   const [showModal, setShowModal] = useState(false)
   const [currentTab, setCurrentTab] = useState('Home')
+  const [filters, setFilters] = useState([])
+  const filtersRef = useRef(filters)
   
   async function postApproveRecipe(userId, recipeId) {
     return await axios.post('http://localhost:8080/approve-recipe', { userId, recipeId })
@@ -68,12 +70,56 @@ function App() {
         <>
           <BrowserRouter>
             <Routes>
-              <Route path="/" element={ <Home setIsAuthenticated={ setIsAuthenticated } user={ user } currentTab={ currentTab } setCurrentTab={ setCurrentTab } postApproveRecipe={ postApproveRecipe } /> } />
-              <Route path="/:authorName" element={ <Profile user={ user } currentTab={ currentTab } setCurrentTab={ setCurrentTab } postApproveRecipe={ postApproveRecipe } /> }/>
-              <Route path="/settings" element={ <Settings user={ user } currentTab={ currentTab } setCurrentTab={ setCurrentTab } /> } />
-              <Route path="/search" element={ <Search user={ user } currentTab={ currentTab } setCurrentTab={ setCurrentTab } /> } />
-              <Route path="/create" element={ <RecipeBuilder user={ user } currentTab={ currentTab } setCurrentTab={ setCurrentTab } /> } />
-              <Route path="/recipe/:recipeId" element={ <Recipe user={ user } currentTab={ currentTab } setCurrentTab={ setCurrentTab } /> } />
+              <Route path="/home" element={ 
+                  <Home
+                    setIsAuthenticated={ setIsAuthenticated } user={ user } 
+                    currentTab={ currentTab } setCurrentTab={ setCurrentTab } 
+                    filters={ filters } setFilters={ setFilters } filtersRef={ filtersRef }
+                    postApproveRecipe={ postApproveRecipe }
+                  /> 
+                }
+              />
+              <Route path="/:authorName" element={ 
+                  <Profile 
+                    user={ user } 
+                    currentTab={ currentTab } setCurrentTab={ setCurrentTab } 
+                    postApproveRecipe={ postApproveRecipe } 
+                  /> 
+                }
+              />
+              <Route path="/settings" element={ 
+                  <Settings 
+                    user={ user } 
+                    currentTab={ currentTab } setCurrentTab={ setCurrentTab } 
+                  /> 
+                } 
+              />
+              <Route path="/search" element={ 
+                  <Search 
+                    user={ user }
+                    currentTab={ currentTab } setCurrentTab={ setCurrentTab }
+                    filters={ filters } setFilters={ setFilters } filtersRef={ filtersRef }
+                  /> 
+                } 
+              />
+              <Route path="/create" element={ 
+                  <Create 
+                    user={ user } 
+                    currentTab={ currentTab } setCurrentTab={ setCurrentTab } 
+                  /> 
+                } 
+              />
+              <Route path="/recipe/:recipeId" element={ 
+                  <Recipe 
+                    user={ user } 
+                    currentTab={ currentTab } setCurrentTab={ setCurrentTab } 
+                  /> 
+                } 
+              />
+              <Route path="/" element={ 
+                  <Navigate to="/home" />
+                } 
+              />
             </Routes>
           </BrowserRouter>
         </>

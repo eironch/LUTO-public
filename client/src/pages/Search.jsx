@@ -3,9 +3,12 @@ import NavBar from '../components/NavBar'
 import SearchBar from '../components/SearchBar'
 
 function Search(p) {
+    const user = p.user
+    const filters = p.filters
+    const setFilters = p.setFilters
+    const filtersRef = p.filtersRef
     const currentTab = p.currentTab
     const setCurrentTab = p.setCurrentTab
-    const user = p.user
     
     useLayoutEffect(() => {
         setCurrentTab("Search")
@@ -13,7 +16,11 @@ function Search(p) {
 
     return (
         <div>
-            <NavBar user={ user } currentTab={ currentTab } setCurrentTab={ setCurrentTab } />
+            <NavBar 
+                user={ user }
+                filters={ filters } setFilters={ setFilters }
+                currentTab={ currentTab } setCurrentTab={ setCurrentTab } 
+            />
             <div className="flex flex-col gap-3 h-svh">
                 <div className="flex flex-col gap-3 p-3 h-svh">
                     {/* space for top navbar */}

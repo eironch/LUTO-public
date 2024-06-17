@@ -3,8 +3,8 @@ import { Link } from 'react-router-dom'
 import { v4 as uuidv4 } from 'uuid'
 import debounce from 'lodash.debounce'
 
-import Feedback from '../components/Feedback'
-import Textarea from '../components/Textarea'
+import Feedback from './Feedback'
+import Textarea from './Textarea'
 
 import ProfilePicture from '../assets/profile-picture.png'
 import ApproveIcon from '../assets/approve-icon.png'
@@ -13,6 +13,7 @@ import AddIcon from '../assets/add-icon.png'
 import SearchIcon from '../assets/search-icon.png'
 import TagIcon from '../assets/tag-icon.png'
 import IngredientsIcon from '../assets/ingredients-icon.png'
+import SummaryIcon from '../assets/summary-icon.png'
 
 function IngredientForm(p) {
     const keyIndex = p.keyIndex
@@ -35,7 +36,9 @@ function IngredientForm(p) {
 
     return (
         <li className="flex rounded-3xl text-center items-center">
-            <p className="flex items-center pr-3 text-2xl font-bold">•</p>
+            <p className="flex items-center px-3 text-2xl font-bold">
+                •
+            </p>
             <input className={`${ (ingredient === "") ? "bg-zinc-700" : "bg-zinc-900" } p-3 w-full  rounded-3xl focus:bg-zinc-700 hover:bg-zinc-700`} 
                 value={ ingredientValue } onChange={ e => setIngredientValue(e.target.value) } 
                 placeholder="What Ingredient?" 
@@ -44,7 +47,7 @@ function IngredientForm(p) {
     )
 }
 
-function SidebarBuilder(p) {
+function SidebarCreate(p) {
     const user = p.user
 
     const setRecipeImage = p.setRecipeImage
@@ -79,7 +82,7 @@ function SidebarBuilder(p) {
     function addTag(e) {
         const index = e.target.id
         const tag = tagChoices[index]
-
+        console.log()
         if (!tags.includes(tag)) {
             setTags([...tags, tag])
         }
@@ -170,24 +173,35 @@ function SidebarBuilder(p) {
                 {/* User */}
                 <Link to={`/${ user.username }`} className="flex gap-6 flex-row items-center mb-3 p-6 rounded-3xl bg-zinc-900 hover:bg-zinc-500">
                     <img className="w-14" src={ ProfilePicture } alt="" />
-                    <p className="text-xl font-semibold">{ user.username }</p>
+                    <p className="text-xl font-semibold">
+                        { user.username }
+                    </p>
                 </Link>
                 {/* Summary */}
-                <div className="flex flex-col p-3 mb-3 rounded-3xl bg-zinc-900">
-                    <p className="text-2xl font-semibold p-3">Summary</p>
-                    <Textarea attribute={`${summary ?  "bg-transparent" : "bg-zinc-700"} text-justify text-lg focus:bg-zinc-700`} 
-                        maxLength={ 300 } value={ summary || "" } setValue={ setSummary }
-                        placeholder="What would you describe your dish?"
-                    />
-                    <p className="p-3 w-full flex justify-end">{`${ summary ? summary.length : "0" }/300`}</p>
+                <div className="flex flex-col mb-3 rounded-3xl bg-zinc-900">
+                    <div className="flex flex-row p-6 gap-6 items-center shadow-md shadow-zinc-950">
+                        <img className="w-10" src={ SummaryIcon } alt="" />
+                        <p className="text-2xl font-semibold">
+                            Summary
+                        </p>
+                    </div>
+                    <div className="flex flex-col p-3">
+                        <Textarea attribute={`${summary ?  "bg-transparent" : "bg-zinc-700"} text-justify text-lg focus:bg-zinc-700`} 
+                            maxLength={ 300 } value={ summary || "" } setValue={ setSummary }
+                            placeholder="What would you describe your dish?"
+                        />
+                        <p className="flex p-3 w-full justify-end">
+                            {`${ summary ? summary.length : "0" }/300`}
+                        </p>
+                    </div>
                 </div>
                 {/* Ingredients */}
-                <div className="flex flex-col gap-3 p-6 mb-3 rounded-3xl bg-zinc-900">
-                    <div className="flex flex-row items-center gap-6">
+                <div className="flex flex-col mb-3 rounded-3xl bg-zinc-900">
+                    <div className="flex flex-row p-6 gap-6 items-center shadow-md shadow-zinc-950">
                         <img className="w-10" src={ IngredientsIcon } alt="" />
                         <p className="text-2xl font-semibold">Ingredients</p>
                     </div>
-                    <ul className="text-lg flex flex-col gap-1 px-3">
+                    <ul className="text-lg flex flex-col gap-1 p-6 pt-3">
                         {
                             ingredients &&
                             ingredients.map(ingredient => 
@@ -203,12 +217,12 @@ function SidebarBuilder(p) {
                     </ul>
                 </div>
                 {/* Tags */}
-                <div className="flex flex-col gap-3 p-6 mb-3 rounded-3xl bg-zinc-900">
-                    <div className="flex flex-row items-center gap-6">
+                <div className="flex flex-col mb-3 gap-3 rounded-3xl bg-zinc-900">
+                    <div className="flex flex-row gap-6 p-6 items-center shadow-md shadow-zinc-950">
                         <img className="w-10" src={ TagIcon } alt="" />
                         <p className="text-2xl font-semibold">Tags</p>
                     </div>
-                    <div className="block text-md font-semibold w-full">
+                    <div className="block px-6 pt-3 text-md font-semibold w-full">
                         {
                             tags &&
                             tags.map((tag, index) => 
@@ -218,7 +232,7 @@ function SidebarBuilder(p) {
                             )
                         }
                     </div>
-                    <div className="flex flex-row gap-3 items-center">
+                    <div className="flex flex-row px-6 gap-3 items-center">
                         {
                             !searchValue && <p className="text-xl font-bold">Popular</p>
                         }
@@ -231,7 +245,7 @@ function SidebarBuilder(p) {
                             />
                         </div>
                     </div>
-                    <div className="block text-md font-semibold w-full">
+                    <div className="block px-6 pb-6 text-md font-semibold w-full">
                         {
                             tagChoices.map((tag, index) => {
                                 const isAdded = tags.find(recipeTag => recipeTag === tag)
@@ -252,4 +266,4 @@ function SidebarBuilder(p) {
     )
 }
 
-export default SidebarBuilder
+export default SidebarCreate

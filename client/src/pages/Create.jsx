@@ -62,10 +62,10 @@ function ElementsModal(p) {
     )
 }
 
-function RecipeBuilder(p) {
+function Create(p) {
+    const user = p.user
     const currentTab = p.currentTab
     const setCurrentTab = p.setCurrentTab
-    const user = p.user
 
     const [showModal, setShowModal] = useState(false)
     const [recipeImage, setRecipeImage] = useState(new Blob())
@@ -79,7 +79,7 @@ function RecipeBuilder(p) {
     
 
     useLayoutEffect(() => {
-        setCurrentTab("Builder")
+        setCurrentTab("Create")
     }, [])
 
     useLayoutEffect(() => {
@@ -214,4 +214,4 @@ function RecipeBuilder(p) {
     )
 }
 
-export default RecipeBuilder
+export default Create
