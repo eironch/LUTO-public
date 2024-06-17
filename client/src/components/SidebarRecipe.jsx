@@ -6,6 +6,8 @@ import ApproveIcon from '../assets/approve-icon.png'
 import FeedbackIcon from '../assets/feedback-icon.png'
 import TagIcon from '../assets/tag-icon.png'
 import IngredientsIcon from '../assets/ingredients-icon.png'
+import SummaryIcon from '../assets/summary-icon.png'
+import Feedback from './Feedback'
 
 function SidebarRecipe(p) {
     const authorName = p.authorName
@@ -45,21 +47,29 @@ function SidebarRecipe(p) {
                 {/* User */}
                 <Link to={`/${ authorName }`} className="flex gap-6 flex-row items-center mb-3 p-6 rounded-3xl bg-zinc-900 hover:bg-zinc-500">
                     <img className="w-14" src={ ProfilePicture } alt="" />
-                    <p className="text-xl font-semibold">{ authorName }</p>
+                    <p className="text-xl font-semibold">
+                        { authorName }
+                    </p>
                 </Link>
                 {/* Summary */}
-                <div className="flex flex-col p-6 gap-6 mb-3 rounded-3xl bg-zinc-900">
-                    <p className="text-2xl font-semibold">Summary</p>
-                    <p className="text-justify text-lg">{ summary }</p>
-                            
+                <div className="flex flex-col mb-3 rounded-3xl bg-zinc-900">
+                    <div className="flex flex-row p-6 gap-6 items-center shadow-md shadow-zinc-950">
+                        <img className="w-10" src={ SummaryIcon } alt="" />
+                        <p className="text-2xl font-semibold">
+                            Summary
+                        </p>
+                    </div>
+                    <p className="text-justify p-6 text-lg">
+                        { summary }
+                    </p>        
                 </div>
                 {/* Ingredients */}
-                <div className="flex flex-col gap-6 p-6 mb-3 rounded-3xl bg-zinc-900">
-                    <div className="flex flex-row items-center gap-6">
+                <div className="flex flex-col mb-3 rounded-3xl bg-zinc-900">
+                    <div className="flex flex-row p-6 gap-6 items-center shadow-md shadow-zinc-950">
                         <img className="w-10" src={ IngredientsIcon } alt="" />
                         <p className="text-2xl font-semibold">Ingredients</p>
                     </div>
-                    <ul className="text-lg flex flex-col gap-3">
+                    <ul className="flex flex-col p-6 gap-3 text-lg ">
                         {
                             ingredients &&
                             ingredients.map((ingredient, index) => 
@@ -72,12 +82,12 @@ function SidebarRecipe(p) {
                     </ul>
                 </div>
                 {/* Tags */}
-                <div className="flex flex-col gap-3 p-6 mb-3 rounded-3xl bg-zinc-900">
-                    <div className="flex flex-row items-center gap-6">
+                <div className="flex flex-col mb-3 rounded-3xl bg-zinc-900">
+                    <div className="flex flex-row p-6 gap-6 items-center shadow-md shadow-zinc-950">
                         <img className="w-10" src={ TagIcon } alt="" />
                         <p className="text-2xl font-semibold">Tags</p>
                     </div>
-                    <div className="block text-md font-semibold w-full">
+                    <div className="block p-6 text-md font-semibold w-full">
                         {
                             tags &&
                             tags.map((tag, index) => 
@@ -89,11 +99,15 @@ function SidebarRecipe(p) {
                     </div>
                 </div>
                 {/* Feedbacks */}
-                <div className="flex flex-col gap-6 p-6 mb-3 rounded-3xl bg-zinc-900">
-                    <div className="flex flex-row items-center gap-6">
+                <div className="flex flex-col mb-3 rounded-3xl bg-zinc-900">
+                    <div className="flex flex-row items-center p-6 gap-6 shadow-md shadow-zinc-950">
                         <img className="w-10" src={ FeedbackIcon } alt="" />
                         <p className="text-2xl font-semibold">Feedbacks</p>
                         <p className="flex text-xl font-semibold justify-end w-full"></p>
+                    </div>
+                    <div className="flex flex-col p-6 gap-6">
+                        <Feedback user={ { username: "Anonymous" } }/>
+                        <Feedback user={ { username: "Anonymous" } }/>
                     </div>
                 </div>
             </div>

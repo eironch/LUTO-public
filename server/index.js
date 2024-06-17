@@ -179,7 +179,7 @@ app.post('/publish-recipe', upload.any(), (req, res) => {
     const recipe = {
         userId,
         categories,
-        tags,
+        tags: JSON.parse(tags),
         recipeImage: '',
         title,
         summary,
@@ -338,18 +338,44 @@ app.post('/approve-recipe', async (req, res) => {
 })
 
 app.get('/feed-recipes', async (req, res) => {
-    const { userId } = req.query
-
+    const { userId, filters } = req.query
+    const pipeline = []
+    
     try {
-        const recipes = await RecipeOverview.find()
-            .populate({
-                path: 'userId',
-                select: 'username',
-            }).populate({
-                path: 'recipeId',
-                select: 'approvalCount',
-            }).sort({ createdAt: -1 })
+        if (filters) {
+            pipeline.push(
+                { 
+                    $match: { tags: { $in: filters } }
+                },
+                {
+                    $addFields: {
+                        matchCount: {
+                            $size: {
+                                $filter: {
+                                    input: "$tags",
+                                    as: "tag",
+                                    cond: { $in: ["$$tag", filters] }
+                                }
+                            }
+                        }
+                    }
+                },
+            )
+        }
 
+        pipeline.push({ $sort: { createdAt: -1 } })
+
+        const aggregatedResults = await RecipeOverview.aggregate(pipeline)
+        console.log(aggregatedResults)
+        const results = aggregatedResults.map(result => new RecipeOverview(result))
+
+        const recipes = await RecipeOverview.populate(results, [
+                    { path: 'userId', select: 'username' },
+                    { path: 'recipeId', select: 'approvalCount'}
+                ])
+
+
+        console.log(recipes)
         if (!recipes.length) {
             return res.status(400).json({ message: 'No recipes found.' })
         }

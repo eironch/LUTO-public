@@ -12,8 +12,9 @@ import SearchIcon from '../assets/search-icon.png'
 
 function SidebarTab(p) {
     const currentTab = p.currentTab
+    const filters = p.filters
+    const setFilters = p.setFilters
 
-    const [tags, setTags] = useState([])
     const [searchValue, setSearchValue] = useState('')
     const [tagChoices, setTagChoices] = useState([])
     const systemTags = ['Vegetarian',
@@ -38,20 +39,19 @@ function SidebarTab(p) {
         const index = e.target.id
         const tag = tagChoices[index]
 
-        if (!tags.includes(tag)) {
-            setTags([...tags, tag])
+        if (!filters.includes(tag)) {
+            setFilters([...filters, tag])
         }
     }
 
     function removeTag(e) {
         const index = e.target.id
-        const tag = tags[index]
+        const tag = filters[index]
 
-        setTags(tags.filter(recipeTag => recipeTag !== tag))
+        setFilters(filters.filter(recipeTag => recipeTag !== tag))
     }
 
     const handleTagSearch = debounce(input => {
-        console.log(input)
         if (!input) {
             return handlePopularTags()
         }
@@ -77,7 +77,7 @@ function SidebarTab(p) {
         <div className="p-3 pt-0 grid w-full gap-3 h-full overflow-hidden" style={ { gridTemplateColumns: 'repeat(15, minmax(0, 1fr))' } }>
             <div className="col-span-2 rounded-3xl bg-zinc-900 pointer-events-auto">
                 <div className="flex items-center flex-col gap-3 m-3">
-                    <Link to="/" className={`${ currentTab==="Home" && "bg-zinc-700 shadow-md shadow-zinc-950" } flex flex-row items-center gap-4 p-4 overflow-hidden w-full rounded-3xl hover:bg-zinc-500 hover:shadow-md hover:shadow-zinc-950`}>
+                    <Link to="/home" className={`${ currentTab==="Home" && "bg-zinc-700 shadow-md shadow-zinc-950" } flex flex-row items-center gap-4 p-4 overflow-hidden w-full rounded-3xl hover:bg-zinc-500 hover:shadow-md hover:shadow-zinc-950`}>
                         <img className="w-8" src={ HomeIcon } alt="" />
                         <p className="text-zinc-100 text-lg font-semibold">Home</p>
                     </Link>
@@ -100,10 +100,11 @@ function SidebarTab(p) {
                 </div>
             </div>
             <div className="col-span-11"></div>
+            {/* Tags */}
             {
                 (currentTab === "Home" || currentTab === "Search") &&
                 <div className="bg-zinc-900 flex flex-col text-zinc-100 rounded-3xl col-span-2 overflow-hidden pointer-events-auto">
-                    <div className="flex p-6 pb-3 gap-3 shadow-md shadow-zinc-950 flex-row items-center">
+                    <div className="flex p-6 gap-3 shadow-md shadow-zinc-950 flex-row items-center">
                         <img  className="w-8" src={ FilterIcon } alt="" />
                         <p className="text-2xl font-bold">
                             Filter
@@ -112,8 +113,8 @@ function SidebarTab(p) {
                     <div className="flex flex-col pl-6 pr-3 pt-3 pb-6 gap-3 scrollable-div overflow-y-scroll">
                         <div className="font-semibold gap-3">
                             {
-                                tags &&
-                                tags.map((tag, index) => 
+                                filters &&
+                                filters.map((tag, index) => 
                                     <button className="m-1 px-3 py-1 w-fit bg-zinc-700 rounded-3xl hover:bg-zinc-500" key={ index } id={ index } onClick={ e => { removeTag(e) } }>
                                         { tag }
                                     </button>
@@ -121,17 +122,17 @@ function SidebarTab(p) {
                             }
                         </div>
                         <div className="flex w-full items-center justify-center shadow-md shadow-zinc-950 rounded-3xl bg-zinc-700">
-                                <div className="flex items-center justify-center ml-2 w-12 h-full">
-                                    <img className="w-6" src={ SearchIcon } alt="" />
-                                </div>
-                                <input className="w-full h-10 ml-2 p-3 rounded-3xl bg-transparent text-zinc-100 text-start"
-                                    value={ searchValue } onChange={ e => setSearchValue(e.target.value) } type="text" placeholder="Search Tags"
-                                />
+                            <div className="flex items-center justify-center ml-2 w-12 h-full">
+                                <img className="w-6" src={ SearchIcon } alt="" />
                             </div>
+                            <input className="w-full h-10 ml-2 p-3 rounded-3xl bg-transparent text-zinc-100 text-start"
+                                value={ searchValue } onChange={ e => setSearchValue(e.target.value) } type="text" placeholder="Search Tags"
+                            />
+                        </div>
                         <div className="font-semibold gap-3">
                             {
                                 tagChoices.map((tag, index) => {
-                                    const isAdded = tags.find(recipeTag => recipeTag === tag)
+                                    const isAdded = filters.find(recipeTag => recipeTag === tag)
 
                                     return (
                                         <button className={`${ isAdded ? "bg-zinc-800" : "bg-zinc-700 hover:bg-zinc-500" } m-1 px-3 py-1 w-fit rounded-3xl`} 

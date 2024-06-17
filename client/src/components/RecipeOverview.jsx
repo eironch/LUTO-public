@@ -54,7 +54,7 @@ function RecipeOverview(p) {
         
         const diffInDays = calculateDiffInTime(dateNow, dateCreated, 60 * 60 * 24)
         if (diffInDays >= 7) {
-            return format(dateCreated, 'MMMM dd')
+            return format(dateCreated, 'MMMM d')
         }
 
         if (diffInDays > 0) {
@@ -75,6 +75,8 @@ function RecipeOverview(p) {
         if (diffInSeconds > 0) {
             return `${ diffInSeconds } ${ diffInSeconds === 1 ? 'second ago' : 'seconds ago' }`
         }
+
+        return 'just now'
     } 
 
     useLayoutEffect(() => {
@@ -92,7 +94,9 @@ function RecipeOverview(p) {
             {/* recipe content */}
             <div className="col-span-8 flex flex-col">
                 <div className="flex flex-col w-full min-h-64 gap-3">
-                    <Link to={`/recipe/${ recipeId }`} className="mx-6 mt-6 pt-0.5 text-zinc-100 text-3xl font-bold line-clamp-2 hover:underline">{ title }</Link>
+                    <Link to={`/recipe/${ recipeId }`} className="mx-6 mt-6 pt-0.5 pb-0.5 text-zinc-100 text-3xl font-bold line-clamp-2 hover:underline">
+                        { title }
+                    </Link>
                     <div className="flex flex-row mx-6 text-lg overflow-hidden text-clip text-zinc-400">
                         <Link to={`/${ authorName }`} className="hover:underline">
                             { authorName }

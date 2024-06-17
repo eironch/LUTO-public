@@ -29,7 +29,7 @@ function Recipe(p) {
                 setTitle(res.data.payload.recipeContents.title)
                 setSummary(res.data.payload.recipeContents.summary)
                 setIngredients(res.data.payload.recipeContents.ingredients)
-                setTags(JSON.parse(res.data.payload.recipeContents.tags))
+                setTags(res.data.payload.recipeContents.tags)
                 setRecipeElements(res.data.payload.recipeContents.recipeElements)
             })
             .catch(err => {
@@ -66,13 +66,17 @@ function Recipe(p) {
                                 if (element.contentType === "Subheading") {
                                     return (
                                         <div className="py-6 px-3 flex flex-col gap-3 mb-3 rounded-3xl bg-zinc-900" key={ key }>
-                                            <p className="px-3 text-3xl font-semibold w-full text-justify">{ element.contents[0] }</p>
+                                            <p className="px-3 text-3xl font-semibold w-full text-justify">
+                                                { element.text }
+                                            </p>
                                         </div>
                                     )
                                 } else if (element.contentType === "Text") {
                                     return (
                                         <div className="py-6 px-3 flex flex-col gap-3 mb-3 rounded-3xl bg-zinc-900" key={ key }>
-                                            <p className="px-3 text-xl w-full text-justify">{ element.contents[0] }</p>
+                                            <p className="px-3 text-xl w-full text-justify">
+                                                { element.text }
+                                            </p>
                                         </div>
                                     )
                                 } else if (element.contentType === "Images") {
