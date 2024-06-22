@@ -32,7 +32,8 @@ function Textarea(p) {
     }, [ p.value ])
 
     return (
-        <textarea className={`${ attribute } w-full p-3 box-border rounded-3xl overflow-hidden resize-none`}
+        <textarea 
+            className={`${ attribute } w-full p-3 box-border rounded-3xl overflow-hidden resize-none`}
             ref={ textareaRef } value={ value } maxLength={ maxLength }
             onChange={ e => { setValue(e.target.value) } } placeholder={ placeholder } 
             spellCheck={ isFocused }

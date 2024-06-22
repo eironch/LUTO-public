@@ -1,6 +1,5 @@
 import React, { useState, useLayoutEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { format, getYear } from 'date-fns'
 
 import FeedbackIcon from '../assets/feedback-icon.png'
 import ApproveIcon from '../assets/approve-icon.png'
@@ -16,16 +15,19 @@ function RecipeOverview(p) {
     const summary = p.summary
     const recipeImage = p.recipeImage
     const approvalCount = p.approvalCount
-    const postApproveRecipe = p.postApproveRecipe
-
+    const feedbackCount = p.feedbackCount
+    const setPrevRecipeId = p.setPrevRecipeId
+    const setPrevTitle = p.setPrevTitle
+    const setIsFeedbacksShown = p.setIsFeedbacksShown
+    const approveRecipe = p.approveRecipe
+    const formatDate = p.formatDate
+    
     const dateCreated = new Date(p.dateCreated)
     const [isApproved, setIsApproved] = useState(p.isApproved)
     const [formattedDate, setFormattedDate] = useState('')
     
-    async function approveRecipe() {
-        console.log(recipeId)
-        const { isApproved, approvalCount } = await postApproveRecipe(user.userId, recipeId)
-        console.log('approvalCount ' + approvalCount)
+    async function handleApproveRecipe() {
+        const { isApproved, approvalCount } = await approveRecipe(user.userId, recipeId)
         
         setRecipes(recipes.map(recipe => {
             if (recipe.recipeId._id === recipeId) {
@@ -38,49 +40,14 @@ function RecipeOverview(p) {
         setIsApproved(isApproved)
     }
 
-    function calculateDiffInTime(dateNow, pastDate, unitsOfTime) {
-        const diffInMilliseconds = dateNow - pastDate
-        const diffInTime = Math.floor(diffInMilliseconds / (1000 * unitsOfTime))
-        
-        return diffInTime
+    function handlePrevFeedbacks() {
+        setPrevRecipeId(recipeId)
+        setPrevTitle(title)
+        setIsFeedbacksShown(true)
     }
 
-    function formatDate() {
-        const dateNow = new Date()
-
-        if (getYear(dateCreated) > getYear(dateNow)) {
-            return setFormattedDate(format(dateCreated, 'PP'))
-        }
-        
-        const diffInDays = calculateDiffInTime(dateNow, dateCreated, 60 * 60 * 24)
-        if (diffInDays >= 7) {
-            return format(dateCreated, 'MMMM d')
-        }
-
-        if (diffInDays > 0) {
-            return `${ diffInDays } ${ diffInDays === 1 ? 'day ago' : 'days ago' }`
-        }
-        
-        const diffInHours = calculateDiffInTime(dateNow, dateCreated, 60 * 60)
-        if (diffInHours > 0) {
-            return `${ diffInHours } ${ diffInHours === 1 ? 'hour ago' : 'hours ago' }`
-        }
-
-        const diffInMinutes = calculateDiffInTime(dateNow, dateCreated, 60)
-        if (diffInMinutes > 0) {
-            return `${ diffInMinutes } ${ diffInMinutes === 1 ? 'minute ago' : 'minutes ago' }`
-        }
-
-        const diffInSeconds = calculateDiffInTime(dateNow, dateCreated)
-        if (diffInSeconds > 0) {
-            return `${ diffInSeconds } ${ diffInSeconds === 1 ? 'second ago' : 'seconds ago' }`
-        }
-
-        return 'just now'
-    } 
-
     useLayoutEffect(() => {
-        setFormattedDate(formatDate())
+        setFormattedDate(formatDate(dateCreated))
     }, [])
 
     return (
@@ -94,15 +61,15 @@ function RecipeOverview(p) {
             {/* recipe content */}
             <div className="col-span-8 flex flex-col">
                 <div className="flex flex-col w-full min-h-64 gap-3">
-                    <Link to={`/recipe/${ recipeId }`} className="mx-6 mt-6 pt-0.5 pb-0.5 text-zinc-100 text-3xl font-bold line-clamp-2 hover:underline">
+                    <Link to={`/recipe/${ recipeId }`} className="mx-6 mt-6 pb-1 text-zinc-100 text-3xl font-bold line-clamp-2 hover:underline">
                         { title }
                     </Link>
-                    <div className="flex flex-row mx-6 text-lg overflow-hidden text-clip text-zinc-400">
+                    <div className="flex flex-row mx-6 -m-1 text-lg overflow-hidden text-clip text-zinc-400">
                         <Link to={`/${ authorName }`} className="hover:underline">
                             { authorName }
                         </Link>
                         <p className="line-clamp-1">
-                            ’s Recipe •&nbsp;
+                            ’s recipe •&nbsp;
                         </p>
                         <p className="line-clamp-1">
                             { formattedDate }
@@ -114,14 +81,20 @@ function RecipeOverview(p) {
                 </div>
                 <div className="flex mb-6 ml-6 h-full gap-6">
                     <div className="flex items-end w-full text-zinc-100 text-lg overflow-hidden">
-                        <button className="flex items-center px-4 py-2 gap-4 rounded-3xl hover:bg-zinc-500">
+                        <button className="flex items-center px-4 py-2 gap-4 rounded-3xl hover:bg-zinc-500" onClick={ () => handlePrevFeedbacks() }>
                             <img className="w-10" src={ FeedbackIcon } alt="" />
-                            <p>1.1k</p>
+                            { 
+                                feedbackCount > 0 && 
+                                <p>{ feedbackCount }</p>
+                            }
                         </button>
                     </div>
                     <div className="flex justify-end items-end w-full mr-6 gap-4 text-zinc-100 text-lg overflow-hidden">
-                        <button className="flex justify-end items-center px-4 py-2 gap-4 rounded-3xl hover:bg-zinc-500" onClick={ () => { approveRecipe() } }>
-                            <p>{ approvalCount > 0 && approvalCount }</p>
+                        <button className="flex justify-end items-center px-4 py-2 gap-4 rounded-3xl hover:bg-zinc-500" onClick={ () => { handleApproveRecipe() } }>
+                            { 
+                                approvalCount > 0 && 
+                                <p>{ approvalCount }</p>
+                            }
                             <img className="w-10" src={ isApproved ? ApprovedIcon : ApproveIcon } alt="" />
                         </button>
                     </div>

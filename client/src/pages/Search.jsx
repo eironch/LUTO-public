@@ -9,17 +9,20 @@ function Search(p) {
     const filtersRef = p.filtersRef
     const currentTab = p.currentTab
     const setCurrentTab = p.setCurrentTab
-    
+
     useLayoutEffect(() => {
         setCurrentTab("Search")
     }, [])
 
+    if (currentTab !== "Search") {
+        return
+    }
     return (
         <div>
             <NavBar 
                 user={ user }
                 filters={ filters } setFilters={ setFilters }
-                currentTab={ currentTab } setCurrentTab={ setCurrentTab } 
+                currentTab={ currentTab } setCurrentTab={ setCurrentTab }
             />
             <div className="flex flex-col gap-3 h-svh">
                 <div className="flex flex-col gap-3 p-3 h-svh">

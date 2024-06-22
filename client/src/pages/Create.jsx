@@ -1,4 +1,4 @@
-import React, { useState, useRef, useLayoutEffect } from 'react'
+import React, { useState, useLayoutEffect } from 'react'
 import axios from 'axios'
 import { v4 as uuidv4 } from 'uuid'
 import { Link } from 'react-router-dom'
@@ -14,7 +14,7 @@ function ElementsModal(p) {
     const addElement = p.addElement
 
     return (
-        <div className="flex justify-center items-center fixed inset-0 text-zinc-100 bg-zinc-950 bg-opacity-80" 
+        <div className="flex justify-center items-center fixed inset-0 text-zinc-100 bg-zinc-950 bg-opacity-90" 
             onMouseDownCapture={ 
                 (event) => { 
                     const isOutsideModal = !event.target.closest('.model-inner')
@@ -27,7 +27,9 @@ function ElementsModal(p) {
         >
             <div className="flex flex-col w-5/12 max-w-lg h-[50%] max-h-lg aspect-1 gap-6 p-6 rounded-3xl bg-zinc-900 model-inner">
                 <div className="flex justify-end">
-                    <button className="p-3 rounded-3xl hover:bg-zinc-500" onClick={ () => { setShowModal(false) } }>X</button>
+                    <button className="p-3 rounded-3xl hover:bg-zinc-500" onClick={ () => { setShowModal(false) } }>
+                        𐌗
+                    </button>
                 </div>
                 <p className="text-3xl font-semibold text-center">Add to Recipe</p>
                 <ul className="flex flex-col gap-3 h-full overflow-y-scroll overflow-x-hidden scrollable-div">
@@ -66,7 +68,7 @@ function Create(p) {
     const user = p.user
     const currentTab = p.currentTab
     const setCurrentTab = p.setCurrentTab
-
+    
     const [showModal, setShowModal] = useState(false)
     const [recipeImage, setRecipeImage] = useState(new Blob())
     const [summary, setSummary] = useState('')
@@ -77,11 +79,6 @@ function Create(p) {
     const [elementFiles, setElementFiles] = useState([])
     const [recipeElements, setRecipeElements] = useState([])
     
-
-    useLayoutEffect(() => {
-        setCurrentTab("Create")
-    }, [])
-
     useLayoutEffect(() => {
         console.log("text")
         console.log(elementTexts)
@@ -162,6 +159,14 @@ function Create(p) {
             })
     }
 
+    useLayoutEffect(() => {
+        setCurrentTab("Create")
+    })
+
+    if (currentTab !== "Create") {
+        return
+    }
+
     return (
         <div>
             <NavBar
@@ -181,7 +186,8 @@ function Create(p) {
                             What are you cooking?
                         </p>
                         <div className="flex flex-col items-center w-full mb-3 py-6 px-3 rounded-3xl bg-zinc-900">
-                            <Textarea attribute={`${ !title && "bg-zinc-700" } px-3 text-3xl font-bold w-full text-center focus:bg-zinc-700 bg-transparent`} 
+                            <Textarea 
+                                attribute={`${ !title && "bg-zinc-700" } px-3 text-3xl font-bold w-full text-center focus:bg-zinc-700 bg-transparent`} 
                                 maxLength={ 200 } value={ title } setValue={ setTitle } 
                                 placeholder="What is the title of your recipe?" 
                             />

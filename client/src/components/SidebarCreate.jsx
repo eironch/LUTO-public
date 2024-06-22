@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom'
 import { v4 as uuidv4 } from 'uuid'
 import debounce from 'lodash.debounce'
 
-import Feedback from './Feedback'
 import Textarea from './Textarea'
 
 import ProfilePicture from '../assets/profile-picture.png'
@@ -155,17 +154,13 @@ function SidebarCreate(p) {
                     </div>
                     <div className="grid grid-cols-2 pt-2">
                         <div className="flex">
-                            <div className="flex gap-3 px-4 py-2 items-center justify-start rounded-3xl hover:bg-orange-400">
-                                <button className="hover:underline">
-                                    <img className="w-10" src={ FeedbackIcon } alt="" />
-                                </button>
+                            <div className="flex gap-3 px-4 py-2 items-center justify-start rounded-3xl">
+                                <img className="w-10" src={ FeedbackIcon } alt="" />
                             </div>
                         </div>
                         <div className="flex justify-end">
-                            <div className="flex gap-3 px-4 py-2 items-center rounded-3xl hover:bg-orange-400">
-                                <button>
-                                    <img className="w-10" src={ ApproveIcon } alt="" />
-                                </button>
+                            <div className="flex gap-3 px-4 py-2 items-center rounded-3xl">
+                                <img className="w-10" src={ ApproveIcon } alt="" />
                             </div>
                         </div>
                     </div>
@@ -186,7 +181,8 @@ function SidebarCreate(p) {
                         </p>
                     </div>
                     <div className="flex flex-col p-3">
-                        <Textarea attribute={`${summary ?  "bg-transparent" : "bg-zinc-700"} text-justify text-lg focus:bg-zinc-700`} 
+                        <Textarea 
+                            attribute={`${summary ?  "bg-transparent" : "bg-zinc-700"} text-justify text-lg focus:bg-zinc-700`} 
                             maxLength={ 300 } value={ summary || "" } setValue={ setSummary }
                             placeholder="What would you describe your dish?"
                         />
@@ -247,6 +243,7 @@ function SidebarCreate(p) {
                     </div>
                     <div className="block px-6 pb-6 text-md font-semibold w-full">
                         {
+                            tags &&
                             tagChoices.map((tag, index) => {
                                 const isAdded = tags.find(recipeTag => recipeTag === tag)
 

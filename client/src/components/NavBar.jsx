@@ -13,8 +13,10 @@ function NavBar(p) {
     const currentTab = p.currentTab
     const setCurrentTab = p.setCurrentTab
     const user = p.user
-    const authorName = p.authorName 
+    const authorName = p.authorName
+    const formatDate = p.formatDate
 
+    const recipeId = p.recipeId
     const recipeImage = p.recipeImage
     const setRecipeImage = p.setRecipeImage 
     const title = p.title
@@ -24,6 +26,10 @@ function NavBar(p) {
     const setIngredients = p.setIngredients
     const tags = p.tags
     const setTags = p.setTags
+    const approvalCount = p.approvalCount
+    const setApprovalCount = p.setApprovalCount
+    const feedbackCount = p.feedbackCount
+    const setFeedbackCount  = p.setFeedbackCount
     const publishRecipe = p.publishRecipe
 
     const filters  = p.filters
@@ -53,21 +59,27 @@ function NavBar(p) {
                                     {
                                         currentTab === "Profile" &&
                                         <Link to="/create" className="flex items-center p-4 gap-4 w-full h-full bg-orange-500 hover:bg-orange-400 overflow-hidden">
-                                            <p className="flex text-zinc-100 text-lg w-full font-semibold">Create</p>
+                                            <p className="flex text-zinc-100 text-lg w-full font-semibold">
+                                                Create
+                                            </p>
                                             <img className="w-8" src={ CreateIcon } alt="" />
                                         </Link>
                                     }
                                     {
                                         currentTab === "Create" &&
                                         <button className="flex items-center p-4 gap-4 w-full h-full bg-zinc-700 hover:bg-zinc-500 overflow-hidden">
-                                            <p className="flex text-zinc-100 text-lg w-full font-semibold">Drafts</p>
+                                            <p className="flex text-zinc-100 text-lg w-full font-semibold">
+                                                Drafts
+                                            </p>
                                             <img className="w-8" src={ CreateIcon } alt="" />
                                         </button>
                                     }
                                     {
                                         currentTab === "Recipe" &&
                                         <button className="flex items-center p-4 gap-4 w-full h-full bg-orange-500 hover:bg-orange-400 overflow-hidden">
-                                            <p className="flex text-zinc-100 text-lg w-full font-semibold">Save</p>
+                                            <p className="flex text-zinc-100 text-lg w-full font-semibold">
+                                                Save
+                                            </p>
                                             <img className="w-8" src={ SaveIcon } alt="" />
                                         </button>
                                     }
@@ -136,11 +148,12 @@ function NavBar(p) {
                     currentTab === "Create" &&
                     (
                         <SidebarCreate
+                            user={ user }    
                             setRecipeImage={ setRecipeImage || null }
                             summary={ summary || null } setSummary={ setSummary || null }
                             ingredients={ ingredients || null } setIngredients={ setIngredients || null }
                             tags={ tags || null } setTags={ setTags || null }
-                            user={ user } currentTab={ currentTab } setCurrentTab={ setCurrentTab } 
+                            currentTab={ currentTab } setCurrentTab={ setCurrentTab } 
                         />
                     )
                 }
@@ -148,9 +161,13 @@ function NavBar(p) {
                     currentTab === "Recipe" &&
                     (
                         <SidebarRecipe
+                            user={ user } recipeId={ recipeId || null }
                             summary={ summary || null } recipeImage={ recipeImage || null }
                             ingredients={ ingredients || null } tags={ tags || null }
-                            authorName={ authorName || null } currentTab={ currentTab }
+                            authorName={ authorName || null }
+                            approvalCount={ approvalCount } setApprovalCount={ setApprovalCount } 
+                            feedbackCount={ feedbackCount } setFeedbackCount={ setFeedbackCount } 
+                            currentTab={ currentTab } formatDate={ formatDate || null }
                         />
                     )
                 }                 

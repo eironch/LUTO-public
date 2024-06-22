@@ -9,13 +9,14 @@ function Profile(p) {
     const user = p.user
     const currentTab = p.currentTab
     const setCurrentTab = p.setCurrentTab
-    const postApproveRecipe = p.postApproveRecipe
-
+    const approveRecipe = p.approveRecipe
+    const formatDate = p.formatDate
+    
     const { authorName } = useParams()
     const [userRecipes, setUserRecipes] = useState([])
-    
+
     useLayoutEffect(() => {
-        axios.get('http://localhost:8080/user-recipes', { params: { authorName, userId: user.userId } })
+        axios.get('http://localhost:8080/user-recipes', { params: { authorName } })
             .then(res => {
                 console.log('Status Code:', res.status)
                 console.log('Data:', res.data)
@@ -32,11 +33,15 @@ function Profile(p) {
         setCurrentTab("Profile")
     }, [])
 
+    if (currentTab !== "Profile") {
+        return
+    }
+
     return (
        <div className="scrollable-div overflow-y-scroll">
-            <NavBar 
+            <NavBar
                 user={ user }authorName={ authorName } 
-                currentTab={ currentTab } setCurrentTab={ setCurrentTab } 
+                currentTab={ currentTab } setCurrentTab={ setCurrentTab }
             />
             <div className="flex flex-col p-3 pr-0 h-svh bg-zinc-950">
                 {/* content */}
@@ -47,13 +52,12 @@ function Profile(p) {
                             userRecipes.map((recipe, index) => {
                                 return <RecipeOverview 
                                     key={ index } user={ user } 
-                                    recipeId={ recipe.recipeId._id }
-                                    recipeImage={ recipe.recipeImage } title={ recipe.title } 
-                                    summary={ recipe.summary } authorName={ authorName }
-                                    isApproved={ recipe.isApproved } approvalCount={ recipe.recipeId.approvalCount } 
-                                    recipes={ userRecipes } setRecipes={ setUserRecipes }
-                                    dateCreated={ recipe.createdAt }
-                                    postApproveRecipe={ postApproveRecipe }
+                                    recipeId={ recipe.recipeId._id } recipeImage={ recipe.recipeImage } 
+                                    title={ recipe.title } summary={ recipe.summary } 
+                                    authorName={ authorName } isApproved={ recipe.isApproved } 
+                                    approvalCount={ recipe.recipeId.approvalCount } recipes={ userRecipes } 
+                                    setRecipes={ setUserRecipes } dateCreated={ recipe.createdAt }
+                                    approveRecipe={ approveRecipe } formatDate={ formatDate }
                                 />
                             })
                         }

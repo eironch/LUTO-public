@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useRef } from 'react'
 import { Link } from 'react-router-dom'
 
 import ProfilePicture from '../assets/profile-picture.png'
@@ -7,18 +7,40 @@ import FeedbackIcon from '../assets/feedback-icon.png'
 import TagIcon from '../assets/tag-icon.png'
 import IngredientsIcon from '../assets/ingredients-icon.png'
 import SummaryIcon from '../assets/summary-icon.png'
-import Feedback from './Feedback'
+import FeedbackSection from './FeedbackSection'
 
 function SidebarRecipe(p) {
+    const user = p.user
+    const formatDate = p.formatDate
+    
+    const recipeId = p.recipeId
     const authorName = p.authorName
     const recipeImage = p.recipeImage
     const summary = p.summary
     const ingredients = p.ingredients
     const tags = p.tags
+    const approvalCount = p.approvalCount
+    const setApprovalCount = p.setApprovalCount
+    const feedbackCount = p.feedbackCount
+    const setFeedbackCount  = p.setFeedbackCount
+
+    const divRef = useRef(null)
+    const sectionRef = useRef(null)
+
+    const scrollToBottom = () => {
+        if (divRef.current && sectionRef.current) {
+            const offsetTop = sectionRef.current.offsetTop - divRef.current.offsetTop
+
+            divRef.current.scrollTo({
+                top: offsetTop,
+                behavior: 'smooth'
+            })
+        }
+    }
 
     return (
         <div className="pl-3 grid w-full h-full overflow-hidden" style={ { gridTemplateColumns: 'repeat(15, minmax(0, 1fr))' } }>
-            <div className="flex overflow-x-hidden overflow-y-scroll h-full scrollable-div flex-col text-zinc-100 col-span-4 pointer-events-auto">
+            <div className="flex overflow-x-hidden overflow-y-scroll h-full scrollable-div flex-col text-zinc-100 col-span-4 pointer-events-auto" ref={ divRef }>
                 {/* Recipe Image */}
                 <div className="p-2 mb-3 rounded-3xl bg-gradient-to-tr from-orange-500 to-orange-400">
                     <div className="relative w-full h-auto aspect-w-2 aspect-h-2 rounded-3xl">
@@ -29,18 +51,26 @@ function SidebarRecipe(p) {
                     </div>
                     <div className="grid grid-cols-2 pt-2">
                         <div className="flex">
-                            <div className="flex gap-3 px-4 py-2 items-center justify-start rounded-3xl hover:bg-orange-400">
-                                <button className="hover:underline">
+                            <button className="flex gap-3 px-4 py-2 items-center justify-start rounded-3xl hover:bg-orange-400" onClick={ () => scrollToBottom() }>
+                                <div className="flex flex-row gap-3 items-center text-lg hover:underline">
                                     <img className="w-10" src={ FeedbackIcon } alt="" />
-                                </button>
-                            </div>
+                                    { 
+                                        feedbackCount > 0 && 
+                                        <p>{ feedbackCount }</p>
+                                    }
+                                </div>
+                            </button>
                         </div>
                         <div className="flex justify-end">
-                            <div className="flex gap-3 px-4 py-2 items-center rounded-3xl hover:bg-orange-400">
-                                <button>
+                            <button className="flex gap-3 px-4 py-2 items-center rounded-3xl hover:bg-orange-400">
+                                <div className="flex flex-row gap-3 items-center text-lg">
+                                    { 
+                                        approvalCount > 0 &&
+                                        <p>{ approvalCount }</p>
+                                    }
                                     <img className="w-10" src={ ApproveIcon } alt="" />
-                                </button>
-                            </div>
+                                </div>
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -99,16 +129,12 @@ function SidebarRecipe(p) {
                     </div>
                 </div>
                 {/* Feedbacks */}
-                <div className="flex flex-col mb-3 rounded-3xl bg-zinc-900">
-                    <div className="flex flex-row items-center p-6 gap-6 shadow-md shadow-zinc-950">
-                        <img className="w-10" src={ FeedbackIcon } alt="" />
-                        <p className="text-2xl font-semibold">Feedbacks</p>
-                        <p className="flex text-xl font-semibold justify-end w-full"></p>
-                    </div>
-                    <div className="flex flex-col p-6 gap-6">
-                        <Feedback user={ { username: "Anonymous" } }/>
-                        <Feedback user={ { username: "Anonymous" } }/>
-                    </div>
+                <div ref={ sectionRef }>
+                    <FeedbackSection 
+                        user={ user } recipeId={ recipeId } 
+                        feedbackCount={ feedbackCount } setFeedbackCount={ setFeedbackCount } 
+                        formatDate={ formatDate } attribute={ "mb-3" }
+                    />
                 </div>
             </div>
         </div>

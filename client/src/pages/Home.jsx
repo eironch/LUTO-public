@@ -1,21 +1,64 @@
-import React, { useState, useCallback, useLayoutEffect } from 'react'
+import React, { useState, useCallback, useEffect, useLayoutEffect } from 'react'
 import axios from 'axios'
 import { debounce } from 'lodash'
 
 import NavBar from '../components/NavBar'
 import RecipeOverview from '../components/RecipeOverview'
 import SearchBar from '../components/SearchBar'
+import FeedbackSection from '../components/FeedbackSection'
 
-function Home(p) {    
+function FeedbacksModal(p) {
+    const user = p.user
+    const formatDate = p.formatDate
+
+    const recipeId = p.recipeId
+    const title = p.title
+    const feedbackCount = p.feedbackCount
+    const setFeedbackCount = p.setFeedbackCount
+    const setShowModal = p.setShowModal
+
+    return (
+        <div className="absolute inset-0 grid place-items-center h-screen pt-3 text-zinc-100 bg-zinc-950 bg-opacity-90 overflow-y-scroll scrollable-div" 
+            onMouseDownCapture={ 
+                (event) => { 
+                    const isOutsideModal = !event.target.closest('.model-inner')
+
+                    if (isOutsideModal) {
+                        setShowModal(false)
+                        setFeedbackCount(0)
+                    }
+                } 
+            }
+        >
+            <div className="flex justify-center w-full h-full items-center">
+                <div className="flex flex-col gap-3 justify-center items-center w-5/12 overflow-hidden model-inner">
+                        <p className="px-6 text-xl font-semibold text-ellipsis line-clamp-1">{ title }</p>
+                        <FeedbackSection 
+                            user={ user } recipeId={ recipeId } 
+                            feedbackCount={ feedbackCount } setFeedbackCount={ setFeedbackCount } 
+                            formatDate={ formatDate }
+                        />
+                </div>
+            </div>
+        </div>
+    )
+}
+
+function Home(p) {
     const user = p.user
     const currentTab = p.currentTab
     const setCurrentTab = p.setCurrentTab
     const filters = p.filters
     const setFilters = p.setFilters
     const filtersRef = p.filtersRef
-    const postApproveRecipe = p.postApproveRecipe
-
+    const approveRecipe = p.approveRecipe
+    const formatDate = p.formatDate
+    
     const [feedRecipes, setFeedRecipes] = useState([])
+    const [isFeedbacksShown, setIsFeedbacksShown] = useState(false)
+    const [prevRecipeId, setPrevRecipeId] = useState()
+    const [prevTitle, setPrevTitle] = useState()
+    const [prevfeedbackCount, setPrevFeedbackCount] = useState()
     
     function fetchFeedRecipes(filters) {
         axios.get('http://localhost:8080/feed-recipes', { params: { userId: user.userId, filters } })
@@ -52,7 +95,12 @@ function Home(p) {
     useLayoutEffect(() => {
         setCurrentTab("Home")
     }, [])
-
+    
+    if (currentTab !== "Home") {
+        return
+    }
+    console.log("Home")
+    console.log("tab now " + currentTab)
     return (
         <div className="scrollable-div overflow-y-scroll">
             <NavBar 
@@ -73,24 +121,40 @@ function Home(p) {
                         <div className="col-span-2"></div>
                         <div className="col-span-11 block">
                             { 
-                                feedRecipes.map(recipe => {
-                                    return <RecipeOverview 
+                                feedRecipes.map(recipe => 
+                                    <RecipeOverview
                                         key={ recipe.recipeId._id } user={ user }
-                                        recipeId={ recipe.recipeId._id }
-                                        recipeImage={ recipe.recipeImage }title={ recipe.title } 
-                                        summary={ recipe.summary }authorName={ recipe.userId.username } 
-                                        isApproved={ recipe.isApproved } approvalCount={ recipe.recipeId.approvalCount } 
-                                        recipes={ feedRecipes } setRecipes={ setFeedRecipes }
-                                        dateCreated={ recipe.createdAt } 
-                                        postApproveRecipe={ postApproveRecipe }
+                                        recipeId={ recipe.recipeId._id } recipeImage={ recipe.recipeImage } 
+                                        title={ recipe.title } summary={ recipe.summary } 
+                                        authorName={ recipe.userId.username } isApproved={ recipe.isApproved } 
+                                        approvalCount={ recipe.recipeId.approvalCount } feedbackCount={ recipe.recipeId.feebackCount } 
+                                        dateCreated={ recipe.createdAt } recipes={ feedRecipes } 
+                                        setRecipes={ setFeedRecipes } setPrevRecipeId={ setPrevRecipeId }
+                                        setPrevTitle={ setPrevTitle } setIsFeedbacksShown={ setIsFeedbacksShown }
+                                        approveRecipe={ approveRecipe } formatDate={ formatDate }
                                     />
-                                })
+                                )
                             }
                         </div>
                         <div className="col-span-2"></div>
                     </div>
                 </div>
-                { (currentTab === "Home" || currentTab === "Search" || currentTab === "Settings" ) && <SearchBar currentTab={ currentTab } setCurrentTab={setCurrentTab }/> }
+                {/* searchbar */}
+                { 
+                    (currentTab === "Home" || currentTab === "Search" || currentTab === "Settings" ) && 
+                    <SearchBar 
+                        currentTab={ currentTab } setCurrentTab={setCurrentTab }
+                    /> 
+                }
+                {
+                    isFeedbacksShown &&
+                    <FeedbacksModal 
+                        user={ user } recipeId={ prevRecipeId }
+                        title={ prevTitle } feedbackCount={ prevfeedbackCount } 
+                        setFeedbackCount={ setPrevFeedbackCount } setShowModal={ setIsFeedbacksShown } 
+                        formatDate={ formatDate }
+                    />
+                }
             </div>
         </div>
     )

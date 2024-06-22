@@ -110,7 +110,7 @@ function SidebarTab(p) {
                             Filter
                         </p>
                     </div>
-                    <div className="flex flex-col pl-6 pr-3 pt-3 pb-6 gap-3 scrollable-div overflow-y-scroll">
+                    <div className="flex flex-col pl-6 pr-3 pt-3 pb-6 gap-3 scrollable-div overflow-y-scroll overflow-x-hidden">
                         <div className="font-semibold gap-3">
                             {
                                 filters &&
@@ -131,6 +131,7 @@ function SidebarTab(p) {
                         </div>
                         <div className="font-semibold gap-3">
                             {
+                                filters &&
                                 tagChoices.map((tag, index) => {
                                     const isAdded = filters.find(recipeTag => recipeTag === tag)
 

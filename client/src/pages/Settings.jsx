@@ -2,13 +2,24 @@ import React, { useLayoutEffect } from 'react'
 import NavBar from '../components/NavBar'
 
 function Settings(p) {
+    const user = p.user
+    const currentTab = p.currentTab
+    const setCurrentTab = p.setCurrentTab
+
     useLayoutEffect(() => {
-        p.setCurrentTab("Settings")    
+        setCurrentTab("Settings")
     }, [])
+
+    if (currentTab !== "Settings") {
+        return
+    }
 
     return (
         <div>
-            <NavBar user={ p.user } currentTab={ p.currentTab } setCurrentTab={ p.setCurrentTab } />
+            <NavBar 
+                user={ p.user } currentTab={ p.currentTab }
+                setCurrentTab={ p.setCurrentTab }
+            />
             <div className="flex flex-col gap-3 p-3 h-svh bg-zinc-950">
                 {/* space for top navbar */}
                 <div className="grid w-full gap-3 h-16" style={ { gridTemplateColumns: 'repeat(15, minmax(0, 1fr))' } }>

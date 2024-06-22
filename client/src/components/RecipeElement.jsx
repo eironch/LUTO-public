@@ -45,7 +45,8 @@ function CustomTextarea(p) {
     }
 
     return (
-        <textarea className={`${ attribute } w-full p-3 box-border rounded-3xl overflow-hidden resize-none`}
+        <textarea 
+            className={`${ attribute } w-full p-3 box-border rounded-3xl overflow-hidden resize-none`}
             ref={ textareaRef } value={ values.find(value => value.key === keyIndex).value } maxLength={ maxLength }
             onChange={ e => updateValue(e.target.value) } placeholder={ placeholder } 
             spellCheck={ isFocused }
@@ -97,7 +98,7 @@ function Text(p) {
 }
 
 function Images(p) {
-    const scrollableDivRef = useRef()
+    const divRef = useRef()
     const [isHovered, setIsHovered] = useState(false)
     const [isNewAdded, setIsNewAdded] = useState(false)
     const keyIndex = p.keyIndex
@@ -108,8 +109,8 @@ function Images(p) {
     const elementFiles = values.find(element => element.key === keyIndex)
 
     useLayoutEffect(() => {
-        if (scrollableDivRef.current && isNewAdded) {
-            scrollableDivRef.current.scrollLeft = scrollableDivRef.current.scrollWidth
+        if (divRef.current && isNewAdded) {
+            divRef.current.scrollLeft = divRef.current.scrollWidth
             setIsNewAdded(false)
         }   
     }, [isNewAdded])
@@ -122,7 +123,7 @@ function Images(p) {
 
         console.log(key + " current index")
         if (file && file.size > maxSizeInBytes) {
-            // log
+            // placeholder
             return alert('File size exceeds the maximum allowed limit (25MB). Please Select a smaller file.')
         } else if (!file) {
             return
@@ -147,7 +148,7 @@ function Images(p) {
 
     return (
         <div className="pt-6 pb-3 px-6 flex flex-col justify-center items-center gap-3 mb-3 rounded-3xl overflow-hidden bg-zinc-900" onMouseEnter={() => { setIsHovered(true) }} onMouseLeave={() => { setIsHovered(false) }}>
-            <div className="flex flex-row w-full h-full gap-3 justify-start items-center overflow-x-scroll scrollable-div" ref={ scrollableDivRef }>
+            <div className="flex flex-row w-full h-full gap-3 justify-start items-center overflow-x-scroll scrollable-div" ref={ divRef }>
                 {
                     elementFiles.value.map((value, index) => (
                         <div className="w-full min-w-32 max-w-96 h-full max-h-96 min-h-32 aspect-1 overflow-y-hidden flex-none">

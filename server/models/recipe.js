@@ -19,31 +19,39 @@ const recipeSchema = new Schema({
     userId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
-        require: true,
+        require: true
     },
     recipeImage:{
         type: String,
-        require: true,
+        require: true
     },
     title: {
         type: String,
         require: true,
     },
     summary: {
-        type: String,
+        type: String
     },
     ingredients: {
-        type: [String],
+        type: [String]
     },
     tags: {
-        type: [String],
+        type: [String]
     },
     recipeElements: {
         type: [elementSchema]
     },
     approvalCount: {
         type: Number,
-        default: 0,
+        default: 0
+    },
+    feedbackCount: {
+        type: Number,
+        default: 0
+    },
+    flagCount: {
+        type: Number,
+        default: 0
     },
 }, { timestamps: true })
 
