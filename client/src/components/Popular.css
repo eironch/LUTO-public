@@ -105,7 +105,7 @@
   .contents .item:hover{
     transform: scale(1.02);
     transition: 0.3s;
-    background: linear-gradient(#FA9A48, #212121);
+    background: #212121;
     border: 1px solid #E7691A;
   }
   .contents .item img {
@@ -148,8 +148,8 @@
   .comment img {
     height: 35px !important; 
     width: 75px !important; 
-    
   }
+  
   #like{
     height: 40px !important;
     width: 35px !important;
