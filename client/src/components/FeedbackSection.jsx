@@ -64,8 +64,8 @@ function FeedbackSection(p) {
                 setFeedbackCount(res.data.payload.feedbackCount.feedbackCount)
             })
             .catch(err => {
-                console.log('Error Status:', err.res.status)
-                console.log('Error Data:', err.res.data)
+                console.log('Error Status:', err.response.status)
+                console.log('Error Data:', err.response.data)
             })
     }
     console.log("tab right now " + p.currentTab)
@@ -81,8 +81,8 @@ function FeedbackSection(p) {
                 getFeedbacks()
             })
             .catch(err => {
-                console.log('Error Status:', err.res.status)
-                console.log('Error Data:', err.res.data)
+                console.log('Error Status:', err.response.status)
+                console.log('Error Data:', err.response.data)
             })
     }
 

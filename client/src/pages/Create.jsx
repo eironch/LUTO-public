@@ -160,10 +160,10 @@ function Create(p) {
     }
 
     useLayoutEffect(() => {
-        setCurrentTab("Create")
+        setCurrentTab('Create')
     })
 
-    if (currentTab !== "Create") {
+    if (currentTab !== 'Create') {
         return
     }
 
@@ -179,7 +179,7 @@ function Create(p) {
                 user={ user } currentTab={ currentTab } setCurrentTab={ setCurrentTab } 
             />
             <div className="pr-0 flex flex-col gap-3 p-3 h-svh overflow-y-scroll scrollable-div bg-zinc-950">
-                <div className="grid w-full gap-3" style={ { gridTemplateColumns: 'repeat(15, minmax(0, 1fr))' } }>
+                <div className="grid w-full gap-3" style={ { gridTemplateColumns: "repeat(15, minmax(0, 1fr))" } }>
                     <div className="col-span-4"></div>
                     <div className="col-span-11 flex flex-col rounded-3xl text-zinc-100">
                         <p className="text-3xl font-bold h-16 mb-3 p-6 flex items-center text-zinc-400">

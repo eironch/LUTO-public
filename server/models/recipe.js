@@ -41,7 +41,7 @@ const recipeSchema = new Schema({
     recipeElements: {
         type: [elementSchema]
     },
-    approvalCount: {
+    points: {
         type: Number,
         default: 0
     },

@@ -9,7 +9,7 @@ function Profile(p) {
     const user = p.user
     const currentTab = p.currentTab
     const setCurrentTab = p.setCurrentTab
-    const approveRecipe = p.approveRecipe
+    const handleApproveRecipe = p.handleApproveRecipe
     const formatDate = p.formatDate
     
     const { authorName } = useParams()
@@ -30,10 +30,10 @@ function Profile(p) {
     }, [authorName])
 
     useLayoutEffect(() => {
-        setCurrentTab("Profile")
+        setCurrentTab('Profile')
     }, [])
 
-    if (currentTab !== "Profile") {
+    if (currentTab !== 'Profile') {
         return
     }
 
@@ -45,7 +45,7 @@ function Profile(p) {
             />
             <div className="flex flex-col p-3 pr-0 h-svh bg-zinc-950">
                 {/* content */}
-                <div className="grid w-full gap-3 h-full" style={ { gridTemplateColumns: 'repeat(15, minmax(0, 1fr))' } }>
+                <div className="grid w-full gap-3 h-full" style={ { gridTemplateColumns: "repeat(15, minmax(0, 1fr))" } }>
                     <div className="col-span-4"></div>
                     <div className="col-span-11 block">
                         { 
@@ -55,9 +55,9 @@ function Profile(p) {
                                     recipeId={ recipe.recipeId._id } recipeImage={ recipe.recipeImage } 
                                     title={ recipe.title } summary={ recipe.summary } 
                                     authorName={ authorName } isApproved={ recipe.isApproved } 
-                                    approvalCount={ recipe.recipeId.approvalCount } recipes={ userRecipes } 
+                                    points={ recipe.recipeId.points } recipes={ userRecipes } 
                                     setRecipes={ setUserRecipes } dateCreated={ recipe.createdAt }
-                                    approveRecipe={ approveRecipe } formatDate={ formatDate }
+                                    handleApproveRecipe={ handleApproveRecipe } formatDate={ formatDate }
                                 />
                             })
                         }

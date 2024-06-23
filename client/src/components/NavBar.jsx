@@ -1,9 +1,11 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { Link } from 'react-router-dom'
+
+import SidebarCreate from '../components/SidebarCreate'
 import SidebarTab from '../components/SidebarTab'
 import SidebarProfile from '../components/SidebarProfile'
-import SidebarCreate from './SidebarCreate'
 import SidebarRecipe from '../components/SidebarRecipe'
+
 import Logo from '../assets/luto-logo-gradient.png'
 import ProfilePicture from '../assets/profile-picture.png'
 import CreateIcon from '../assets/create-icon.png'
@@ -26,24 +28,27 @@ function NavBar(p) {
     const setIngredients = p.setIngredients
     const tags = p.tags
     const setTags = p.setTags
-    const approvalCount = p.approvalCount
-    const setApprovalCount = p.setApprovalCount
+    const points = p.points
+    const setPoints = p.setPoints
     const feedbackCount = p.feedbackCount
     const setFeedbackCount  = p.setFeedbackCount
+    const isRecipeSaved = p.isRecipeSaved
     const publishRecipe = p.publishRecipe
+    const handleSaveRecipe = p.handleSaveRecipe
 
     const filters  = p.filters
     const setFilters = p.setFilters
     console.log(!(title && recipeImage.size && summary && (ingredients.length > 1  || ingredients[0].value)))
+    
     return (
         <div>
             <div className="fixed flex gap-3 flex-col w-full h-svh pointer-events-none">
                 {/* navbar */}
                 <div className="p-3 pb-0">
-                    <div className="grid gap-3 w-full min-h-16 pointer-events-none" style={ { gridTemplateColumns: 'repeat(15, minmax(0, 1fr))' } }>
+                    <div className="grid gap-3 w-full min-h-16 pointer-events-none" style={ { gridTemplateColumns: "repeat(15, minmax(0, 1fr))" } }>
                         {/* logo navbar side*/}
                         {
-                            (currentTab === "Home" || currentTab === "Search" || currentTab === "Settings" ) &&
+                            (currentTab === "Home" || currentTab === "Search" || currentTab === "Settings" || currentTab === "Saved") &&
                             <Link to="/home" className="pointer-events-auto rounded-3xl flex col-span-2 items-center justify-center bg-zinc-900 hover:bg-zinc-500">
                                 <img className="px-4 w-48" src={ Logo } alt="" />
                             </Link>
@@ -76,9 +81,9 @@ function NavBar(p) {
                                     }
                                     {
                                         currentTab === "Recipe" &&
-                                        <button className="flex items-center p-4 gap-4 w-full h-full bg-orange-500 hover:bg-orange-400 overflow-hidden">
+                                        <button className={`${ isRecipeSaved ? "bg-zinc-900 hover:bg-zinc-500" : " bg-orange-500 hover:bg-orange-400"} flex items-center p-4 gap-4 w-full h-full rounded-3xl overflow-hidden`} onClick={ () => handleSaveRecipe() }>
                                             <p className="flex text-zinc-100 text-lg w-full font-semibold">
-                                                Save
+                                                { isRecipeSaved ? "Unsave" :"Save" }
                                             </p>
                                             <img className="w-8" src={ SaveIcon } alt="" />
                                         </button>
@@ -106,12 +111,12 @@ function NavBar(p) {
                         }
                         {/* logo navbar middle */}
                         {
-                            (currentTab === "Home" || currentTab === "Search" || currentTab === "Settings" ) &&
-                            <div className={`${ (currentTab!=="Home" && currentTab!=="Profile" && currentTab!=="Search") && "bg-zinc-900" } rounded-3xl flex items-center justify-center`} 
-                                style={ { gridColumn: (currentTab === "Home" || currentTab === "Search" || currentTab === "Settings" ) ? "span 11" : "span 13" } }
+                            (currentTab === "Home" || currentTab === "Search" || currentTab === "Settings" || currentTab === "Saved" || currentTab === "Saved") &&
+                            <div className={`${ (currentTab!=="Home" && currentTab!=="Profile" && currentTab!=="Search" && currentTab !== "Saved") && "bg-zinc-900" } rounded-3xl flex items-center justify-center`} 
+                                style={ { gridColumn: (currentTab === "Home" || currentTab === "Search" || currentTab === "Settings" || currentTab === "Saved") ? "span 11" : "span 13" } }
                             >
                                 { 
-                                    (currentTab !== "Home" && currentTab !== "Search" && currentTab !== "Profile") &&
+                                    (currentTab === "Settings") &&
                                     <Link to="/home" className="fixed flex items-center pointer-events-auto left-1/2 transform -translate-x-1/2">
                                         <img className="px-4 w-48 " src={ Logo } alt="" />
                                     </Link>
@@ -120,7 +125,7 @@ function NavBar(p) {
                         }
                         {/* profile */}
                         {
-                            (currentTab === "Home" || currentTab === "Search" || currentTab === "Settings" ) &&
+                            (currentTab === "Home" || currentTab === "Search" || currentTab === "Settings" || currentTab === "Saved") &&
                             <Link to={`/${ user.username }`} className="col-span-2 flex items-center justify-end rounded-3xl bg-zinc-900 pointer-events-auto hover:bg-zinc-500">
                                 { 
                                     currentTab!=="Profile" && <p className="text-zinc-100 text-end w-full ml-3 text-xl font-semibold overflow-hidden">
@@ -134,7 +139,7 @@ function NavBar(p) {
                 </div>
                 {/* content */}
                 { 
-                    (currentTab === "Home" || currentTab === "Search" || currentTab === "Settings" ) && 
+                    (currentTab === "Home" || currentTab === "Search" || currentTab === "Settings" || currentTab === "Saved") && 
                     <SidebarTab 
                         filters={ filters } setFilters={ setFilters }
                         currentTab={ currentTab } 
@@ -165,7 +170,7 @@ function NavBar(p) {
                             summary={ summary || null } recipeImage={ recipeImage || null }
                             ingredients={ ingredients || null } tags={ tags || null }
                             authorName={ authorName || null }
-                            approvalCount={ approvalCount } setApprovalCount={ setApprovalCount } 
+                            points={ points } setPoints={ setPoints } 
                             feedbackCount={ feedbackCount } setFeedbackCount={ setFeedbackCount } 
                             currentTab={ currentTab } formatDate={ formatDate || null }
                         />

@@ -6,14 +6,16 @@ import jwt from 'jsonwebtoken'
 import mongoose from 'mongoose'
 import { Types } from 'mongoose'
 import multer from 'multer'
-import { db, bucket } from './firebaseAdmin.js'
+import { bucket } from './firebaseAdmin.js'
 import { v4 as uuidv4 } from 'uuid' 
 
 import User from './models/user.js'
 import Recipe from './models/recipe.js'
 import RecipeOverview from './models/recipeOverview.js'
-import Approval from './models/approval.js'
+import Point from './models/point.js'
 import Feedback from './models/feedback.js'
+import Save from './models/save.js'
+import Flag from './models/flag.js'
 
 const PORT = 8080
 
@@ -51,7 +53,7 @@ function verifyToken(token) {
 
 // connect to mongodb
 const dbURI = 'mongodb+srv://test:f2qWY9k3dxnsqj9T@luto.tihpifs.mongodb.net/luto?retryWrites=true&w=majority&appName=LUTO'
-mongoose.connect(dbURI)
+mongoose.connect(dbURI, { autoIndex: false })
     .then(() => { 
         app.listen(PORT, () => {
             console.log('Connected to backend.')
@@ -60,6 +62,18 @@ mongoose.connect(dbURI)
     .catch(err => { 
         console.log('Connection error') 
     })
+
+// mongoose.connection.once('open', async () => {
+//     try {
+//         await Recipe.createIndexes()
+//         await RecipeOverview.createIndexes()
+//         await Approval.createIndexes()
+
+//         console.log('Indexes created successfully.')
+//     } catch (error) {
+//         console.error('Error creating indexes:', error)
+//     }
+// })
 
 // mongoose and mongo sandbox routes
 app.get('/', (req, res) => {
@@ -72,6 +86,7 @@ app.post('/create-account', (req, res) => {
         username,
         password,
         bio: '',
+        userType: "user",
         refreshToken: '',
     })
 
@@ -159,7 +174,7 @@ app.get('/check-auth', (req, res) => {
     return res.status(202).json({ isAuthenticated: false })
 })
 
-app.post('/publish-recipe', upload.any(), (req, res) => {
+app.post('/publish-recipe', upload.any(), async (req, res) => {
     const { 
         userId,
         categories,
@@ -177,7 +192,7 @@ app.post('/publish-recipe', upload.any(), (req, res) => {
     const ingredients = JSON.parse(req.body.ingredients)
     const recipeElements = JSON.parse(req.body.recipeElements)
 
-    const recipe = {
+    const recipeFormat = {
         userId,
         categories,
         tags: JSON.parse(tags),
@@ -188,48 +203,35 @@ app.post('/publish-recipe', upload.any(), (req, res) => {
         recipeElements,
     }
     console.log('recipe')
-    console.log(recipe)
     console.log(recipeFiles)
     try {
-        uploadFile(recipeFiles)
-            .then(fileLinks => {
-                const elementLinks = fileLinks.elementFiles
+        const fileLinks = uploadFile(recipeFiles)
+        const elementLinks = fileLinks.elementFiles
+        recipeFormat.recipeImage = fileLinks.recipeImage
 
-                recipe.recipeImage = fileLinks.recipeImage
+        recipeElements.forEach((element) => {
+            for (let x = 0; x < element.filesLength; x++) {
+                element.files.push(elementLinks[x])
+            }
 
-                recipeElements.forEach((element) => {
-                    for (let x = 0; x < element.filesLength; x++) {
-                        element.files.push(elementLinks[x])
-                    }
+            elementLinks.splice(0, element.filesLength)
+        })
 
-                    elementLinks.splice(0, element.filesLength)
-                })
+        const recipe = new Recipe(recipe)
+        const savedRecipe = await recipe.save()
 
-                console.log('new recipe')
-                console.log(recipe)
-                return recipe
-            })
-            .then(recipeValues => {
-                const recipe = new Recipe(recipeValues)
+        const recipeOverview = new RecipeOverview({
+            recipeId: savedRecipe._id,
+            userId: savedRecipe.userId,
+            categories: savedRecipe.categories,
+            tags: savedRecipe.tags,
+            recipeImage: savedRecipe.recipeImage, 
+            title: savedRecipe.title,
+            summary: savedRecipe.summary,
+        })        
+        await recipeOverview.save()
 
-                recipe.save()
-                    .then(savedRecipe => {
-                        const recipeOverview = new RecipeOverview({
-                            recipeId: savedRecipe._id,
-                            userId: savedRecipe.userId,
-                            categories: savedRecipe.categories,
-                            tags: savedRecipe.tags,
-                            recipeImage: savedRecipe.recipeImage, 
-                            title: savedRecipe.title,
-                            summary: savedRecipe.summary,
-                        })
-
-                        return recipeOverview.save()
-                    })
-                    .then(() => {
-                        return res.status(201).json({ success: true, message:'Recipe published.'})
-                    })
-            })
+        return res.status(201).json({ success: true, message:'Recipe published.'})
     } catch (err) {
         return res.status(500).json({ message:'File upload error.', err})
     }
@@ -251,7 +253,6 @@ async function uploadFile(files){
                 try {
                     const fileUrl = await uploadFileToStorage(file)
 
-                    // const [signedUrl] = await bucket.file(fileUrl).getSignedUrl(options)
                     console.log('url download:', fileUrl)
                     return fileUrl
                 } catch (error) {
@@ -305,33 +306,51 @@ function uploadFileToStorage(file) {
     })
 }
 
-app.post('/approve-recipe', async (req, res) => {
-    const { userId, recipeId } = req.body
+app.post('/give-point', async (req, res) => {
+    const { userId, recipeId, pointStatus } = req.body
 
     try {
-        const existingLike = await Approval.findOne({ userId, recipeId })
+        const isGivenPoint = await Point.findOne({ userId, recipeId })
 
-        if (existingLike) {
-            await Approval.deleteOne({ userId, recipeId })
+        if (isGivenPoint) {
+            await Point.updateOne(
+                { userId, recipeId },
+                {
+                    $set: {
+                        pointStatus
+                    },
+                    $currentDate: { updatedAAt: true }
+                }
+            )
 
-            await Recipe.findByIdAndUpdate(recipeId, { $inc: { approvalCount: -1 } })
+            if (pointStatus === "positive") {
+                await Recipe.findByIdAndUpdate(recipeId, { $inc: { points: 1 } })
+            } else if (pointStatus === "negative") {
+                await Recipe.findByIdAndUpdate(recipeId, { $inc: { points: -1 } })
+            }
 
-            const approvalCount = await Recipe.findById(recipeId).select('approvalCount')
-
-            return res.status(200).json({ success: true, message:'Recipe unapproved.', payload: { isApproved: false, approvalCount } })
+            const points = await Recipe.findByid(recipeId).select('points')
+            
+            return res.status(200).json({ success: true, message:'Recipe point status changed.', payload: { pointStatus, points } })
         }
 
-        await Approval.updateOne(
-            { userId, recipeId },
-            { $setOnInsert: { userId, recipeId } },
-            { upsert: true }
-        )
+        const point = new Point({
+            userId,
+            recipeId,
+            pointStatus
+        })
 
-        await Recipe.findByIdAndUpdate(recipeId, { $inc: { approvalCount: 1 } })
+        await point.save()
 
-        const approvalCount = await Recipe.findById(recipeId).select('approvalCount')
-        console.log(approvalCount)
-        return res.status(201).json({ success: true, message:'Recipe approved.', payload: { isApproved: true, approvalCount } })
+        if (pointStatus === "positive") {
+            await Recipe.findByIdAndUpdate(recipeId, { $inc: { points: 1 } })
+        } else if (pointStatus === "negative") {
+            await Recipe.findByIdAndUpdate(recipeId, { $inc: { points: -1 } })
+        }
+  
+        const points = await Recipe.findByid(recipeId).select('points')
+
+        return res.status(201).json({ success: true, message:'Recipe point given.', payload: { pointStatus, points } })
     } catch (err) {
         console.log(err)
         return res.status(500).json({ success: true, message:'Internal server error.', err})
@@ -371,21 +390,20 @@ app.get('/feed-recipes', async (req, res) => {
 
         const recipes = await RecipeOverview.populate(results, [
                     { path: 'userId', select: 'username' },
-                    { path: 'recipeId', select: ['approvalCount', 'feedbackCount']}
+                    { path: 'recipeId', select: ['points', 'feedbackCount']}
                 ])
-
 
         if (!recipes.length) {
             return res.status(400).json({ message: 'No recipes found.' })
         }
 
-        const approvalPromises = recipes.map(async recipe => {
-            const isApproved = await Approval.findOne({ userId, recipeId: recipe.recipeId }) !== null
+        const pointPromises = recipes.map(async recipe => {
+            const isGivenPoint = await Point.findOne({ userId, recipeId: recipe.recipeId }) !== null
     
-            return { ...recipe.toObject(), isApproved }
+            return { ...recipe.toObject(), isGivenPoint }
         })
         
-        return Promise.all(approvalPromises)
+        return Promise.all(pointPromises)
             .then(recipes => {
                 console.log(recipes)
                 return res.status(200).json({ success: true, payload: recipes })
@@ -412,12 +430,14 @@ app.get('/recipe', async (req, res) => {
             return res.status(400).json({ message: 'No such recipe found.' })
         }
 
-        const isApproved = await Approval.findOne({ userId, recipeId: recipe.recipeId }).lean() !== null
+        const isGivenPoint = await Point.findOne({ userId, recipeId }).lean() !== null
 
+        const isSaved = await Save.findOne({ userId, recipeId }) !== null
+    
         const response = {
             userInfo: { username: recipe.userId.username },
             recipeContents: { ...recipe },
-            approvalStatus: { isApproved }
+            recipeStatus: { isGivenPoint, isSaved }
         }
 
         return res.status(200).json({ success: true, payload: response })
@@ -436,27 +456,77 @@ app.get('/user-recipes', async (req, res) => {
         if (!user.length) {
             return res.status(400).json({ message: 'No such user found.' })
         }
-        console.log(user[0]._id)
+
         const recipes = await RecipeOverview.find({ userId: user[0]._id }).populate({
                 path: 'userId',
                 select: 'username'
             }).populate({
                 path: 'recipeId',
-                select: 'approvalCount',
+                select: 'points',
             }).sort({ createdAt: -1 })
         console.log(recipes)
         if (!recipes) {
             return res.status(400).json({ message: 'No recipes found.' })
         }
 
-        const approvalPromises = recipes.map(async recipe => {
-            const isApproved = await Approval.findOne({ userId: user[0]._id, recipeId: recipe.recipeId }) !== null
+        const pointPromises = recipes.map(async recipe => {
+            const isGivenPoint = await Point.findOne({ userId: user[0]._id, recipeId: recipe.recipeId }) !== null
   
             return { ...recipe.toObject(), isApproved }
         })
 
-        return Promise.all(approvalPromises)
+        return Promise.all(pointPromises)
             .then(recipes => {
+                return res.status(200).json({ success: true, payload: recipes })
+            })
+    } catch (err) {
+        console.log(err)
+        return res.status(500).json({ message: 'Internal server error.', err })
+    }
+})
+
+app.get('/find-recipes', async (req, res) => {
+    const { userId, searchQuery, filters } = req.query
+    console.log(req.query)
+    const pipeline = [
+        { 
+            $match: {
+                $and: [
+                    filters ? { tags: { $in: filters } } : {},
+                    {
+                        $or: [
+                            { title: { $regex: searchQuery, $options: 'i' } },
+                            { summary: { $regex: searchQuery, $options: 'i' } }
+                        ]
+                    }
+                ]
+            }
+        },
+        { $sort: { createdAt: -1 } }
+    ]
+    console.log(pipeline)
+    try {
+        const aggregatedResults = await RecipeOverview.aggregate(pipeline)
+        const results = aggregatedResults.map(result => new RecipeOverview(result))
+
+        const recipes = await RecipeOverview.populate(results, [
+                    { path: 'userId', select: 'username' },
+                    { path: 'recipeId', select: ['points', 'feedbackCount']}
+                ])
+
+        if (!recipes.length) {
+            return res.status(400).json({ message: 'No recipes found.' })
+        }
+
+        const pointPromises = recipes.map(async recipe => {
+            const isGivenPoint = await Point.findOne({ userId, recipeId: recipe.recipeId }) !== null
+    
+            return { ...recipe.toObject(), isApproved }
+        })
+        
+        return Promise.all(pointPromises)
+            .then(recipes => {
+                console.log(recipes)
                 return res.status(200).json({ success: true, payload: recipes })
             })
     } catch (err) {
@@ -476,16 +546,11 @@ app.post('/submit-feedback', async (req, res) => {
     })
     
     try {
+        await feedback.save()
+        
         await Recipe.findByIdAndUpdate(recipeId, { $inc: { feedbackCount: 1 } })
-
-        feedback.save()
-            .then(() => {
-                return res.status(201).json({ success: true, message: 'Feedback created.' })
-            })
-            .catch(() => {
-                return res.status(202).json({ success: false, message: 'Error creating feedback.' })
-            })
-            
+        
+        return res.status(201).json({ success: true, message: 'Feedback created.' })
     } catch (err) {
         console.log(err)
         return res.status(500).json({ message: 'Internal server error.', err })
@@ -516,6 +581,60 @@ app.get('/feedbacks', async (req, res) => {
         const feedbackCount = await Recipe.findById(recipeId).select('feedbackCount')
 
         return res.status(200).json({ success: true, payload: { feedbacks, feedbackCount } })
+    } catch (err) {
+        console.log(err)
+        return res.status(500).json({ message: 'Internal server error.', err })
+    }
+})
+
+app.post('/save-recipe', async (req, res) => {
+    const { userId, recipeId } = req.body
+    const save = new Save({
+        userId,
+        recipeId
+    })
+
+    try {
+        const isSaved = await Save.findOne({ userId, recipeId }) !== null
+
+        if (isSaved) {
+            await Save.deleteOne({ userId, recipeId })
+
+            return res.status(200).json({ success: true, message:'Recipe unsaved.', payload: { isSaved: false } })
+        }
+
+        await save.save()
+            .then(() => {
+                return res.status(201).json({ success: true, message: 'Recipe saved.', payload: { isSaved: true }})
+            })
+            .catch(() => {
+                return res.status(202).json({ success: false, message: 'Error saving recipe.' })
+            })
+    } catch (err) {
+        console.log(err)
+        return res.status(500).json({ message: 'Internal server error.', err })
+    }
+})
+
+app.post('/flag-recipe', async (req, res) => {
+    const { userId, recipeId } = req.body
+    const flag = new Flag({
+        userId,
+        recipeId
+    })
+
+    try {
+        const isFlagged = await Flag.findOne({ userId, recipeId }) !== null
+
+        if (isFlagged) {
+            return res.status(400).json({ message: 'Recipe already flagged.' })
+        }
+        
+        await flag.save()
+        
+        await Recipe.findByIdAndUpdate(recipeId, { $inc: { flagCount: 1 } })
+
+        return res.status(200).json({ success: true, message: 'Recipe flagged.' })
     } catch (err) {
         console.log(err)
         return res.status(500).json({ message: 'Internal server error.', err })

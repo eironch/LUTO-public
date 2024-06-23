@@ -74,7 +74,7 @@ function SidebarTab(p) {
     }, [])
 
     return (
-        <div className="p-3 pt-0 grid w-full gap-3 h-full overflow-hidden" style={ { gridTemplateColumns: 'repeat(15, minmax(0, 1fr))' } }>
+        <div className="p-3 pt-0 grid w-full gap-3 h-full overflow-hidden" style={ { gridTemplateColumns: "repeat(15, minmax(0, 1fr))" } }>
             <div className="col-span-2 rounded-3xl bg-zinc-900 pointer-events-auto">
                 <div className="flex items-center flex-col gap-3 m-3">
                     <Link to="/home" className={`${ currentTab==="Home" && "bg-zinc-700 shadow-md shadow-zinc-950" } flex flex-row items-center gap-4 p-4 overflow-hidden w-full rounded-3xl hover:bg-zinc-500 hover:shadow-md hover:shadow-zinc-950`}>
@@ -100,9 +100,9 @@ function SidebarTab(p) {
                 </div>
             </div>
             <div className="col-span-11"></div>
-            {/* Tags */}
+            {/* filters */}
             {
-                (currentTab === "Home" || currentTab === "Search") &&
+                (currentTab === "Home" || currentTab === "Search" || currentTab === "Saved") &&
                 <div className="bg-zinc-900 flex flex-col text-zinc-100 rounded-3xl col-span-2 overflow-hidden pointer-events-auto">
                     <div className="flex p-6 gap-3 shadow-md shadow-zinc-950 flex-row items-center">
                         <img  className="w-8" src={ FilterIcon } alt="" />
@@ -111,6 +111,7 @@ function SidebarTab(p) {
                         </p>
                     </div>
                     <div className="flex flex-col pl-6 pr-3 pt-3 pb-6 gap-3 scrollable-div overflow-y-scroll overflow-x-hidden">
+                        {/* selected tags */}
                         <div className="font-semibold gap-3">
                             {
                                 filters &&
@@ -121,14 +122,16 @@ function SidebarTab(p) {
                                 )
                             }
                         </div>
-                        <div className="flex w-full items-center justify-center shadow-md shadow-zinc-950 rounded-3xl bg-zinc-700">
-                            <div className="flex items-center justify-center ml-2 w-12 h-full">
+                        {/* search input */}
+                        <div className="relative flex w-full items-center justify-center shadow-md shadow-zinc-950 rounded-3xl bg-zinc-700">
+                            <div className="absolute flex ml-4 left-0 right-0 items-start justify-left pointer-events-none">
                                 <img className="w-6" src={ SearchIcon } alt="" />
                             </div>
-                            <input className="w-full h-10 ml-2 p-3 rounded-3xl bg-transparent text-zinc-100 text-start"
+                            <input className="w-full px-14 h-10 rounded-3xl bg-transparent text-zinc-100 text-start"
                                 value={ searchValue } onChange={ e => setSearchValue(e.target.value) } type="text" placeholder="Search Tags"
                             />
                         </div>
+                        {/* tags */}
                         <div className="font-semibold gap-3">
                             {
                                 filters &&

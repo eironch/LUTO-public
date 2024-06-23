@@ -19,8 +19,8 @@ function SidebarRecipe(p) {
     const summary = p.summary
     const ingredients = p.ingredients
     const tags = p.tags
-    const approvalCount = p.approvalCount
-    const setApprovalCount = p.setApprovalCount
+    const points = p.points
+    const setPoints = p.setPoints
     const feedbackCount = p.feedbackCount
     const setFeedbackCount  = p.setFeedbackCount
 
@@ -39,9 +39,9 @@ function SidebarRecipe(p) {
     }
 
     return (
-        <div className="pl-3 grid w-full h-full overflow-hidden" style={ { gridTemplateColumns: 'repeat(15, minmax(0, 1fr))' } }>
+        <div className="pl-3 grid w-full h-full overflow-hidden" style={ { gridTemplateColumns: "repeat(15, minmax(0, 1fr))" } }>
             <div className="flex overflow-x-hidden overflow-y-scroll h-full scrollable-div flex-col text-zinc-100 col-span-4 pointer-events-auto" ref={ divRef }>
-                {/* Recipe Image */}
+                {/* recipe image */}
                 <div className="p-2 mb-3 rounded-3xl bg-gradient-to-tr from-orange-500 to-orange-400">
                     <div className="relative w-full h-auto aspect-w-2 aspect-h-2 rounded-3xl">
                         {
@@ -52,8 +52,8 @@ function SidebarRecipe(p) {
                     <div className="grid grid-cols-2 pt-2">
                         <div className="flex">
                             <button className="flex gap-3 px-4 py-2 items-center justify-start rounded-3xl hover:bg-orange-400" onClick={ () => scrollToBottom() }>
-                                <div className="flex flex-row gap-3 items-center text-lg hover:underline">
-                                    <img className="w-10" src={ FeedbackIcon } alt="" />
+                                <div className="flex flex-row gap-3 items-center text-lg font-semibold">
+                                    <img className="min-w-10 w-10" src={ FeedbackIcon } alt="" />
                                     { 
                                         feedbackCount > 0 && 
                                         <p>{ feedbackCount }</p>
@@ -63,25 +63,25 @@ function SidebarRecipe(p) {
                         </div>
                         <div className="flex justify-end">
                             <button className="flex gap-3 px-4 py-2 items-center rounded-3xl hover:bg-orange-400">
-                                <div className="flex flex-row gap-3 items-center text-lg">
+                                <div className="flex flex-row gap-3 items-center text-lg font-semibold ">
                                     { 
-                                        approvalCount > 0 &&
-                                        <p>{ approvalCount }</p>
+                                        points > 0 &&
+                                        <p>{ points }</p>
                                     }
-                                    <img className="w-10" src={ ApproveIcon } alt="" />
+                                    <img className="min-w-10 w-10" src={ ApproveIcon } alt="" />
                                 </div>
                             </button>
                         </div>
                     </div>
                 </div>
-                {/* User */}
+                {/* user */}
                 <Link to={`/${ authorName }`} className="flex gap-6 flex-row items-center mb-3 p-6 rounded-3xl bg-zinc-900 hover:bg-zinc-500">
                     <img className="w-14" src={ ProfilePicture } alt="" />
                     <p className="text-xl font-semibold">
                         { authorName }
                     </p>
                 </Link>
-                {/* Summary */}
+                {/* summary */}
                 <div className="flex flex-col mb-3 rounded-3xl bg-zinc-900">
                     <div className="flex flex-row p-6 gap-6 items-center shadow-md shadow-zinc-950">
                         <img className="w-10" src={ SummaryIcon } alt="" />
@@ -93,7 +93,7 @@ function SidebarRecipe(p) {
                         { summary }
                     </p>        
                 </div>
-                {/* Ingredients */}
+                {/* ingredients */}
                 <div className="flex flex-col mb-3 rounded-3xl bg-zinc-900">
                     <div className="flex flex-row p-6 gap-6 items-center shadow-md shadow-zinc-950">
                         <img className="w-10" src={ IngredientsIcon } alt="" />
@@ -111,7 +111,7 @@ function SidebarRecipe(p) {
                         }
                     </ul>
                 </div>
-                {/* Tags */}
+                {/* tags */}
                 <div className="flex flex-col mb-3 rounded-3xl bg-zinc-900">
                     <div className="flex flex-row p-6 gap-6 items-center shadow-md shadow-zinc-950">
                         <img className="w-10" src={ TagIcon } alt="" />
@@ -128,7 +128,7 @@ function SidebarRecipe(p) {
                         }
                     </div>
                 </div>
-                {/* Feedbacks */}
+                {/* feedbacks */}
                 <div ref={ sectionRef }>
                     <FeedbackSection 
                         user={ user } recipeId={ recipeId } 

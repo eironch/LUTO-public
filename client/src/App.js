@@ -1,7 +1,6 @@
-import React, { useState, useRef, useLayoutEffect, useEffect, useCallback } from 'react'
-import { Routes, Route, Navigate, useNavigate } from 'react-router-dom'
+import React, { useState, useRef, useLayoutEffect } from 'react'
+import { Routes, Route, Navigate } from 'react-router-dom'
 import axios from 'axios'
-import { debounce } from 'lodash'
 import { format, getYear } from 'date-fns'
 
 import Auth from './pages/Auth'
@@ -11,6 +10,7 @@ import Settings from './pages/Settings'
 import Search from './pages/Search'
 import Recipe from './pages/Recipe'
 import Create from './pages/Create'
+import Saved from './pages/Saved'
 
 import Modal from './components/Modal'
 
@@ -23,22 +23,34 @@ function App() {
   const [currentTab, setCurrentTab] = useState('Home')
   const [filters, setFilters] = useState([])
   const filtersRef = useRef(filters)
-  const navigate = useNavigate()
-  const [route, setRoute] = useState("")
+  const [searchQuery, setSearchQuery] = useState("")
 
-  async function approveRecipe(userId, recipeId) {
+  async function handleApproveRecipe(userId, recipeId) {
     return await axios.post('http://localhost:8080/approve-recipe', { userId, recipeId })
       .then(res => {
         console.log('Status Code:' , res.status)
         console.log('Data:', res.data)
 
-        return { isApproved: res.data.payload.isApproved, approvalCount: res.data.payload.approvalCount.approvalCount }
+        return { isApproved: res.data.payload.isApproved, points: res.data.payload.points.points }
       })
       .catch(err => {
-        console.log('Error Status:', err.res.status)
-        console.log('Error Data:', err.res.data)
+        console.log('Error Status:', err.response.status)
+        console.log('Error Data:', err.response.data)
       })
   }
+
+  function handleFlagRecipe(userId, recipeId) {
+    axios.post('http://localhost:8080/flag-recipe', { userId, recipeId })
+      .then(res => {
+        console.log('Status Code:' , res.status)
+        console.log('Data:', res.data)
+      })
+      .catch(err => {
+        console.log('Error Status:', err.response.status)
+        console.log('Error Data:', err.response.data)
+      })
+  }
+  
 
   useLayoutEffect(() => {
     axios.get(`http://localhost:8080/check-auth`, { withCredentials: true })
@@ -63,7 +75,6 @@ function App() {
           setIsLoading(false)
           setIsAuthenticated(false)
       })
-    
   }, [])
 
   function calculateDiffInTime(dateNow, pastDate, unitsOfTime) {
@@ -121,37 +132,41 @@ function App() {
                     setIsAuthenticated={ setIsAuthenticated } user={ user } 
                     currentTab={ currentTab } setCurrentTab={ setCurrentTab } 
                     filters={ filters } setFilters={ setFilters } filtersRef={ filtersRef }
-                    approveRecipe={ approveRecipe } formatDate={ formatDate }
-                  /> 
+                    handleApproveRecipe={ handleApproveRecipe } formatDate={ formatDate }
+                    searchQuery={ searchQuery } setSearchQuery={ setSearchQuery }
+                    handleFlagRecipe={ handleFlagRecipe }
+                  />
                 }
               />
               <Route path="/:authorName" element={ 
                   <Profile 
-                    user={ user }
-                    currentTab={ currentTab } setCurrentTab={ setCurrentTab } 
-                    approveRecipe={ approveRecipe } formatDate={ formatDate }
-                  /> 
+                    user={ user } currentTab={ currentTab } 
+                    setCurrentTab={ setCurrentTab } handleApproveRecipe={ handleApproveRecipe } 
+                    formatDate={ formatDate }
+                  />
                 }
               />
               <Route path="/settings" element={ 
                   <Settings 
-                    user={ user } 
-                    currentTab={ currentTab } setCurrentTab={ setCurrentTab }
-                  /> 
+                    user={ user } currentTab={ currentTab } 
+                    setCurrentTab={ setCurrentTab }
+                  />
                 } 
               />
               <Route path="/search" element={ 
                   <Search 
-                    user={ user }
-                    currentTab={ currentTab } setCurrentTab={ setCurrentTab }
-                    filters={ filters } setFilters={ setFilters } filtersRef={ filtersRef }
+                    user={ user } currentTab={ currentTab } 
+                    setCurrentTab={ setCurrentTab } filters={ filters }
+                    setFilters={ setFilters } formatDate={ formatDate }
+                    handleApproveRecipe={ handleApproveRecipe }
+                    searchQuery={ searchQuery } setSearchQuery={ setSearchQuery }
                   /> 
                 } 
               />
               <Route path="/create" element={ 
                   <Create
-                    user={ user } 
-                    currentTab={ currentTab } setCurrentTab={ setCurrentTab }
+                    user={ user } currentTab={ currentTab } 
+                    setCurrentTab={ setCurrentTab }
                   />
                 } 
               />
@@ -159,6 +174,13 @@ function App() {
                   <Recipe 
                     user={ user } currentTab={ currentTab } 
                     setCurrentTab={ setCurrentTab } formatDate={ formatDate } 
+                  /> 
+                } 
+              />
+              <Route path="/saved" element={ 
+                  <Saved 
+                    user={ user } currentTab={ currentTab } 
+                    setCurrentTab={ setCurrentTab }
                   /> 
                 } 
               />
