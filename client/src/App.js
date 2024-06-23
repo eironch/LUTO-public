@@ -10,6 +10,7 @@ import Recipe from './pages/Recipe'
 import RecipeBuilder from './pages/RecipeBuilder'
 import Modal from './components/Modal'
 import SearchPage from './pages/SearchPage'
+import PopularPage from './pages/PopularPage'
 
 
 function App() {
@@ -66,7 +67,7 @@ function App() {
 
   return (
     <>
-    <SearchPage />
+    <PopularPage />
       
     </>
   )
