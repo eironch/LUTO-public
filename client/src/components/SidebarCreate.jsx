@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom'
 import { v4 as uuidv4 } from 'uuid'
 import debounce from 'lodash.debounce'
 
-import Feedback from './Feedback'
 import Textarea from './Textarea'
 
 import ProfilePicture from '../assets/profile-picture.png'
@@ -14,6 +13,8 @@ import SearchIcon from '../assets/search-icon.png'
 import TagIcon from '../assets/tag-icon.png'
 import IngredientsIcon from '../assets/ingredients-icon.png'
 import SummaryIcon from '../assets/summary-icon.png'
+import GivePointNegativeIcon from '../assets/give-point-negative-icon.png'
+import GivePointPositiveIcon from '../assets/give-point-positive-icon.png'
 
 function IngredientForm(p) {
     const keyIndex = p.keyIndex
@@ -30,7 +31,7 @@ function IngredientForm(p) {
                 ingredient.value = ingredientValue
             }
         })
-
+        
         setIngredients(newIngredients)
     }, [ingredientValue])
 
@@ -137,47 +138,55 @@ function SidebarCreate(p) {
     }, [])
     
     return (
-        <div className="pl-3 grid w-full h-full overflow-hidden" style={ { gridTemplateColumns: 'repeat(15, minmax(0, 1fr))' } }>
+        <div className="pl-3 grid w-full h-full overflow-hidden" style={ { gridTemplateColumns: "repeat(15, minmax(0, 1fr))" } }>
             <div className="flex overflow-x-hidden overflow-y-scroll h-full scrollable-div flex-col text-zinc-100 col-span-4 pointer-events-auto">
-                {/* Recipe Image */}
-                <div className="p-2 mb-3 rounded-3xl bg-gradient-to-tr from-orange-500 to-orange-400">
-                    <div className="relative w-full h-auto aspect-w-2 aspect-h-2">
-                        {
-                            preRecipeImage &&
-                            <div className="bg-orange-300 rounded-3xl">
-                                <img className="absolute inset-0 w-full h-full rounded-3xl object-cover" src={ URL.createObjectURL(preRecipeImage) } alt="" />
-                            </div>
-                        }
-                        <label className={`${ preRecipeImage && "opacity-0" } flex justify-center items-center text-2xl font-semibold border-4 border-dashed border-zinc-200 rounded-3xl cursor-pointer`} htmlFor="fileInput">
-                            Upload Image
-                        </label>
-                        <input className="hidden" id="fileInput" type="file" accept="image/*" onChange={ e => handleFileChange(e) } />
+                {/* recipe image */}
+                <div className="mb-3 rounded-3xl bg-zinc-900">
+                    <div className="p-2 rounded-3xl bg-gradient-to-tr from-orange-500 to-orange-400">
+                        <div className="relative w-full h-auto aspect-w-2 aspect-h-2">
+                            {
+                                preRecipeImage &&
+                                <div className="bg-orange-300 rounded-3xl">
+                                    <img className="absolute inset-0 w-full h-full rounded-3xl object-cover" src={ URL.createObjectURL(preRecipeImage) } alt="" />
+                                </div>
+                            }
+                            <label className={`${ preRecipeImage && "opacity-0" } flex justify-center items-center text-2xl font-semibold border-4 border-dashed border-zinc-200 rounded-3xl cursor-pointer`} htmlFor="fileInput">
+                                Upload Image
+                            </label>
+                            <input className="hidden" id="fileInput" type="file" accept="image/*" onChange={ e => handleFileChange(e) } />
+                        </div>
                     </div>
-                    <div className="grid grid-cols-2 pt-2">
+                    <div className="grid grid-cols-2 p-3">
                         <div className="flex">
-                            <div className="flex gap-3 px-4 py-2 items-center justify-start rounded-3xl hover:bg-orange-400">
-                                <button className="hover:underline">
-                                    <img className="w-10" src={ FeedbackIcon } alt="" />
-                                </button>
+                            <div className="flex gap-3 px-4 py-2 items-center justify-start rounded-3xl">
+                                <div className="flex flex-row gap-3 items-center text-lg font-semibold">
+                                    <img className="min-w-10 w-10" src={ FeedbackIcon } alt="" />
+                                </div>
                             </div>
                         </div>
-                        <div className="flex justify-end">
-                            <div className="flex gap-3 px-4 py-2 items-center rounded-3xl hover:bg-orange-400">
-                                <button>
-                                    <img className="w-10" src={ ApproveIcon } alt="" />
-                                </button>
+                        <div className="flex justify-end items-end w-full overflow-hidden">
+                            <div className="flex justify-end items-center h-fit rounded-3xl bg-zinc-700">
+                                <div className="flex justify-end items-center p-3 gap-4 rounded-3xl">
+                                    <img className="min-w-10 w-10" src={ GivePointNegativeIcon } alt="" />
+                                </div>
+                                <p className="text-zinc-100 text-lg font-semibold">
+                                    0
+                                </p>
+                                <div className="flex justify-end items-center p-3 gap-4 rounded-3xl">
+                                    <img className="min-w-10 w-10" src={ GivePointPositiveIcon } alt="" />
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-                {/* User */}
+                {/* user */}
                 <Link to={`/${ user.username }`} className="flex gap-6 flex-row items-center mb-3 p-6 rounded-3xl bg-zinc-900 hover:bg-zinc-500">
                     <img className="w-14" src={ ProfilePicture } alt="" />
                     <p className="text-xl font-semibold">
                         { user.username }
                     </p>
                 </Link>
-                {/* Summary */}
+                {/* summary */}
                 <div className="flex flex-col mb-3 rounded-3xl bg-zinc-900">
                     <div className="flex flex-row p-6 gap-6 items-center shadow-md shadow-zinc-950">
                         <img className="w-10" src={ SummaryIcon } alt="" />
@@ -186,7 +195,8 @@ function SidebarCreate(p) {
                         </p>
                     </div>
                     <div className="flex flex-col p-3">
-                        <Textarea attribute={`${summary ?  "bg-transparent" : "bg-zinc-700"} text-justify text-lg focus:bg-zinc-700`} 
+                        <Textarea 
+                            attribute={`${summary ?  "bg-transparent" : "bg-zinc-700"} text-justify text-lg focus:bg-zinc-700`} 
                             maxLength={ 300 } value={ summary || "" } setValue={ setSummary }
                             placeholder="What would you describe your dish?"
                         />
@@ -195,7 +205,7 @@ function SidebarCreate(p) {
                         </p>
                     </div>
                 </div>
-                {/* Ingredients */}
+                {/* ingredients */}
                 <div className="flex flex-col mb-3 rounded-3xl bg-zinc-900">
                     <div className="flex flex-row p-6 gap-6 items-center shadow-md shadow-zinc-950">
                         <img className="w-10" src={ IngredientsIcon } alt="" />
@@ -216,37 +226,45 @@ function SidebarCreate(p) {
                         </button>
                     </ul>
                 </div>
-                {/* Tags */}
+                {/* tags */}
                 <div className="flex flex-col mb-3 gap-3 rounded-3xl bg-zinc-900">
-                    <div className="flex flex-row gap-6 p-6 items-center shadow-md shadow-zinc-950">
+                    {/* header */}
+                    <div className="flex flex-row gap-6 p-6 mb-3 items-center shadow-md shadow-zinc-950">
                         <img className="w-10" src={ TagIcon } alt="" />
                         <p className="text-2xl font-semibold">Tags</p>
                     </div>
-                    <div className="block px-6 pt-3 text-md font-semibold w-full">
-                        {
-                            tags &&
-                            tags.map((tag, index) => 
-                                <button className="m-1 px-3 py-1 w-fit bg-zinc-700 rounded-3xl hover:bg-zinc-500" key={ index } id={ index } onClick={ e => { removeTag(e) } }>
-                                    { tag }
-                                </button>
-                            )
-                        }
-                    </div>
+                    {/* selected tags */}
+                    {
+                        tags &&
+                        tags.length > 0 &&
+                        <div className="block px-6 text-md font-semibold w-full">
+                            {
+                                tags.map((tag, index) => 
+                                    <button className="m-1 px-3 py-1 w-fit bg-zinc-700 rounded-3xl hover:bg-zinc-500" key={ index } id={ index } onClick={ e => { removeTag(e) } }>
+                                        { tag }
+                                    </button>
+                                )
+                            }
+                        </div>
+                    }
+                    {/* search input */}
                     <div className="flex flex-row px-6 gap-3 items-center">
                         {
                             !searchValue && <p className="text-xl font-bold">Popular</p>
                         }
-                        <div className="flex w-full items-center justify-center rounded-3xl shadow-md shadow-zinc-950 bg-zinc-700">
-                            <div className="flex items-center justify-center ml-2 w-12 h-full">
+                        <div className="relative flex w-full items-center justify-center rounded-3xl shadow-md shadow-zinc-950 bg-zinc-700">
+                            <div className="absolute flex ml-4 left-0 right-0 items-start justify-left pointer-events-none">
                                 <img className="w-6" src={ SearchIcon } alt="" />
                             </div>
-                            <input className="w-full h-10 ml-2 p-3 rounded-3xl bg-transparent text-zinc-100 text-start"
+                            <input className="w-full h-10 px-14 rounded-3xl bg-transparent text-zinc-100 text-start"
                                 value={ searchValue } onChange={ e => setSearchValue(e.target.value) } type="text" placeholder="Search Tags"
                             />
                         </div>
                     </div>
+                    {/* tags */}
                     <div className="block px-6 pb-6 text-md font-semibold w-full">
                         {
+                            tags &&
                             tagChoices.map((tag, index) => {
                                 const isAdded = tags.find(recipeTag => recipeTag === tag)
 

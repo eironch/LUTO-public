@@ -4,14 +4,18 @@ import bcrypt from 'bcrypt'
 import cookieParser from 'cookie-parser'
 import jwt from 'jsonwebtoken'
 import mongoose from 'mongoose'
+import { Types } from 'mongoose'
 import multer from 'multer'
-import { db, bucket } from './firebaseAdmin.js'
+import { bucket } from './firebaseAdmin.js'
 import { v4 as uuidv4 } from 'uuid' 
 
 import User from './models/user.js'
 import Recipe from './models/recipe.js'
 import RecipeOverview from './models/recipeOverview.js'
-import Approval from './models/approval.js'
+import Point from './models/point.js'
+import Feedback from './models/feedback.js'
+import Save from './models/save.js'
+import Flag from './models/flag.js'
 
 const PORT = 8080
 
@@ -49,7 +53,7 @@ function verifyToken(token) {
 
 // connect to mongodb
 const dbURI = 'mongodb+srv://test:f2qWY9k3dxnsqj9T@luto.tihpifs.mongodb.net/luto?retryWrites=true&w=majority&appName=LUTO'
-mongoose.connect(dbURI)
+mongoose.connect(dbURI, { autoIndex: false })
     .then(() => { 
         app.listen(PORT, () => {
             console.log('Connected to backend.')
@@ -58,6 +62,18 @@ mongoose.connect(dbURI)
     .catch(err => { 
         console.log('Connection error') 
     })
+
+// mongoose.connection.once('open', async () => {
+//     try {
+//         await Recipe.createIndexes()
+//         await RecipeOverview.createIndexes()
+//         await Approval.createIndexes()
+
+//         console.log('Indexes created successfully.')
+//     } catch (error) {
+//         console.error('Error creating indexes:', error)
+//     }
+// })
 
 // mongoose and mongo sandbox routes
 app.get('/', (req, res) => {
@@ -70,6 +86,7 @@ app.post('/create-account', (req, res) => {
         username,
         password,
         bio: '',
+        userType,
         refreshToken: '',
     })
 
@@ -82,8 +99,8 @@ app.post('/create-account', (req, res) => {
         })
 })
 
-app.post('/sign-in', (req, res) => {
-    const { username, password } = req.body
+app.get('/sign-in', (req, res) => {
+    const { username, password } = req.query
 
     User.findOne({ username })
         .then(user => {
@@ -132,14 +149,14 @@ app.post('/sign-in', (req, res) => {
 app.get('/check-auth', (req, res) => {
     const accessToken = req.cookies.authToken
     const decodedAccessToken = verifyToken(accessToken)
-   
+    
     if (accessToken && decodedAccessToken) {
         return res.status(200).json({ isAuthenticated: true, payload: { username: decodedAccessToken.username, userId: decodedAccessToken.userId }})
     }
-    
+    console.log('here')
     const refreshToken = req.cookies.refreshToken
     const decodedRefreshToken = verifyToken(refreshToken)
-
+    console.log('here')
     if (refreshToken && decodedRefreshToken) {
         res.cookie(
             'accessToken',
@@ -150,15 +167,14 @@ app.get('/check-auth', (req, res) => {
                 maxAge: 3600000,
             }
         )
-        
+        console.log('her3123e')
         return res.status(200).json({ isAuthenticated: true, payload: { username: decodedRefreshToken.username, userId: decodedRefreshToken.userId }})
     }
 
     return res.status(202).json({ isAuthenticated: false })
 })
 
-
-app.post('/publish-recipe', upload.any(), (req, res) => {
+app.post('/publish-recipe', upload.any(), async (req, res) => {
     const { 
         userId,
         categories,
@@ -176,7 +192,7 @@ app.post('/publish-recipe', upload.any(), (req, res) => {
     const ingredients = JSON.parse(req.body.ingredients)
     const recipeElements = JSON.parse(req.body.recipeElements)
 
-    const recipe = {
+    const recipeFormat = {
         userId,
         categories,
         tags: JSON.parse(tags),
@@ -186,50 +202,37 @@ app.post('/publish-recipe', upload.any(), (req, res) => {
         ingredients,
         recipeElements,
     }
-    console.log('recipe')
-    console.log(recipe)
-    console.log(recipeFiles)
+
     try {
-        uploadFile(recipeFiles)
-        .then(fileLinks => {
-            const elementLinks = fileLinks.elementFiles
+        const fileLinks = await uploadFile(recipeFiles)
+        const elementLinks = fileLinks.elementFiles
+        recipeFormat.recipeImage = fileLinks.recipeImage
 
-            recipe.recipeImage = fileLinks.recipeImage
+        recipeElements.forEach((element) => {
+            for (let x = 0; x < element.filesLength; x++) {
+                element.files.push(elementLinks[x])
+            }
 
-            recipeElements.forEach((element) => {
-                for (let x = 0; x < element.filesLength; x++) {
-                    element.files.push(elementLinks[x])
-                }
-
-                elementLinks.splice(0, element.filesLength)
-            })
-
-            console.log('new recipe')
-            console.log(recipe)
-            return recipe
+            elementLinks.splice(0, element.filesLength)
         })
-        .then(recipeValues => {
-            const recipe = new Recipe(recipeValues)
 
-            recipe.save()
-                .then(savedRecipe => {
-                    const recipeOverview = new RecipeOverview({
-                        recipeId: savedRecipe._id,
-                        userId: savedRecipe.userId,
-                        categories: savedRecipe.categories,
-                        tags: savedRecipe.tags,
-                        recipeImage: savedRecipe.recipeImage, 
-                        title: savedRecipe.title,
-                        summary: savedRecipe.summary,
-                    })
+        const recipe = new Recipe(recipeFormat)
+        const savedRecipe = await recipe.save()
 
-                    return recipeOverview.save()
-                })
-                .then(() => {
-                    return res.status(201).json({ success: true, message:'Recipe published.'})
-                })
-        })
+        const recipeOverview = new RecipeOverview({
+            recipeId: savedRecipe._id,
+            userId: savedRecipe.userId,
+            categories: savedRecipe.categories,
+            tags: savedRecipe.tags,
+            recipeImage: savedRecipe.recipeImage, 
+            title: savedRecipe.title,
+            summary: savedRecipe.summary,
+        })        
+        await recipeOverview.save()
+
+        return res.status(201).json({ success: true, message:'Recipe published.'})
     } catch (err) {
+        console.log(err)
         return res.status(500).json({ message:'File upload error.', err})
     }
 })
@@ -250,7 +253,6 @@ async function uploadFile(files){
                 try {
                     const fileUrl = await uploadFileToStorage(file)
 
-                    // const [signedUrl] = await bucket.file(fileUrl).getSignedUrl(options)
                     console.log('url download:', fileUrl)
                     return fileUrl
                 } catch (error) {
@@ -304,33 +306,67 @@ function uploadFileToStorage(file) {
     })
 }
 
-app.post('/approve-recipe', async (req, res) => {
-    const { userId, recipeId } = req.body
-
+app.post('/give-point', async (req, res) => {
+    const { userId, recipeId, pointStatus } = req.body
+    console.log(req.body)
     try {
-        const existingLike = await Approval.findOne({ userId, recipeId })
+        const isGivenPoint = await Point.findOne({ userId, recipeId })
 
-        if (existingLike) {
-            await Approval.deleteOne({ userId, recipeId })
-            
-            await Recipe.findByIdAndUpdate(recipeId, { $inc: { approvalCount: -1 } })
+        if (isGivenPoint) {
+            const prevStatus = await Point.findOne({ userId, recipeId }).select('pointStatus')
 
-            const approvalCount = await Recipe.findById(recipeId).select('approvalCount')
-            console.log(approvalCount)
-            return res.status(200).json({ success: true, message:'Recipe unapproved.', payload: { isApproved: false, approvalCount } })
+            if (pointStatus === '') {
+                await Point.deleteOne({ userId, recipeId })
+
+                if (prevStatus.pointStatus === 'negative') {
+                    await Recipe.findByIdAndUpdate(recipeId, { $inc: { points: 1 } })
+                } else if (prevStatus.pointStatus === 'positive') {
+                    await Recipe.findByIdAndUpdate(recipeId, { $inc: { points: -1 } })
+                }
+                
+                const points = await Recipe.findById(recipeId).select('points')
+                
+                return res.status(203).json({ success: true, message:'Recipe point ungiven.', payload: { pointStatus, points } })
+            }
+
+            await Point.updateOne(
+                { userId, recipeId },
+                {
+                    $set: {
+                        pointStatus
+                    },
+                    $currentDate: { updatedAAt: true }
+                }
+            )
+            console.log(prevStatus.pointStatus)
+            if (prevStatus.pointStatus === 'positive') {
+                await Recipe.findByIdAndUpdate(recipeId, { $inc: { points: -2 } })
+            } else if (prevStatus.pointStatus === 'negative') {
+                await Recipe.findByIdAndUpdate(recipeId, { $inc: { points: 2 } })
+            }
+
+            const points = await Recipe.findById(recipeId).select('points')
+            console.log('changed')
+            return res.status(200).json({ success: true, message:'Recipe point status changed.', payload: { pointStatus, points } })
         }
+        console.log('not changed')
+        const point = new Point({
+            userId,
+            recipeId,
+            pointStatus
+        })
 
-        await Approval.updateOne(
-            { userId, recipeId },
-            { $setOnInsert: { userId, recipeId } },
-            { upsert: true }
-        )
+        await point.save()
 
-        await Recipe.findByIdAndUpdate(recipeId, { $inc: { approvalCount: 1 } })
+        if (pointStatus === 'positive') {
+            await Recipe.findByIdAndUpdate(recipeId, { $inc: { points: 1 } })
+        } else if (pointStatus === 'negative') {
+            await Recipe.findByIdAndUpdate(recipeId, { $inc: { points: -1 } })
+        }
+  
+        const points = await Recipe.findById(recipeId).select('points')
 
-        const approvalCount = await Recipe.findById(recipeId).select('approvalCount')
-        console.log(approvalCount)
-        return res.status(201).json({ success: true, message:'Recipe approved.', payload: { isApproved: true, approvalCount } })
+        return res.status(201).json({ success: true, message:'Recipe point given.', payload: { pointStatus, points } })
     } catch (err) {
         console.log(err)
         return res.status(500).json({ success: true, message:'Internal server error.', err})
@@ -352,9 +388,9 @@ app.get('/feed-recipes', async (req, res) => {
                         matchCount: {
                             $size: {
                                 $filter: {
-                                    input: "$tags",
-                                    as: "tag",
-                                    cond: { $in: ["$$tag", filters] }
+                                    input: '$tags',
+                                    as: 'tag',
+                                    cond: { $in: ['$$tag', filters] }
                                 }
                             }
                         }
@@ -366,27 +402,24 @@ app.get('/feed-recipes', async (req, res) => {
         pipeline.push({ $sort: { createdAt: -1 } })
 
         const aggregatedResults = await RecipeOverview.aggregate(pipeline)
-        console.log(aggregatedResults)
         const results = aggregatedResults.map(result => new RecipeOverview(result))
 
         const recipes = await RecipeOverview.populate(results, [
                     { path: 'userId', select: 'username' },
-                    { path: 'recipeId', select: 'approvalCount'}
+                    { path: 'recipeId', select: ['points', 'feedbackCount']}
                 ])
 
-
-        console.log(recipes)
         if (!recipes.length) {
             return res.status(400).json({ message: 'No recipes found.' })
         }
 
-        const approvalPromises = recipes.map(async recipe => {
-            const isApproved = await Approval.findOne({ userId, recipeId: recipe.recipeId }) !== null
-    
-            return { ...recipe.toObject(), isApproved }
+        const pointPromises = recipes.map(async recipe => {
+            const status = await Point.findOne({ userId, recipeId: recipe.recipeId }).select('pointStatus') 
+            console.log(status)
+            return { ...recipe.toObject(), pointStatus: status && status.pointStatus }
         })
         
-        return Promise.all(approvalPromises)
+        return Promise.all(pointPromises)
             .then(recipes => {
                 console.log(recipes)
                 return res.status(200).json({ success: true, payload: recipes })
@@ -413,12 +446,14 @@ app.get('/recipe', async (req, res) => {
             return res.status(400).json({ message: 'No such recipe found.' })
         }
 
-        const isApproved = await Approval.findOne({ userId, recipeId: recipe.recipeId }).lean() !== null
+        const status = await Point.findOne({ userId, recipeId }).select('pointStatus')
 
+        const isSaved = await Save.findOne({ userId, recipeId }) !== null
+    
         const response = {
             userInfo: { username: recipe.userId.username },
             recipeContents: { ...recipe },
-            approvalStatus: { isApproved },
+            recipeStatus: { pointStatus: status && status.pointStatus, isSaved }
         }
 
         return res.status(200).json({ success: true, payload: response })
@@ -429,8 +464,8 @@ app.get('/recipe', async (req, res) => {
 })
 
 app.get('/user-recipes', async (req, res) => {
-    const { authorName, userId } = req.query
-    console.log(userId)
+    const { authorName } = req.query
+    
     try {
         const user = await User.find({ username: authorName })
 
@@ -438,28 +473,184 @@ app.get('/user-recipes', async (req, res) => {
             return res.status(400).json({ message: 'No such user found.' })
         }
 
-        const recipes = await RecipeOverview.find().populate({
-            path: 'userId',
-            select: 'username'
-        }).populate({
-            path: 'recipeId',
-            select: 'approvalCount',
-        }).sort({ createdAt: -1 })
+        const recipes = await RecipeOverview.find({ userId: user[0]._id }).populate({
+                path: 'userId',
+                select: 'username'
+            }).populate({
+                path: 'recipeId',
+                select: 'points',
+            }).sort({ createdAt: -1 })
+        console.log(recipes)
+        if (!recipes) {
+            return res.status(400).json({ message: 'No recipes found.' })
+        }
+
+        const pointPromises = recipes.map(async recipe => {
+            const status = await Point.findOne({ userId: user[0]._id, recipeId: recipe.recipeId }).select('pointStatus')
+  
+            return { ...recipe.toObject(), pointStatus: status && status.pointStatus }
+        })
+
+        return Promise.all(pointPromises)
+            .then(recipes => {
+                return res.status(200).json({ success: true, payload: recipes })
+            })
+    } catch (err) {
+        console.log(err)
+        return res.status(500).json({ message: 'Internal server error.', err })
+    }
+})
+
+app.get('/find-recipes', async (req, res) => {
+    const { userId, searchQuery, filters } = req.query
+    console.log(req.query)
+    const pipeline = [
+        { 
+            $match: {
+                $and: [
+                    filters ? { tags: { $in: filters } } : {},
+                    {
+                        $or: [
+                            { title: { $regex: searchQuery, $options: 'i' } },
+                            { summary: { $regex: searchQuery, $options: 'i' } }
+                        ]
+                    }
+                ]
+            }
+        },
+        { $sort: { createdAt: -1 } }
+    ]
+    console.log(pipeline)
+    try {
+        const aggregatedResults = await RecipeOverview.aggregate(pipeline)
+        const results = aggregatedResults.map(result => new RecipeOverview(result))
+
+        const recipes = await RecipeOverview.populate(results, [
+                    { path: 'userId', select: 'username' },
+                    { path: 'recipeId', select: ['points', 'feedbackCount']}
+                ])
 
         if (!recipes.length) {
             return res.status(400).json({ message: 'No recipes found.' })
         }
 
-        const approvalPromises = recipes.map(async recipe => {
-            const isApproved = await Approval.findOne({ userId, recipeId: recipe.recipeId }) !== null
-  
-            return { ...recipe.toObject(), isApproved }
+        const pointPromises = recipes.map(async recipe => {
+            const status = await Point.findOne({ userId, recipeId: recipe.recipeId }).select('pointStatus')
+    
+            return { ...recipe.toObject(), pointStatus: status && status.pointStatus }
         })
-
-        return Promise.all(approvalPromises)
+        
+        return Promise.all(pointPromises)
             .then(recipes => {
+                console.log(recipes)
                 return res.status(200).json({ success: true, payload: recipes })
             })
+    } catch (err) {
+        console.log(err)
+        return res.status(500).json({ message: 'Internal server error.', err })
+    }
+})
+
+app.post('/submit-feedback', async (req, res) => {
+    const { userId, recipeId, text } = req.body
+    console.log(req)
+    const feedback = new Feedback({
+        userId,
+        recipeId,
+        text,
+        flag: 0,
+    })
+    
+    try {
+        await feedback.save()
+        
+        await Recipe.findByIdAndUpdate(recipeId, { $inc: { feedbackCount: 1 } })
+        
+        return res.status(201).json({ success: true, message: 'Feedback created.' })
+    } catch (err) {
+        console.log(err)
+        return res.status(500).json({ message: 'Internal server error.', err })
+    }
+})
+
+app.get('/feedbacks', async (req, res) => {
+    const { recipeId } = req.query
+    console.log(recipeId)
+    console.log('hererereererr')
+    const pipeline = [
+        { 
+            $match: { recipeId: new Types.ObjectId(recipeId) }
+        },
+        {
+            $sort: { createdAt: -1 }
+        }
+    ]
+
+    try {
+        const aggregatedResults = await Feedback.aggregate(pipeline)
+
+        const feedbacks = await User.populate(aggregatedResults, {
+            path: 'userId',
+            select: 'username'
+        })
+
+        const feedbackCount = await Recipe.findById(recipeId).select('feedbackCount')
+
+        return res.status(200).json({ success: true, payload: { feedbacks, feedbackCount } })
+    } catch (err) {
+        console.log(err)
+        return res.status(500).json({ message: 'Internal server error.', err })
+    }
+})
+
+app.post('/save-recipe', async (req, res) => {
+    const { userId, recipeId } = req.body
+    const save = new Save({
+        userId,
+        recipeId
+    })
+
+    try {
+        const isSaved = await Save.findOne({ userId, recipeId }) !== null
+
+        if (isSaved) {
+            await Save.deleteOne({ userId, recipeId })
+
+            return res.status(200).json({ success: true, message:'Recipe unsaved.', payload: { isSaved: false } })
+        }
+
+        await save.save()
+            .then(() => {
+                return res.status(201).json({ success: true, message: 'Recipe saved.', payload: { isSaved: true }})
+            })
+            .catch(() => {
+                return res.status(202).json({ success: false, message: 'Error saving recipe.' })
+            })
+    } catch (err) {
+        console.log(err)
+        return res.status(500).json({ message: 'Internal server error.', err })
+    }
+})
+
+app.post('/flag-recipe', async (req, res) => {
+    const { userId, recipeId } = req.body
+    const flag = new Flag({
+        userId,
+        recipeId
+    })
+
+    try {
+        const isFlagged = await Flag.findOne({ userId, recipeId }) !== null
+
+        if (isFlagged) {
+            return res.status(400).json({ message: 'Recipe already flagged.' })
+        }
+        
+        await flag.save()
+        
+        await Recipe.findByIdAndUpdate(recipeId, { $inc: { flagCount: 1 } })
+
+        return res.status(200).json({ success: true, message: 'Recipe flagged.' })
     } catch (err) {
         console.log(err)
         return res.status(500).json({ message: 'Internal server error.', err })

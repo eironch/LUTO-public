@@ -1,6 +1,8 @@
 import React, { useState, useRef, useLayoutEffect } from 'react'
-import { Routes, Route, BrowserRouter, Navigate } from 'react-router-dom'
+import { Routes, Route, Navigate } from 'react-router-dom'
 import axios from 'axios'
+import { format, getYear } from 'date-fns'
+
 import Auth from './pages/Auth'
 import Home from './pages/Home'
 import Profile from './pages/Profile'
@@ -8,6 +10,8 @@ import Settings from './pages/Settings'
 import Search from './pages/Search'
 import Recipe from './pages/Recipe'
 import Create from './pages/Create'
+import Saved from './pages/Saved'
+
 import Modal from './components/Modal'
 
 function App() {
@@ -19,14 +23,15 @@ function App() {
   const [currentTab, setCurrentTab] = useState('Home')
   const [filters, setFilters] = useState([])
   const filtersRef = useRef(filters)
-  
-  async function postApproveRecipe(userId, recipeId) {
-    return await axios.post('http://localhost:8080/approve-recipe', { userId, recipeId })
-      .then(response => {
-        console.log('Status Code:' , response.status)
-        console.log('Data:', response.data)
+  const [searchQuery, setSearchQuery] = useState("")
 
-        return { isApproved: response.data.payload.isApproved, approvalCount: response.data.payload.approvalCount.approvalCount }
+  async function handleGiveRecipePoint(userId, recipeId, pointStatus) {
+    return await axios.post('http://localhost:8080/give-point', { userId, recipeId, pointStatus })
+      .then(res => {
+        console.log('Status Code:', res.status)
+        console.log('Data:', res.data)
+        
+        return { recipePointStatus: res.data.payload.pointStatus, points: res.data.payload.points.points }
       })
       .catch(err => {
         console.log('Error Status:', err.response.status)
@@ -34,20 +39,33 @@ function App() {
       })
   }
 
+  function handleFlagRecipe(userId, recipeId) {
+    axios.post('http://localhost:8080/flag-recipe', { userId, recipeId })
+      .then(res => {
+        console.log('Status Code:' , res.status)
+        console.log('Data:', res.data)
+      })
+      .catch(err => {
+        console.log('Error Status:', err.response.status)
+        console.log('Error Data:', err.response.data)
+      })
+  }
+  
+
   useLayoutEffect(() => {
     axios.get(`http://localhost:8080/check-auth`, { withCredentials: true })
-      .then(response => {
-          console.log('Status Code:' , response.status)
-          console.log('Data:', response.data)
-
+      .then(res => {
+          console.log('Status Code:' , res.status)
+          console.log('Data:', res.data)
+          
           setIsLoading(false)
-          setUser({ username: response.data.payload.username, userId: response.data.payload.userId })
-          setIsAuthenticated(response.data.isAuthenticated)
+          setUser({ username: res.data.payload.username, userId: res.data.payload.userId })
+          setIsAuthenticated(res.data.isAuthenticated)
       })
       .catch(error => {
-          if (error.response) {
-              console.log('Error Status:', error.response.status)
-              console.log('Error Data:', error.response.data)
+          if (error.res) {
+              console.log('Error Status:', error.res.status)
+              console.log('Error Data:', error.res.data)
           } else if (error.request) {
               console.log('Error Request:', error.request)
           } else {
@@ -57,8 +75,48 @@ function App() {
           setIsLoading(false)
           setIsAuthenticated(false)
       })
-    
   }, [])
+
+  function calculateDiffInTime(dateNow, pastDate, unitsOfTime) {
+    const diffInMilliseconds = dateNow - pastDate
+    const diffInTime = Math.floor(diffInMilliseconds / (1000 * unitsOfTime))
+    
+    return diffInTime
+  }
+
+  function formatDate(dateCreated) {
+    const dateNow = new Date()
+    
+    if (getYear(dateCreated) > getYear(dateNow)) {
+      return format(dateCreated, 'PP')
+    }
+    
+    const diffInDays = calculateDiffInTime(dateNow, dateCreated, 60 * 60 * 24)
+    if (diffInDays >= 7) {
+      return format(dateCreated, 'MMMM d')
+    }
+
+    if (diffInDays > 0) {
+      return `${ diffInDays } ${ diffInDays === 1 ? 'day ago' : 'days ago' }`
+    }
+    
+    const diffInHours = calculateDiffInTime(dateNow, dateCreated, 60 * 60)
+    if (diffInHours > 0) {
+      return `${ diffInHours } ${ diffInHours === 1 ? 'hour ago' : 'hours ago' }`
+    }
+
+    const diffInMinutes = calculateDiffInTime(dateNow, dateCreated, 60)
+    if (diffInMinutes > 0) {
+      return `${ diffInMinutes } ${ diffInMinutes === 1 ? 'minute ago' : 'minutes ago' }`
+    }
+
+    const diffInSeconds = calculateDiffInTime(dateNow, dateCreated)
+    if (diffInSeconds > 0) {
+      return `${ diffInSeconds } ${ diffInSeconds === 1 ? 'second ago' : 'seconds ago' }`
+    }
+
+    return 'just now'
+}
 
   return (
     <>
@@ -68,51 +126,62 @@ function App() {
         :
         isAuthenticated ?
         <>
-          <BrowserRouter>
             <Routes>
               <Route path="/home" element={ 
                   <Home
                     setIsAuthenticated={ setIsAuthenticated } user={ user } 
                     currentTab={ currentTab } setCurrentTab={ setCurrentTab } 
                     filters={ filters } setFilters={ setFilters } filtersRef={ filtersRef }
-                    postApproveRecipe={ postApproveRecipe }
-                  /> 
+                    handleGiveRecipePoint={ handleGiveRecipePoint } formatDate={ formatDate }
+                    searchQuery={ searchQuery } setSearchQuery={ setSearchQuery }
+                    handleFlagRecipe={ handleFlagRecipe }
+                  />
                 }
               />
               <Route path="/:authorName" element={ 
                   <Profile 
-                    user={ user } 
-                    currentTab={ currentTab } setCurrentTab={ setCurrentTab } 
-                    postApproveRecipe={ postApproveRecipe } 
-                  /> 
+                    user={ user } currentTab={ currentTab } 
+                    setCurrentTab={ setCurrentTab } handleGiveRecipePoint={ handleGiveRecipePoint } 
+                    formatDate={ formatDate }
+                  />
                 }
               />
               <Route path="/settings" element={ 
                   <Settings 
-                    user={ user } 
-                    currentTab={ currentTab } setCurrentTab={ setCurrentTab } 
-                  /> 
+                    user={ user } currentTab={ currentTab } 
+                    setCurrentTab={ setCurrentTab }
+                  />
                 } 
               />
               <Route path="/search" element={ 
                   <Search 
-                    user={ user }
-                    currentTab={ currentTab } setCurrentTab={ setCurrentTab }
-                    filters={ filters } setFilters={ setFilters } filtersRef={ filtersRef }
+                    user={ user } currentTab={ currentTab } 
+                    setCurrentTab={ setCurrentTab } filters={ filters }
+                    setFilters={ setFilters } formatDate={ formatDate }
+                    handleGiveRecipePoint={ handleGiveRecipePoint }
+                    searchQuery={ searchQuery } setSearchQuery={ setSearchQuery }
                   /> 
                 } 
               />
               <Route path="/create" element={ 
-                  <Create 
-                    user={ user } 
-                    currentTab={ currentTab } setCurrentTab={ setCurrentTab } 
-                  /> 
+                  <Create
+                    user={ user } currentTab={ currentTab } 
+                    setCurrentTab={ setCurrentTab }
+                  />
                 } 
               />
               <Route path="/recipe/:recipeId" element={ 
                   <Recipe 
-                    user={ user } 
-                    currentTab={ currentTab } setCurrentTab={ setCurrentTab } 
+                    user={ user } currentTab={ currentTab } 
+                    setCurrentTab={ setCurrentTab } formatDate={ formatDate }
+                    handleGiveRecipePoint={ handleGiveRecipePoint }
+                  /> 
+                } 
+              />
+              <Route path="/saved" element={ 
+                  <Saved 
+                    user={ user } currentTab={ currentTab } 
+                    setCurrentTab={ setCurrentTab }
                   /> 
                 } 
               />
@@ -121,7 +190,6 @@ function App() {
                 } 
               />
             </Routes>
-          </BrowserRouter>
         </>
         :
         <Auth 

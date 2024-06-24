@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react'
 
 function Modal(p) {
-    const modalTimer = useRef(null);
+    const modalTimer = useRef(null)
 
     useEffect(() => {
         if (p.showModal) {

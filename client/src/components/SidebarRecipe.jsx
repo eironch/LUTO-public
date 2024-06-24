@@ -1,57 +1,103 @@
-import React from 'react'
+import React, { useState, useRef } from 'react'
 import { Link } from 'react-router-dom'
 
+import PointSection from '../components/PointSection'
+import FeedbackSection from '../components/FeedbackSection'
+
 import ProfilePicture from '../assets/profile-picture.png'
-import ApproveIcon from '../assets/approve-icon.png'
 import FeedbackIcon from '../assets/feedback-icon.png'
 import TagIcon from '../assets/tag-icon.png'
 import IngredientsIcon from '../assets/ingredients-icon.png'
 import SummaryIcon from '../assets/summary-icon.png'
-import Feedback from './Feedback'
+
+
+
+
 
 function SidebarRecipe(p) {
+    const user = p.user
+    const formatDate = p.formatDate
+    
+    const recipeId = p.recipeId
     const authorName = p.authorName
     const recipeImage = p.recipeImage
     const summary = p.summary
     const ingredients = p.ingredients
     const tags = p.tags
+    const points = p.points
+    const setPoints = p.setPoints
+    const pointStatus = p.pointStatus
+    const setPointStatus = p.setPointStatus
+    const feedbackCount = p.feedbackCount
+    const setFeedbackCount  = p.setFeedbackCount
+    const handleGiveRecipePoint = p.handleGiveRecipePoint
+
+    const divRef = useRef(null)
+    const sectionRef = useRef(null)
+
+    const scrollToBottom = () => {
+        if (divRef.current && sectionRef.current) {
+            const offsetTop = sectionRef.current.offsetTop - divRef.current.offsetTop
+
+            divRef.current.scrollTo({
+                top: offsetTop,
+                behavior: 'smooth'
+            })
+        }
+    }
+    console.log("status " + pointStatus)
+    async function handleGivePoint(status) {
+        if (pointStatus === status) {
+            status = ''
+        }
+        
+        const { recipePointStatus, points } = await handleGiveRecipePoint(user.userId, recipeId, status)
+        
+        setPoints(points)
+        setPointStatus(recipePointStatus)
+    }
 
     return (
-        <div className="pl-3 grid w-full h-full overflow-hidden" style={ { gridTemplateColumns: 'repeat(15, minmax(0, 1fr))' } }>
-            <div className="flex overflow-x-hidden overflow-y-scroll h-full scrollable-div flex-col text-zinc-100 col-span-4 pointer-events-auto">
-                {/* Recipe Image */}
-                <div className="p-2 mb-3 rounded-3xl bg-gradient-to-tr from-orange-500 to-orange-400">
-                    <div className="relative w-full h-auto aspect-w-2 aspect-h-2 rounded-3xl">
-                        {
-                            recipeImage &&
-                            <img className="absolute inset-0 w-full h-full rounded-3xl object-cover" src={ recipeImage } alt="" />
-                        }
-                    </div>
-                    <div className="grid grid-cols-2 pt-2">
-                        <div className="flex">
-                            <div className="flex gap-3 px-4 py-2 items-center justify-start rounded-3xl hover:bg-orange-400">
-                                <button className="hover:underline">
-                                    <img className="w-10" src={ FeedbackIcon } alt="" />
-                                </button>
-                            </div>
+        <div className="pl-3 grid w-full h-full overflow-hidden" style={ { gridTemplateColumns: "repeat(15, minmax(0, 1fr))" } }>
+            <div className="flex overflow-x-hidden overflow-y-scroll h-full scrollable-div flex-col text-zinc-100 col-span-4 pointer-events-auto" ref={ divRef }>
+                {/* recipe image */}
+                <div className="mb-3 rounded-3xl bg-zinc-900">
+                    <div className="p-2 rounded-3xl bg-gradient-to-tr from-orange-500 to-orange-400">
+                        <div className="relative w-full h-auto aspect-w-2 aspect-h-2 rounded-3xl">
+                            {
+                                recipeImage &&
+                                <img className="absolute inset-0 w-full h-full rounded-3xl object-cover" src={ recipeImage } alt="" />
+                            }
                         </div>
-                        <div className="flex justify-end">
-                            <div className="flex gap-3 px-4 py-2 items-center rounded-3xl hover:bg-orange-400">
-                                <button>
-                                    <img className="w-10" src={ ApproveIcon } alt="" />
-                                </button>
-                            </div>
+                    </div>
+                    <div className="grid grid-cols-2 p-3">
+                        <div className="flex">
+                            <button className="flex gap-3 p-3 px-4 items-center justify-start rounded-3xl hover:bg-zinc-500" onClick={ () => scrollToBottom() }>
+                                <div className="flex flex-row gap-3 items-center text-lg font-semibold">
+                                    <img className="min-w-10 w-10" src={ FeedbackIcon } alt="" />
+                                    { 
+                                        feedbackCount > 0 && 
+                                        <p>{ feedbackCount }</p>
+                                    }
+                                </div>
+                            </button>
+                        </div>
+                        <div className="flex justify-end items-end w-full overflow-hidden">
+                            <PointSection 
+                                handleGivePoint={ handleGivePoint } pointStatus={ pointStatus }
+                                points={ points }
+                            />
                         </div>
                     </div>
                 </div>
-                {/* User */}
+                {/* user */}
                 <Link to={`/${ authorName }`} className="flex gap-6 flex-row items-center mb-3 p-6 rounded-3xl bg-zinc-900 hover:bg-zinc-500">
                     <img className="w-14" src={ ProfilePicture } alt="" />
                     <p className="text-xl font-semibold">
                         { authorName }
                     </p>
                 </Link>
-                {/* Summary */}
+                {/* summary */}
                 <div className="flex flex-col mb-3 rounded-3xl bg-zinc-900">
                     <div className="flex flex-row p-6 gap-6 items-center shadow-md shadow-zinc-950">
                         <img className="w-10" src={ SummaryIcon } alt="" />
@@ -63,7 +109,7 @@ function SidebarRecipe(p) {
                         { summary }
                     </p>        
                 </div>
-                {/* Ingredients */}
+                {/* ingredients */}
                 <div className="flex flex-col mb-3 rounded-3xl bg-zinc-900">
                     <div className="flex flex-row p-6 gap-6 items-center shadow-md shadow-zinc-950">
                         <img className="w-10" src={ IngredientsIcon } alt="" />
@@ -81,7 +127,7 @@ function SidebarRecipe(p) {
                         }
                     </ul>
                 </div>
-                {/* Tags */}
+                {/* tags */}
                 <div className="flex flex-col mb-3 rounded-3xl bg-zinc-900">
                     <div className="flex flex-row p-6 gap-6 items-center shadow-md shadow-zinc-950">
                         <img className="w-10" src={ TagIcon } alt="" />
@@ -98,17 +144,13 @@ function SidebarRecipe(p) {
                         }
                     </div>
                 </div>
-                {/* Feedbacks */}
-                <div className="flex flex-col mb-3 rounded-3xl bg-zinc-900">
-                    <div className="flex flex-row items-center p-6 gap-6 shadow-md shadow-zinc-950">
-                        <img className="w-10" src={ FeedbackIcon } alt="" />
-                        <p className="text-2xl font-semibold">Feedbacks</p>
-                        <p className="flex text-xl font-semibold justify-end w-full"></p>
-                    </div>
-                    <div className="flex flex-col p-6 gap-6">
-                        <Feedback user={ { username: "Anonymous" } }/>
-                        <Feedback user={ { username: "Anonymous" } }/>
-                    </div>
+                {/* feedbacks */}
+                <div ref={ sectionRef }>
+                    <FeedbackSection 
+                        user={ user } recipeId={ recipeId } 
+                        feedbackCount={ feedbackCount } setFeedbackCount={ setFeedbackCount } 
+                        formatDate={ formatDate } attribute={ "mb-3" }
+                    />
                 </div>
             </div>
         </div>

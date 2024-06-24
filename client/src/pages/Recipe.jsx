@@ -8,6 +8,9 @@ function Recipe(p) {
     const user = p.user
     const currentTab = p.currentTab
     const setCurrentTab = p.setCurrentTab
+    const formatDate = p.formatDate
+    
+    const handleGiveRecipePoint = p.handleGiveRecipePoint
 
     const { recipeId } = useParams()
     const [authorName, setAuthorName] = useState()
@@ -17,13 +20,34 @@ function Recipe(p) {
     const [ingredients, setIngredients] = useState()
     const [tags, setTags] = useState()
     const [recipeElements, setRecipeElements] = useState()
-    
+    const [points, setPoints] = useState()
+    const [feedbackCount, setFeedbackCount] = useState()
+    const [isRecipeSaved, setIsRecipeSaved] = useState()
+    const [pointStatus, setPointStatus] = useState(p.pointStatus)
+
+    function handleSaveRecipe() {
+        setIsRecipeSaved(!isRecipeSaved)
+
+        axios.post('http://localhost:8080/save-recipe', { userId: user.userId, recipeId })
+            .then(res => {
+                console.log('Status Code:', res.status)
+                console.log('Data:', res.data)
+                
+                setIsRecipeSaved(res.data.payload.isSaved)
+            })
+            .catch(err => {
+                setIsRecipeSaved(!isRecipeSaved)
+                console.log('Error Status:', err.response.status)
+                console.log('Error Data:', err.response.data)
+            })
+    }
+
     useLayoutEffect(() => {
         axios.get('http://localhost:8080/recipe', { params: { recipeId, userId: user.userId } })
             .then(res => {
                 console.log('Status Code:' , res.status)
                 console.log('Data:', res.data)
-  
+                
                 setAuthorName(res.data.payload.userInfo.username)
                 setRecipeImage(res.data.payload.recipeContents.recipeImage)
                 setTitle(res.data.payload.recipeContents.title)
@@ -31,6 +55,10 @@ function Recipe(p) {
                 setIngredients(res.data.payload.recipeContents.ingredients)
                 setTags(res.data.payload.recipeContents.tags)
                 setRecipeElements(res.data.payload.recipeContents.recipeElements)
+                setPoints(res.data.payload.recipeContents.points)
+                setPointStatus(res.data.payload.recipeStatus.pointStatus)
+                setFeedbackCount(res.data.payload.recipeContents.feedbackCount)
+                setIsRecipeSaved(res.data.payload.recipeStatus.isSaved)
             })
             .catch(err => {
                 console.log('Error Status:', err.response.status)
@@ -39,19 +67,29 @@ function Recipe(p) {
     }, [recipeId])
 
     useLayoutEffect(() => {
-        setCurrentTab("Recipe")
+        setCurrentTab('Recipe')
     }, [])
+
+    if (currentTab !== 'Recipe') {
+        return
+    }
 
     return (
         <div>
             <NavBar 
-                recipeImage = { recipeImage } title={ title }
-                summary={ summary } ingredients={ ingredients } tags={ tags }
-                authorName = { authorName } user={ user } 
-                currentTab={ currentTab } setCurrentTab={ setCurrentTab } 
+                user={ user } recipeId={ recipeId } 
+                recipeImage = { recipeImage } title={ title } 
+                summary={ summary } ingredients={ ingredients } 
+                tags={ tags } authorName = { authorName }
+                points={ points } setPoints={ setPoints } 
+                feedbackCount={ feedbackCount } setFeedbackCount={ setFeedbackCount }
+                currentTab={ currentTab } setCurrentTab={ setCurrentTab }
+                isRecipeSaved={ isRecipeSaved } formatDate={ formatDate } 
+                pointStatus={ pointStatus } setPointStatus={ setPointStatus }
+                handleSaveRecipe={ handleSaveRecipe } handleGiveRecipePoint={ handleGiveRecipePoint }
             />
             <div className="pr-0 flex flex-col gap-3 p-3 pb-0 h-svh overflow-y-scroll scrollable-div bg-zinc-950">
-                <div className="grid w-full gap-3" style={ { gridTemplateColumns: 'repeat(15, minmax(0, 1fr))' } }>
+                <div className="grid w-full gap-3" style={ { gridTemplateColumns: "repeat(15, minmax(0, 1fr))" } }>
                     <div className="col-span-4"></div>
                     <div className="col-span-11 flex flex-col rounded-3xl text-zinc-100">
                         <div className="flex flex-col items-center w-full mb-3 p-6 rounded-3xl bg-zinc-900">
@@ -62,7 +100,6 @@ function Recipe(p) {
                         {
                             recipeElements &&
                             recipeElements.map((element, key) => {
-                                console.log(recipeElements)
                                 if (element.contentType === "Subheading") {
                                     return (
                                         <div className="py-6 px-3 flex flex-col gap-3 mb-3 rounded-3xl bg-zinc-900" key={ key }>

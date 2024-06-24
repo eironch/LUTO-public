@@ -14,7 +14,7 @@ const preferenceSchema = new Schema({
     darkMode: {
         type: Boolean,
         default: false,
-        required: true,
+        required: true
     },
 }, { timestamps: { createdAt: true, updatedAt: false } })
 

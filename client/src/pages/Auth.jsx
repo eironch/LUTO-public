@@ -10,7 +10,7 @@ function Auth(p) {
     const [passwordAgain, setPasswordAgain] = useState('')
 
     function createAccount() {
-        axios.post(`http://localhost:8080/create-account`, { username: p.user.username, password } )
+        axios.post(`http://localhost:8080/create-account`, { username: p.user.username, password })
             .then(res => {
                 console.log('Status Code:' , res.status)
                 console.log('Data:', res.data)
@@ -35,7 +35,7 @@ function Auth(p) {
     }
 
     function signIn() {
-        axios.post(`http://localhost:8080/sign-in`, { username: p.user.username, password }, { withCredentials: true })
+        axios.get(`http://localhost:8080/sign-in`, { params: { username: p.user.username, password }, withCredentials: true })
             .then(res => {
                 console.log('Status Code:' , res.status)
                 console.log('Data:', res.data)

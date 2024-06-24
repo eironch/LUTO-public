@@ -2,22 +2,33 @@ import React, { useLayoutEffect } from 'react'
 import NavBar from '../components/NavBar'
 
 function Settings(p) {
+    const user = p.user
+    const currentTab = p.currentTab
+    const setCurrentTab = p.setCurrentTab
+
     useLayoutEffect(() => {
-        p.setCurrentTab("Settings")    
+        setCurrentTab('Settings')
     }, [])
+
+    if (currentTab !== 'Settings') {
+        return
+    }
 
     return (
         <div>
-            <NavBar user={ p.user } currentTab={ p.currentTab } setCurrentTab={ p.setCurrentTab } />
+            <NavBar 
+                user={ p.user } currentTab={ p.currentTab }
+                setCurrentTab={ p.setCurrentTab }
+            />
             <div className="flex flex-col gap-3 p-3 h-svh bg-zinc-950">
                 {/* space for top navbar */}
-                <div className="grid w-full gap-3 h-16" style={ { gridTemplateColumns: 'repeat(15, minmax(0, 1fr))' } }>
+                <div className="grid w-full gap-3 h-16" style={ { gridTemplateColumns: "repeat(15, minmax(0, 1fr))" } }>
                     <div className="col-span-2"></div>
                     <div className="col-span-11 h-16 rounded-3xl bg-zinc-900"></div>
                     <div className="col-span-2"></div>     
                 </div>
                 {/* content */}
-                <div className="grid w-full gap-3 h-full" style={ { gridTemplateColumns: 'repeat(15, minmax(0, 1fr))' } }>
+                <div className="grid w-full gap-3 h-full" style={ { gridTemplateColumns: "repeat(15, minmax(0, 1fr))" } }>
                     <div className="col-span-2"></div>
                     <div className="flex flex-col p-9 bg-zinc-900 rounded-3xl text-zinc-100" style={ { gridColumn: "span 13" } }>
                         <p className="text-3xl font-bold mb-6">Account Settings</p>

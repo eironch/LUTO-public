@@ -2,7 +2,7 @@ import mongoose from 'mongoose'
 
 const Schema = mongoose.Schema
 
-const approvalSchema = new Schema({
+const pointSchema = new Schema({
     userId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
@@ -13,12 +13,11 @@ const approvalSchema = new Schema({
         ref: 'Recipe',
         require: true
     },
-}, { timestamps: { createdAt: true, updatedAt: false } })
+    pointStatus: {
+        type: String,
+        require: true
+    }
+}, { timestamps: true })
 
-approvalSchema.index(
-    { userId: 1, recipeId: 1 },
-    { unique: true }
-)
-
-const Approval = mongoose.model('Approval', approvalSchema)
-export default Approval
+const Point = mongoose.model('Point', pointSchema)
+export default Point

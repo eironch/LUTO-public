@@ -18,13 +18,18 @@ const userSchema = new Schema({
     bio: {
         type: String
     },
+    userType: {
+        type: String,
+        required: true,
+        default: 'user'
+    },
     refreshToken: {
         type: String,
         unique: true,
         require: true
     },
 }, { timestamps: true })
-
+// placeholder
 const secretKey = "luto-app"
 
 function generateRefreshToken(userId, username) {
@@ -40,7 +45,7 @@ userSchema.pre('save', function(next) {
 
 userSchema.pre('save', function(next) {
     const user = this
-    if (!user.isModified('password')) return next();
+    if (!user.isModified('password')) return next()
 
     bcrypt.hash(user.password, 8, (err, hash) => {
         if (err) return next(err)

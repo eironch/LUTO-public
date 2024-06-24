@@ -1,10 +1,9 @@
-import React, { useState, useLayoutEffect } from 'react'
+import React, { useState, useEffect, useLayoutEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
-import { format, getYear } from 'date-fns'
+
+import PointSection from '../components/PointSection'
 
 import FeedbackIcon from '../assets/feedback-icon.png'
-import ApproveIcon from '../assets/approve-icon.png'
-import ApprovedIcon from '../assets/approved-icon.png'
 
 function RecipeOverview(p) {
     const user = p.user
@@ -15,72 +14,80 @@ function RecipeOverview(p) {
     const title = p.title
     const summary = p.summary
     const recipeImage = p.recipeImage
-    const approvalCount = p.approvalCount
-    const postApproveRecipe = p.postApproveRecipe
+    const points = p.points
+    const feedbackCount = p.feedbackCount
+    const setPrevRecipeId = p.setPrevRecipeId
+    const setPrevTitle = p.setPrevTitle
+    const setIsFeedbacksShown = p.setIsFeedbacksShown
+    const handleGiveRecipePoint = p.handleGiveRecipePoint
+    const formatDate = p.formatDate
+    const moreModalShown = p.moreModalShown
+    const setMoreModalShown = p.setMoreModalShown
+    const handleFlagRecipe = p.handleFlagRecipe
 
     const dateCreated = new Date(p.dateCreated)
-    const [isApproved, setIsApproved] = useState(p.isApproved)
+    const [pointStatus, setPointStatus] = useState(p.pointStatus)
     const [formattedDate, setFormattedDate] = useState('')
-    
-    async function approveRecipe() {
-        console.log(recipeId)
-        const { isApproved, approvalCount } = await postApproveRecipe(user.userId, recipeId)
-        console.log('approvalCount ' + approvalCount)
+    const modalRef = useRef(null)
+    const buttonRef = useRef(null)
+    console.log(recipeImage)
+    useEffect(() => {
+        function handleClickOutside(event) {
+            if (modalRef.current && !modalRef.current.contains(event.target) && !buttonRef.current.contains(event.target)) {
+                setMoreModalShown()
+            }
+        }
+
+        if (moreModalShown === recipeId) {
+            document.addEventListener('mousedown', handleClickOutside)
+        } else {
+            document.removeEventListener('mousedown', handleClickOutside)
+        }
+
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside)
+        }
+    }, [moreModalShown])
+
+    async function handleGivePoint(status) {
+        if (pointStatus === status) {
+            status = ''
+        }
+        
+        const { recipePointStatus, points } = await handleGiveRecipePoint(user.userId, recipeId, status)
         
         setRecipes(recipes.map(recipe => {
             if (recipe.recipeId._id === recipeId) {
-                recipe.recipeId.approvalCount = approvalCount
+                recipe.recipeId.points = points
             }
 
             return recipe
         }))
         
-        setIsApproved(isApproved)
+        setPointStatus(recipePointStatus)
     }
 
-    function calculateDiffInTime(dateNow, pastDate, unitsOfTime) {
-        const diffInMilliseconds = dateNow - pastDate
-        const diffInTime = Math.floor(diffInMilliseconds / (1000 * unitsOfTime))
-        
-        return diffInTime
+    function handlePrevFeedbacks() {
+        setPrevRecipeId(recipeId)
+        setPrevTitle(title)
+        setIsFeedbacksShown(true)
     }
 
-    function formatDate() {
-        const dateNow = new Date()
+    function handleShowMoreModal() {
+        if (moreModalShown !== recipeId) {
+            setMoreModalShown(recipeId)
+        } else {
+            setMoreModalShown()
+        }
+    }
 
-        if (getYear(dateCreated) > getYear(dateNow)) {
-            return setFormattedDate(format(dateCreated, 'PP'))
-        }
-        
-        const diffInDays = calculateDiffInTime(dateNow, dateCreated, 60 * 60 * 24)
-        if (diffInDays >= 7) {
-            return format(dateCreated, 'MMMM d')
-        }
-
-        if (diffInDays > 0) {
-            return `${ diffInDays } ${ diffInDays === 1 ? 'day ago' : 'days ago' }`
-        }
-        
-        const diffInHours = calculateDiffInTime(dateNow, dateCreated, 60 * 60)
-        if (diffInHours > 0) {
-            return `${ diffInHours } ${ diffInHours === 1 ? 'hour ago' : 'hours ago' }`
-        }
-
-        const diffInMinutes = calculateDiffInTime(dateNow, dateCreated, 60)
-        if (diffInMinutes > 0) {
-            return `${ diffInMinutes } ${ diffInMinutes === 1 ? 'minute ago' : 'minutes ago' }`
-        }
-
-        const diffInSeconds = calculateDiffInTime(dateNow, dateCreated)
-        if (diffInSeconds > 0) {
-            return `${ diffInSeconds } ${ diffInSeconds === 1 ? 'second ago' : 'seconds ago' }`
-        }
-
-        return 'just now'
-    } 
+    function flagRecipe() {
+        handleFlagRecipe(user.userId, recipeId)
+        setMoreModalShown()
+    }
 
     useLayoutEffect(() => {
-        setFormattedDate(formatDate())
+        setFormattedDate(formatDate(dateCreated))
     }, [])
 
     return (
@@ -94,15 +101,30 @@ function RecipeOverview(p) {
             {/* recipe content */}
             <div className="col-span-8 flex flex-col">
                 <div className="flex flex-col w-full min-h-64 gap-3">
-                    <Link to={`/recipe/${ recipeId }`} className="mx-6 mt-6 pt-0.5 pb-0.5 text-zinc-100 text-3xl font-bold line-clamp-2 hover:underline">
-                        { title }
-                    </Link>
-                    <div className="flex flex-row mx-6 text-lg overflow-hidden text-clip text-zinc-400">
+                    <div className="flex gap-3 items-center">
+                        <Link to={`/recipe/${ recipeId }`} className="ml-6 mt-6 pb-1 w-full text-zinc-100 text-3xl font-bold line-clamp-2 hover:underline">
+                            { title }
+                        </Link>
+                        <div className="relative flex mr-10 mt-6 h-full justify-center items-center text-zinc-100">
+                            <button className="w-10 h-10 text-lg rounded-3xl hover:bg-zinc-500" onClick={ () => handleShowMoreModal()} ref={ buttonRef }>
+                                •••
+                            </button>
+                            {
+                                moreModalShown === recipeId &&
+                                <div className="absolute flex p-3 mt-28 mr-24 w-36 rounded-3xl bg-zinc-700 shadow-md shadow-zinc-950" ref={ modalRef }>
+                                    <button className="p-3 w-full text-left font-semibold text-red-600 rounded-3xl hover:bg-zinc-500" onClick={ () => flagRecipe() }>
+                                        Flag Content
+                                    </button>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                    <div className="flex flex-row mx-6 -m-1 text-lg overflow-hidden text-clip text-zinc-400">
                         <Link to={`/${ authorName }`} className="hover:underline">
                             { authorName }
                         </Link>
                         <p className="line-clamp-1">
-                            ’s Recipe •&nbsp;
+                            ’s recipe •&nbsp;
                         </p>
                         <p className="line-clamp-1">
                             { formattedDate }
@@ -113,17 +135,20 @@ function RecipeOverview(p) {
                     </p>
                 </div>
                 <div className="flex mb-6 ml-6 h-full gap-6">
-                    <div className="flex items-end w-full text-zinc-100 text-lg overflow-hidden">
-                        <button className="flex items-center px-4 py-2 gap-4 rounded-3xl hover:bg-zinc-500">
-                            <img className="w-10" src={ FeedbackIcon } alt="" />
-                            <p>1.1k</p>
+                    <div className="flex items-end w-full text-zinc-100 text-lg font-semibold overflow-hidden">
+                        <button className="flex items-center p-3 px-4 gap-4 rounded-3xl hover:bg-zinc-500" onClick={ () => handlePrevFeedbacks() }>
+                            <img className="min-w-10 w-10" src={ FeedbackIcon } alt="" />
+                            { 
+                                feedbackCount > 0 && 
+                                <p>{ feedbackCount }</p>
+                            }
                         </button>
                     </div>
-                    <div className="flex justify-end items-end w-full mr-6 gap-4 text-zinc-100 text-lg overflow-hidden">
-                        <button className="flex justify-end items-center px-4 py-2 gap-4 rounded-3xl hover:bg-zinc-500" onClick={ () => { approveRecipe() } }>
-                            <p>{ approvalCount > 0 && approvalCount }</p>
-                            <img className="w-10" src={ isApproved ? ApprovedIcon : ApproveIcon } alt="" />
-                        </button>
+                    <div className="flex justify-end items-end w-full mr-6 gap-3 text-zinc-100 text-lg font-semibold overflow-hidden">
+                        <PointSection 
+                            handleGivePoint={ handleGivePoint } pointStatus={ pointStatus }
+                            points={ points }
+                        />
                     </div>
                 </div>
             </div>

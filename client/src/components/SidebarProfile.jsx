@@ -1,12 +1,13 @@
 import React from "react";
 import { Link } from 'react-router-dom'
+
 import ProfilePicture from "../assets/profile-picture.png"
 
 function SidebarProfile(p) {
     const authorName = p.authorName
 
     return (
-        <div className="grid pl-3 gap-3 w-full h-full overflow-hidden" style={ { gridTemplateColumns: 'repeat(15, minmax(0, 1fr))' } }>
+        <div className="grid pl-3 gap-3 w-full h-full overflow-hidden" style={ { gridTemplateColumns: "repeat(15, minmax(0, 1fr))" } }>
             <div className="flex flex-col gap-3 text-zinc-100 col-span-4 pointer-events-auto">
                 {/* user  */}
                 <div className="flex flex-row p-6 gap-6 items-center text-2xl rounded-3xl bg-zinc-900 overflow-hidden">

@@ -13,9 +13,6 @@ const recipeOverviewSchema = new Schema({
         ref: 'User',
         require: true,
     },
-    categories: {
-        type: [String],
-    },
     tags: {
         type: [String],
     },

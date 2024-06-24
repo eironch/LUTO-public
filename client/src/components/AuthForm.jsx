@@ -7,13 +7,13 @@ function AuthForm(p) {
                 <h1 className="text-zinc-100 text-5xl font-bold">{ p.action }</h1>
             </div>
             <div className="flex flex-col mt-10 items-center">
-                <input className={`${p.isCredsCorrect ? "border-zinc-100" : "border-red-700" } bg-transparent text-center border rounded-3xl p-3 w-10/12 caret-zinc-100 text-xl text-zinc-100 my-5`} 
+                <input className={`${p.isCredsCorrect ? "border-zinc-100" : "border-red-600" } bg-transparent text-center border rounded-3xl p-3 w-10/12 caret-zinc-100 text-xl text-zinc-100 my-5`} 
                 value={ p.user.username } onChange={ (e) => { p.setUser({ username: e.target.value}) } } type="text" placeholder="Username"/>
-                <input className={`${p.isCredsCorrect ? "border-zinc-100" : "border-red-700" } bg-transparent text-center border rounded-3xl p-3 w-10/12 caret-zinc-100 text-xl text-zinc-100 mb-5`} 
+                <input className={`${p.isCredsCorrect ? "border-zinc-100" : "border-red-600" } bg-transparent text-center border rounded-3xl p-3 w-10/12 caret-zinc-100 text-xl text-zinc-100 mb-5`} 
                 value={ p.password } onChange={ (e) => { p.setPassword(e.target.value) } } type="password" placeholder="Password"/>
                 {
                     p.action === "Sign In"? <div></div>:
-                    <input className={`${p.isCredsCorrect ? "border-zinc-100" : "border-red-700" } bg-transparent text-center border rounded-3xl p-3 w-10/12 caret-zinc-100 text-xl text-zinc-100 mb-5`} 
+                    <input className={`${p.isCredsCorrect ? "border-zinc-100" : "border-red-600" } bg-transparent text-center border rounded-3xl p-3 w-10/12 caret-zinc-100 text-xl text-zinc-100 mb-5`} 
                     value={ p.passwordAgain } onChange={ (e) => { p.setPasswordAgain(e.target.value) } } type="password" placeholder="Password"/>
                 }
             </div>
