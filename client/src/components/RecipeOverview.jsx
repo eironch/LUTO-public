@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useLayoutEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
 
+import PointSection from '../components/PointSection'
+
 import FeedbackIcon from '../assets/feedback-icon.png'
-import ApproveIcon from '../assets/approve-icon.png'
-import ApprovedIcon from '../assets/approved-icon.png'
 
 function RecipeOverview(p) {
     const user = p.user
@@ -19,18 +19,18 @@ function RecipeOverview(p) {
     const setPrevRecipeId = p.setPrevRecipeId
     const setPrevTitle = p.setPrevTitle
     const setIsFeedbacksShown = p.setIsFeedbacksShown
-    const handleApproveRecipe = p.handleApproveRecipe
+    const handleGiveRecipePoint = p.handleGiveRecipePoint
     const formatDate = p.formatDate
     const moreModalShown = p.moreModalShown
     const setMoreModalShown = p.setMoreModalShown
     const handleFlagRecipe = p.handleFlagRecipe
 
     const dateCreated = new Date(p.dateCreated)
-    const [isApproved, setIsApproved] = useState(p.isApproved)
+    const [pointStatus, setPointStatus] = useState(p.pointStatus)
     const [formattedDate, setFormattedDate] = useState('')
     const modalRef = useRef(null)
     const buttonRef = useRef(null)
-
+    console.log(recipeImage)
     useEffect(() => {
         function handleClickOutside(event) {
             if (modalRef.current && !modalRef.current.contains(event.target) && !buttonRef.current.contains(event.target)) {
@@ -49,8 +49,12 @@ function RecipeOverview(p) {
         }
     }, [moreModalShown])
 
-    async function handleApprove() {
-        const { isApproved, points } = await handleApproveRecipe(user.userId, recipeId)
+    async function handleGivePoint(status) {
+        if (pointStatus === status) {
+            status = ''
+        }
+        
+        const { recipePointStatus, points } = await handleGiveRecipePoint(user.userId, recipeId, status)
         
         setRecipes(recipes.map(recipe => {
             if (recipe.recipeId._id === recipeId) {
@@ -60,7 +64,7 @@ function RecipeOverview(p) {
             return recipe
         }))
         
-        setIsApproved(isApproved)
+        setPointStatus(recipePointStatus)
     }
 
     function handlePrevFeedbacks() {
@@ -132,7 +136,7 @@ function RecipeOverview(p) {
                 </div>
                 <div className="flex mb-6 ml-6 h-full gap-6">
                     <div className="flex items-end w-full text-zinc-100 text-lg font-semibold overflow-hidden">
-                        <button className="flex items-center px-4 py-2 gap-4 rounded-3xl hover:bg-zinc-500" onClick={ () => handlePrevFeedbacks() }>
+                        <button className="flex items-center p-3 px-4 gap-4 rounded-3xl hover:bg-zinc-500" onClick={ () => handlePrevFeedbacks() }>
                             <img className="min-w-10 w-10" src={ FeedbackIcon } alt="" />
                             { 
                                 feedbackCount > 0 && 
@@ -140,14 +144,11 @@ function RecipeOverview(p) {
                             }
                         </button>
                     </div>
-                    <div className="flex justify-end items-end w-full mr-6 gap-4 text-zinc-100 text-lg font-semibold  overflow-hidden">
-                        <button className="flex justify-end items-center px-4 py-2 gap-4 rounded-3xl hover:bg-zinc-500" onClick={ () => { handleApprove() } }>
-                            { 
-                                points > 0 && 
-                                <p>{ points }</p>
-                            }
-                            <img className="min-w-10 w-10" src={ isApproved ? ApprovedIcon : ApproveIcon } alt="" />
-                        </button>
+                    <div className="flex justify-end items-end w-full mr-6 gap-3 text-zinc-100 text-lg font-semibold overflow-hidden">
+                        <PointSection 
+                            handleGivePoint={ handleGivePoint } pointStatus={ pointStatus }
+                            points={ points }
+                        />
                     </div>
                 </div>
             </div>

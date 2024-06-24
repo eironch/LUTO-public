@@ -18,7 +18,7 @@ function Home(p) {
     const filtersRef = p.filtersRef
     const searchQuery = p.searchQuery
     const setSearchQuery = p.setSearchQuery
-    const handleApproveRecipe = p.handleApproveRecipe
+    const handleGiveRecipePoint = p.handleGiveRecipePoint
     const handleFlagRecipe = p.handleFlagRecipe
 
     const [feedRecipes, setFeedRecipes] = useState([])
@@ -33,7 +33,7 @@ function Home(p) {
             .then(res => {
                 console.log('Status Code:' , res.status)
                 console.log('Data:', res.data)
-                console.log(res.data)
+                console.log("fetched")
                 setFeedRecipes(res.data.payload)
             })
             .catch(err => {
@@ -94,13 +94,13 @@ function Home(p) {
                                         key={ recipe.recipeId._id } user={ user }
                                         recipeId={ recipe.recipeId._id } recipeImage={ recipe.recipeImage } 
                                         title={ recipe.title } summary={ recipe.summary } 
-                                        authorName={ recipe.userId.username } isApproved={ recipe.isApproved } 
+                                        authorName={ recipe.userId.username } pointStatus={ recipe.pointStatus } 
                                         points={ recipe.recipeId.points } feedbackCount={ recipe.recipeId.feedbackCount } 
                                         dateCreated={ recipe.createdAt } recipes={ feedRecipes } 
                                         setRecipes={ setFeedRecipes } setPrevRecipeId={ setPrevRecipeId }
                                         setPrevTitle={ setPrevTitle } setIsFeedbacksShown={ setIsFeedbacksShown }
                                         moreModalShown={ moreModalShown } setMoreModalShown={ setMoreModalShown }
-                                        handleApproveRecipe={ handleApproveRecipe } formatDate={ formatDate }
+                                        handleGiveRecipePoint={ handleGiveRecipePoint } formatDate={ formatDate }
                                         handleFlagRecipe={ handleFlagRecipe }
                                     />
                                 )

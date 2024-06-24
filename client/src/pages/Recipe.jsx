@@ -10,6 +10,8 @@ function Recipe(p) {
     const setCurrentTab = p.setCurrentTab
     const formatDate = p.formatDate
     
+    const handleGiveRecipePoint = p.handleGiveRecipePoint
+
     const { recipeId } = useParams()
     const [authorName, setAuthorName] = useState()
     const [recipeImage, setRecipeImage] = useState()
@@ -21,7 +23,8 @@ function Recipe(p) {
     const [points, setPoints] = useState()
     const [feedbackCount, setFeedbackCount] = useState()
     const [isRecipeSaved, setIsRecipeSaved] = useState()
-    
+    const [pointStatus, setPointStatus] = useState(p.pointStatus)
+
     function handleSaveRecipe() {
         setIsRecipeSaved(!isRecipeSaved)
 
@@ -53,6 +56,7 @@ function Recipe(p) {
                 setTags(res.data.payload.recipeContents.tags)
                 setRecipeElements(res.data.payload.recipeContents.recipeElements)
                 setPoints(res.data.payload.recipeContents.points)
+                setPointStatus(res.data.payload.recipeStatus.pointStatus)
                 setFeedbackCount(res.data.payload.recipeContents.feedbackCount)
                 setIsRecipeSaved(res.data.payload.recipeStatus.isSaved)
             })
@@ -80,8 +84,9 @@ function Recipe(p) {
                 points={ points } setPoints={ setPoints } 
                 feedbackCount={ feedbackCount } setFeedbackCount={ setFeedbackCount }
                 currentTab={ currentTab } setCurrentTab={ setCurrentTab }
-                isRecipeSaved={ isRecipeSaved }
-                formatDate={ formatDate } handleSaveRecipe={ handleSaveRecipe }
+                isRecipeSaved={ isRecipeSaved } formatDate={ formatDate } 
+                pointStatus={ pointStatus } setPointStatus={ setPointStatus }
+                handleSaveRecipe={ handleSaveRecipe } handleGiveRecipePoint={ handleGiveRecipePoint }
             />
             <div className="pr-0 flex flex-col gap-3 p-3 pb-0 h-svh overflow-y-scroll scrollable-div bg-zinc-950">
                 <div className="grid w-full gap-3" style={ { gridTemplateColumns: "repeat(15, minmax(0, 1fr))" } }>

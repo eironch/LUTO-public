@@ -25,13 +25,13 @@ function App() {
   const filtersRef = useRef(filters)
   const [searchQuery, setSearchQuery] = useState("")
 
-  async function handleApproveRecipe(userId, recipeId) {
-    return await axios.post('http://localhost:8080/approve-recipe', { userId, recipeId })
+  async function handleGiveRecipePoint(userId, recipeId, pointStatus) {
+    return await axios.post('http://localhost:8080/give-point', { userId, recipeId, pointStatus })
       .then(res => {
-        console.log('Status Code:' , res.status)
+        console.log('Status Code:', res.status)
         console.log('Data:', res.data)
-
-        return { isApproved: res.data.payload.isApproved, points: res.data.payload.points.points }
+        
+        return { recipePointStatus: res.data.payload.pointStatus, points: res.data.payload.points.points }
       })
       .catch(err => {
         console.log('Error Status:', err.response.status)
@@ -132,7 +132,7 @@ function App() {
                     setIsAuthenticated={ setIsAuthenticated } user={ user } 
                     currentTab={ currentTab } setCurrentTab={ setCurrentTab } 
                     filters={ filters } setFilters={ setFilters } filtersRef={ filtersRef }
-                    handleApproveRecipe={ handleApproveRecipe } formatDate={ formatDate }
+                    handleGiveRecipePoint={ handleGiveRecipePoint } formatDate={ formatDate }
                     searchQuery={ searchQuery } setSearchQuery={ setSearchQuery }
                     handleFlagRecipe={ handleFlagRecipe }
                   />
@@ -141,7 +141,7 @@ function App() {
               <Route path="/:authorName" element={ 
                   <Profile 
                     user={ user } currentTab={ currentTab } 
-                    setCurrentTab={ setCurrentTab } handleApproveRecipe={ handleApproveRecipe } 
+                    setCurrentTab={ setCurrentTab } handleGiveRecipePoint={ handleGiveRecipePoint } 
                     formatDate={ formatDate }
                   />
                 }
@@ -158,7 +158,7 @@ function App() {
                     user={ user } currentTab={ currentTab } 
                     setCurrentTab={ setCurrentTab } filters={ filters }
                     setFilters={ setFilters } formatDate={ formatDate }
-                    handleApproveRecipe={ handleApproveRecipe }
+                    handleGiveRecipePoint={ handleGiveRecipePoint }
                     searchQuery={ searchQuery } setSearchQuery={ setSearchQuery }
                   /> 
                 } 
@@ -173,7 +173,8 @@ function App() {
               <Route path="/recipe/:recipeId" element={ 
                   <Recipe 
                     user={ user } currentTab={ currentTab } 
-                    setCurrentTab={ setCurrentTab } formatDate={ formatDate } 
+                    setCurrentTab={ setCurrentTab } formatDate={ formatDate }
+                    handleGiveRecipePoint={ handleGiveRecipePoint }
                   /> 
                 } 
               />

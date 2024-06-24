@@ -15,7 +15,7 @@ const elementSchema = new Schema({
     },
 }, { _id: false })
 
-const recipeSchema = new Schema({
+const draftSchema = new Schema({
     userId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
@@ -33,8 +33,7 @@ const recipeSchema = new Schema({
         type: String
     },
     ingredients: {
-        type: [String],
-        require: true
+        type: [String]
     },
     tags: {
         type: [String]
@@ -56,5 +55,5 @@ const recipeSchema = new Schema({
     },
 }, { timestamps: true })
 
-const Recipe = mongoose.model('Recipe', recipeSchema)
-export default Recipe
+const Draft = mongoose.model('Draft', draftSchema)
+export default Draft

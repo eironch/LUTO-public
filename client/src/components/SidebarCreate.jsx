@@ -13,6 +13,8 @@ import SearchIcon from '../assets/search-icon.png'
 import TagIcon from '../assets/tag-icon.png'
 import IngredientsIcon from '../assets/ingredients-icon.png'
 import SummaryIcon from '../assets/summary-icon.png'
+import GivePointNegativeIcon from '../assets/give-point-negative-icon.png'
+import GivePointPositiveIcon from '../assets/give-point-positive-icon.png'
 
 function IngredientForm(p) {
     const keyIndex = p.keyIndex
@@ -29,7 +31,7 @@ function IngredientForm(p) {
                 ingredient.value = ingredientValue
             }
         })
-
+        
         setIngredients(newIngredients)
     }, [ingredientValue])
 
@@ -139,28 +141,40 @@ function SidebarCreate(p) {
         <div className="pl-3 grid w-full h-full overflow-hidden" style={ { gridTemplateColumns: "repeat(15, minmax(0, 1fr))" } }>
             <div className="flex overflow-x-hidden overflow-y-scroll h-full scrollable-div flex-col text-zinc-100 col-span-4 pointer-events-auto">
                 {/* recipe image */}
-                <div className="p-2 mb-3 rounded-3xl bg-gradient-to-tr from-orange-500 to-orange-400">
-                    <div className="relative w-full h-auto aspect-w-2 aspect-h-2">
-                        {
-                            preRecipeImage &&
-                            <div className="bg-orange-300 rounded-3xl">
-                                <img className="absolute inset-0 w-full h-full rounded-3xl object-cover" src={ URL.createObjectURL(preRecipeImage) } alt="" />
-                            </div>
-                        }
-                        <label className={`${ preRecipeImage && "opacity-0" } flex justify-center items-center text-2xl font-semibold border-4 border-dashed border-zinc-200 rounded-3xl cursor-pointer`} htmlFor="fileInput">
-                            Upload Image
-                        </label>
-                        <input className="hidden" id="fileInput" type="file" accept="image/*" onChange={ e => handleFileChange(e) } />
+                <div className="mb-3 rounded-3xl bg-zinc-900">
+                    <div className="p-2 rounded-3xl bg-gradient-to-tr from-orange-500 to-orange-400">
+                        <div className="relative w-full h-auto aspect-w-2 aspect-h-2">
+                            {
+                                preRecipeImage &&
+                                <div className="bg-orange-300 rounded-3xl">
+                                    <img className="absolute inset-0 w-full h-full rounded-3xl object-cover" src={ URL.createObjectURL(preRecipeImage) } alt="" />
+                                </div>
+                            }
+                            <label className={`${ preRecipeImage && "opacity-0" } flex justify-center items-center text-2xl font-semibold border-4 border-dashed border-zinc-200 rounded-3xl cursor-pointer`} htmlFor="fileInput">
+                                Upload Image
+                            </label>
+                            <input className="hidden" id="fileInput" type="file" accept="image/*" onChange={ e => handleFileChange(e) } />
+                        </div>
                     </div>
-                    <div className="grid grid-cols-2 pt-2">
+                    <div className="grid grid-cols-2 p-3">
                         <div className="flex">
                             <div className="flex gap-3 px-4 py-2 items-center justify-start rounded-3xl">
-                                <img className="min-w-10 w-10" src={ FeedbackIcon } alt="" />
+                                <div className="flex flex-row gap-3 items-center text-lg font-semibold">
+                                    <img className="min-w-10 w-10" src={ FeedbackIcon } alt="" />
+                                </div>
                             </div>
                         </div>
-                        <div className="flex justify-end">
-                            <div className="flex gap-3 px-4 py-2 items-center rounded-3xl">
-                                <img className="min-w-10 w-10" src={ ApproveIcon } alt="" />
+                        <div className="flex justify-end items-end w-full overflow-hidden">
+                            <div className="flex justify-end items-center h-fit rounded-3xl bg-zinc-700">
+                                <div className="flex justify-end items-center p-3 gap-4 rounded-3xl">
+                                    <img className="min-w-10 w-10" src={ GivePointNegativeIcon } alt="" />
+                                </div>
+                                <p className="text-zinc-100 text-lg font-semibold">
+                                    0
+                                </p>
+                                <div className="flex justify-end items-center p-3 gap-4 rounded-3xl">
+                                    <img className="min-w-10 w-10" src={ GivePointPositiveIcon } alt="" />
+                                </div>
                             </div>
                         </div>
                     </div>

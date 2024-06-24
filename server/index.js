@@ -86,7 +86,7 @@ app.post('/create-account', (req, res) => {
         username,
         password,
         bio: '',
-        userType: "user",
+        userType,
         refreshToken: '',
     })
 
@@ -153,10 +153,10 @@ app.get('/check-auth', (req, res) => {
     if (accessToken && decodedAccessToken) {
         return res.status(200).json({ isAuthenticated: true, payload: { username: decodedAccessToken.username, userId: decodedAccessToken.userId }})
     }
-    console.log("here")
+    console.log('here')
     const refreshToken = req.cookies.refreshToken
     const decodedRefreshToken = verifyToken(refreshToken)
-    console.log("here")
+    console.log('here')
     if (refreshToken && decodedRefreshToken) {
         res.cookie(
             'accessToken',
@@ -167,7 +167,7 @@ app.get('/check-auth', (req, res) => {
                 maxAge: 3600000,
             }
         )
-        console.log("her3123e")
+        console.log('her3123e')
         return res.status(200).json({ isAuthenticated: true, payload: { username: decodedRefreshToken.username, userId: decodedRefreshToken.userId }})
     }
 
@@ -202,10 +202,9 @@ app.post('/publish-recipe', upload.any(), async (req, res) => {
         ingredients,
         recipeElements,
     }
-    console.log('recipe')
-    console.log(recipeFiles)
+
     try {
-        const fileLinks = uploadFile(recipeFiles)
+        const fileLinks = await uploadFile(recipeFiles)
         const elementLinks = fileLinks.elementFiles
         recipeFormat.recipeImage = fileLinks.recipeImage
 
@@ -217,7 +216,7 @@ app.post('/publish-recipe', upload.any(), async (req, res) => {
             elementLinks.splice(0, element.filesLength)
         })
 
-        const recipe = new Recipe(recipe)
+        const recipe = new Recipe(recipeFormat)
         const savedRecipe = await recipe.save()
 
         const recipeOverview = new RecipeOverview({
@@ -233,6 +232,7 @@ app.post('/publish-recipe', upload.any(), async (req, res) => {
 
         return res.status(201).json({ success: true, message:'Recipe published.'})
     } catch (err) {
+        console.log(err)
         return res.status(500).json({ message:'File upload error.', err})
     }
 })
@@ -308,11 +308,27 @@ function uploadFileToStorage(file) {
 
 app.post('/give-point', async (req, res) => {
     const { userId, recipeId, pointStatus } = req.body
-
+    console.log(req.body)
     try {
         const isGivenPoint = await Point.findOne({ userId, recipeId })
 
         if (isGivenPoint) {
+            const prevStatus = await Point.findOne({ userId, recipeId }).select('pointStatus')
+
+            if (pointStatus === '') {
+                await Point.deleteOne({ userId, recipeId })
+
+                if (prevStatus.pointStatus === 'negative') {
+                    await Recipe.findByIdAndUpdate(recipeId, { $inc: { points: 1 } })
+                } else if (prevStatus.pointStatus === 'positive') {
+                    await Recipe.findByIdAndUpdate(recipeId, { $inc: { points: -1 } })
+                }
+                
+                const points = await Recipe.findById(recipeId).select('points')
+                
+                return res.status(203).json({ success: true, message:'Recipe point ungiven.', payload: { pointStatus, points } })
+            }
+
             await Point.updateOne(
                 { userId, recipeId },
                 {
@@ -322,18 +338,18 @@ app.post('/give-point', async (req, res) => {
                     $currentDate: { updatedAAt: true }
                 }
             )
-
-            if (pointStatus === "positive") {
-                await Recipe.findByIdAndUpdate(recipeId, { $inc: { points: 1 } })
-            } else if (pointStatus === "negative") {
-                await Recipe.findByIdAndUpdate(recipeId, { $inc: { points: -1 } })
+            console.log(prevStatus.pointStatus)
+            if (prevStatus.pointStatus === 'positive') {
+                await Recipe.findByIdAndUpdate(recipeId, { $inc: { points: -2 } })
+            } else if (prevStatus.pointStatus === 'negative') {
+                await Recipe.findByIdAndUpdate(recipeId, { $inc: { points: 2 } })
             }
 
-            const points = await Recipe.findByid(recipeId).select('points')
-            
+            const points = await Recipe.findById(recipeId).select('points')
+            console.log('changed')
             return res.status(200).json({ success: true, message:'Recipe point status changed.', payload: { pointStatus, points } })
         }
-
+        console.log('not changed')
         const point = new Point({
             userId,
             recipeId,
@@ -342,13 +358,13 @@ app.post('/give-point', async (req, res) => {
 
         await point.save()
 
-        if (pointStatus === "positive") {
+        if (pointStatus === 'positive') {
             await Recipe.findByIdAndUpdate(recipeId, { $inc: { points: 1 } })
-        } else if (pointStatus === "negative") {
+        } else if (pointStatus === 'negative') {
             await Recipe.findByIdAndUpdate(recipeId, { $inc: { points: -1 } })
         }
   
-        const points = await Recipe.findByid(recipeId).select('points')
+        const points = await Recipe.findById(recipeId).select('points')
 
         return res.status(201).json({ success: true, message:'Recipe point given.', payload: { pointStatus, points } })
     } catch (err) {
@@ -372,9 +388,9 @@ app.get('/feed-recipes', async (req, res) => {
                         matchCount: {
                             $size: {
                                 $filter: {
-                                    input: "$tags",
-                                    as: "tag",
-                                    cond: { $in: ["$$tag", filters] }
+                                    input: '$tags',
+                                    as: 'tag',
+                                    cond: { $in: ['$$tag', filters] }
                                 }
                             }
                         }
@@ -398,9 +414,9 @@ app.get('/feed-recipes', async (req, res) => {
         }
 
         const pointPromises = recipes.map(async recipe => {
-            const isGivenPoint = await Point.findOne({ userId, recipeId: recipe.recipeId }) !== null
-    
-            return { ...recipe.toObject(), isGivenPoint }
+            const status = await Point.findOne({ userId, recipeId: recipe.recipeId }).select('pointStatus') 
+            console.log(status)
+            return { ...recipe.toObject(), pointStatus: status && status.pointStatus }
         })
         
         return Promise.all(pointPromises)
@@ -430,14 +446,14 @@ app.get('/recipe', async (req, res) => {
             return res.status(400).json({ message: 'No such recipe found.' })
         }
 
-        const isGivenPoint = await Point.findOne({ userId, recipeId }).lean() !== null
+        const status = await Point.findOne({ userId, recipeId }).select('pointStatus')
 
         const isSaved = await Save.findOne({ userId, recipeId }) !== null
     
         const response = {
             userInfo: { username: recipe.userId.username },
             recipeContents: { ...recipe },
-            recipeStatus: { isGivenPoint, isSaved }
+            recipeStatus: { pointStatus: status && status.pointStatus, isSaved }
         }
 
         return res.status(200).json({ success: true, payload: response })
@@ -470,9 +486,9 @@ app.get('/user-recipes', async (req, res) => {
         }
 
         const pointPromises = recipes.map(async recipe => {
-            const isGivenPoint = await Point.findOne({ userId: user[0]._id, recipeId: recipe.recipeId }) !== null
+            const status = await Point.findOne({ userId: user[0]._id, recipeId: recipe.recipeId }).select('pointStatus')
   
-            return { ...recipe.toObject(), isApproved }
+            return { ...recipe.toObject(), pointStatus: status && status.pointStatus }
         })
 
         return Promise.all(pointPromises)
@@ -519,9 +535,9 @@ app.get('/find-recipes', async (req, res) => {
         }
 
         const pointPromises = recipes.map(async recipe => {
-            const isGivenPoint = await Point.findOne({ userId, recipeId: recipe.recipeId }) !== null
+            const status = await Point.findOne({ userId, recipeId: recipe.recipeId }).select('pointStatus')
     
-            return { ...recipe.toObject(), isApproved }
+            return { ...recipe.toObject(), pointStatus: status && status.pointStatus }
         })
         
         return Promise.all(pointPromises)
@@ -560,7 +576,7 @@ app.post('/submit-feedback', async (req, res) => {
 app.get('/feedbacks', async (req, res) => {
     const { recipeId } = req.query
     console.log(recipeId)
-    console.log("hererereererr")
+    console.log('hererereererr')
     const pipeline = [
         { 
             $match: { recipeId: new Types.ObjectId(recipeId) }

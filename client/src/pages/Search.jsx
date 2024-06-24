@@ -18,7 +18,7 @@ function Search(p) {
     const setFilters = p.setFilters
     const searchQuery = p.searchQuery
     const setSearchQuery = p.setSearchQuery
-    const handleApproveRecipe = p.handleApproveRecipe
+    const handleGiveRecipePoint = p.handleGiveRecipePoint
 
     const [searchedRecipes, setSearchedRecipes] = useState([])
     const [isFeedbacksShown, setIsFeedbacksShown] = useState(false)
@@ -118,12 +118,12 @@ function Search(p) {
                                             key={ recipe.recipeId._id } user={ user }
                                             recipeId={ recipe.recipeId._id } recipeImage={ recipe.recipeImage } 
                                             title={ recipe.title } summary={ recipe.summary } 
-                                            authorName={ recipe.userId.username } isApproved={ recipe.isApproved } 
+                                            authorName={ recipe.userId.username } pointStatus={ recipe.pointStatus } 
                                             points={ recipe.recipeId.points } feedbackCount={ recipe.recipeId.feedbackCount } 
                                             dateCreated={ recipe.createdAt } recipes={ searchedRecipes } 
                                             setRecipes={ setSearchedRecipes } setPrevRecipeId={ setPrevRecipeId }
                                             setPrevTitle={ setPrevTitle } setIsFeedbacksShown={ setIsFeedbacksShown }
-                                            handleApproveRecipe={ handleApproveRecipe } formatDate={ formatDate }
+                                            handleGiveRecipePoint={ handleGiveRecipePoint } formatDate={ formatDate }
                                         />
                                     )
                                 }

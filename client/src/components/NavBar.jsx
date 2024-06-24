@@ -30,11 +30,14 @@ function NavBar(p) {
     const setTags = p.setTags
     const points = p.points
     const setPoints = p.setPoints
+    const pointStatus = p.pointStatus
+    const setPointStatus = p.setPointStatus
     const feedbackCount = p.feedbackCount
     const setFeedbackCount  = p.setFeedbackCount
     const isRecipeSaved = p.isRecipeSaved
     const publishRecipe = p.publishRecipe
     const handleSaveRecipe = p.handleSaveRecipe
+    const handleGiveRecipePoint = p.handleGiveRecipePoint
 
     const filters  = p.filters
     const setFilters = p.setFilters
@@ -96,10 +99,10 @@ function NavBar(p) {
 
                                         </div>
                                         <div className="col-span-2 flex items-center pointer-events-auto w-full h-full rounded-3xl overflow-hidden">
-                                            <button className={`${ (title && recipeImage.size && summary && (ingredients.length > 1  && ingredients[0].value)) && "bg-orange-500 hover:bg-orange-400" } 
+                                            <button className={`${ (title && recipeImage.size && summary && (ingredients.length > 1 || ingredients[0].value)) && "bg-orange-500 hover:bg-orange-400" } 
                                                     flex items-center p-4 gap-4 w-full h-full disabled:bg-zinc-900 disabled:cursor-not-allowed overflow-hidden`
                                                 } 
-                                                onClick={ () => { publishRecipe() } } disabled={ !(title && recipeImage.size && summary && (ingredients.length > 1  && ingredients[0].value)) }
+                                                onClick={ () => { publishRecipe() } } disabled={ !(title && recipeImage.size && summary && (ingredients.length > 1  || ingredients[0].value)) }
                                             >
                                                 <p className="flex text-zinc-100 text-lg w-full font-semibold">Publish</p>
                                                 <img className="w-8" src={ CreateIcon } alt="" />
@@ -169,10 +172,11 @@ function NavBar(p) {
                             user={ user } recipeId={ recipeId || null }
                             summary={ summary || null } recipeImage={ recipeImage || null }
                             ingredients={ ingredients || null } tags={ tags || null }
-                            authorName={ authorName || null }
-                            points={ points } setPoints={ setPoints } 
-                            feedbackCount={ feedbackCount } setFeedbackCount={ setFeedbackCount } 
-                            currentTab={ currentTab } formatDate={ formatDate || null }
+                            authorName={ authorName || null } points={ points } 
+                            setPoints={ setPoints } feedbackCount={ feedbackCount } 
+                            setFeedbackCount={ setFeedbackCount } currentTab={ currentTab } 
+                            pointStatus={ pointStatus || null } setPointStatus={ setPointStatus || null }
+                            formatDate={ formatDate || null } handleGiveRecipePoint={ handleGiveRecipePoint }
                         />
                     )
                 }                 

@@ -9,7 +9,7 @@ function Profile(p) {
     const user = p.user
     const currentTab = p.currentTab
     const setCurrentTab = p.setCurrentTab
-    const handleApproveRecipe = p.handleApproveRecipe
+    const handleGiveRecipePoint = p.handleGiveRecipePoint
     const formatDate = p.formatDate
     
     const { authorName } = useParams()
@@ -54,10 +54,10 @@ function Profile(p) {
                                     key={ index } user={ user } 
                                     recipeId={ recipe.recipeId._id } recipeImage={ recipe.recipeImage } 
                                     title={ recipe.title } summary={ recipe.summary } 
-                                    authorName={ authorName } isApproved={ recipe.isApproved } 
+                                    authorName={ authorName } pointStatus={ recipe.pointStatus } 
                                     points={ recipe.recipeId.points } recipes={ userRecipes } 
                                     setRecipes={ setUserRecipes } dateCreated={ recipe.createdAt }
-                                    handleApproveRecipe={ handleApproveRecipe } formatDate={ formatDate }
+                                    handleGiveRecipePoint={ handleGiveRecipePoint } formatDate={ formatDate }
                                 />
                             })
                         }

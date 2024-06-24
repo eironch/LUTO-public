@@ -90,7 +90,7 @@ function Text(p) {
                 maxLength={ 2000 } keyIndex={ keyIndex } values={ values } setValues={ setValues }
                 placeholder="What do you want to tell?" 
             />
-            <button className="p-3 text-2xl font-semibold rounded-3xl hover:bg-red-600" onClick={ () => { removeElement() } }>
+            <button className="p-3 text-2xl font-semibold rounded-3xl hover:bg-green-600" onClick={ () => { removeElement() } }>
                 <img className="w-8" src={ RemoveIcon } alt="" />
             </button>
         </div>

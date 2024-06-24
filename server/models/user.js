@@ -21,7 +21,7 @@ const userSchema = new Schema({
     userType: {
         type: String,
         required: true,
-        default: "user"
+        default: 'user'
     },
     refreshToken: {
         type: String,
@@ -29,7 +29,7 @@ const userSchema = new Schema({
         require: true
     },
 }, { timestamps: true })
-
+// placeholder
 const secretKey = "luto-app"
 
 function generateRefreshToken(userId, username) {

@@ -1,5 +1,6 @@
 import React from "react";
 import { Link } from 'react-router-dom'
+
 import ProfilePicture from "../assets/profile-picture.png"
 
 function SidebarProfile(p) {
