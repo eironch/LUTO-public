@@ -2,11 +2,13 @@ import React, { useState, useLayoutEffect } from 'react'
 import axios from 'axios'
 
 import NavBar from '../components/NavBar'
-import SearchBar from '../components/SearchBar'
 import RecipeOverview from '../components/RecipeOverview'
 import FeedbacksModal from '../components/FeedbacksModal'
+import ConfirmModal from '../components/ConfirmModal'
 
 import SearchIcon from '../assets/search-icon.png'
+import RemoveIcon from '../assets/remove-icon.png'
+import AllowIcon from '../assets/allow-icon.png'
 
 function Search(p) {
     const user = p.user
@@ -19,20 +21,41 @@ function Search(p) {
     const searchQuery = p.searchQuery
     const setSearchQuery = p.setSearchQuery
     const handleGiveRecipePoint = p.handleGiveRecipePoint
-
+    const handleRemoveRecipe = p.handleRemoveRecipe
+    const handleAllowRecipe = p.handleAllowRecipe
+    const handleFlagRecipe= p.handleFlagRecipe
+    
     const [searchedRecipes, setSearchedRecipes] = useState([])
     const [isFeedbacksShown, setIsFeedbacksShown] = useState(false)
     const [prevRecipeId, setPrevRecipeId] = useState()
     const [prevTitle, setPrevTitle] = useState()
     const [prevfeedbackCount, setPrevFeedbackCount] = useState()
+    const [isConfirmationShown, setIsConfirmationShown] = useState(false)
     const [isRecipesFind, setRecipesFind] = useState(true)
+    const [moreModalShown, setMoreModalShown] = useState()
+
+    function removeRecipe() {
+        handleRemoveRecipe(user.userId, prevRecipeId)
+        
+        setIsConfirmationShown()
+        
+        setSearchedRecipes(searchedRecipes.filter(recipe => recipe.recipeId !== prevRecipeId))
+    }
     
+    function allowRecipe() {
+        handleAllowRecipe(prevRecipeId)
+
+        setIsConfirmationShown()
+
+        setSearchedRecipes(searchedRecipes.filter(recipe => recipe.recipeId !== prevRecipeId))
+    }
+
     function handleSearch() {
         if (searchQuery === "") {
             return
         }
 
-        axios.get('http://localhost:8080/find-recipes', { params: { userId: user.userId, searchQuery, filters } })
+        axios.get('http://localhost:8080/search-recipes', { params: { userId: user.userId, searchQuery, filters, sort: user.accountType === "user" ? { createdAt: -1 } : { flagCount: 1 } } })
             .then(res => {
                 console.log('Status Code:' , res.status)
                 console.log('Data:', res.data)
@@ -74,7 +97,7 @@ function Search(p) {
             />
             <div className="flex flex-col gap-3 h-svh">
                 <div className="flex flex-col gap-3 p-3 pr-0 h-svh">
-                    {/* space for top navbar */}
+                    {/* search */}
                     <div className="min-h-52 grid w-full gap-3" style={ { gridTemplateColumns: "repeat(15, minmax(0, 1fr))" } }>
                         <div className="col-span-2"></div>
                         <div className="flex flex-col justify-center items-center col-span-11 h-full rounded-3xl bg-zinc-900">
@@ -95,7 +118,7 @@ function Search(p) {
                                 />
                                 <div className="absolute flex flex-row mr-2 right-0 items-last justify-right pointer-events-none">
                                     <button
-                                        className="w-12 h-8 rounded-3xl text-zinc-100 bg-zinc-500 hover:bg-zinc-600 pointer-events-auto" 
+                                        className="w-12 h-8 rounded-3xl text-zinc-100 hover:bg-zinc-500 pointer-events-auto" 
                                         onClick={ () => handleSearch() }
                                     >
                                         ➤
@@ -115,15 +138,20 @@ function Search(p) {
                                 { 
                                     searchedRecipes.map(recipe => 
                                         <RecipeOverview
-                                            key={ recipe.recipeId._id } user={ user }
-                                            recipeId={ recipe.recipeId._id } recipeImage={ recipe.recipeImage } 
+                                            key={ recipe.recipeId } user={ user }
+                                            recipeId={ recipe.recipeId } recipeImage={ recipe.recipeImage } 
                                             title={ recipe.title } summary={ recipe.summary } 
                                             authorName={ recipe.userId.username } pointStatus={ recipe.pointStatus } 
-                                            points={ recipe.recipeId.points } feedbackCount={ recipe.recipeId.feedbackCount } 
+                                            points={ recipe.points } feedbackCount={ recipe.feedbackCount } 
                                             dateCreated={ recipe.createdAt } recipes={ searchedRecipes } 
                                             setRecipes={ setSearchedRecipes } setPrevRecipeId={ setPrevRecipeId }
                                             setPrevTitle={ setPrevTitle } setIsFeedbacksShown={ setIsFeedbacksShown }
                                             handleGiveRecipePoint={ handleGiveRecipePoint } formatDate={ formatDate }
+                                            moreModalShown={ moreModalShown } setMoreModalShown={ setMoreModalShown }
+                                            handleRemoveRecipe={ handleRemoveRecipe } handleAllowRecipe={ handleAllowRecipe }
+                                            flagCount = { recipe.flagCount } setIsConfirmationShown={ setIsConfirmationShown } 
+                                            setFeedbackCount={ setPrevFeedbackCount } allowRecipe={ allowRecipe }
+                                            handleFlagRecipe={ handleFlagRecipe }
                                         />
                                     )
                                 }
@@ -138,12 +166,6 @@ function Search(p) {
                         <div className="col-span-2"></div>
                     </div>
                 </div>
-                {/* searchbar */}
-                {/* <SearchBar 
-                    user = { user } currentTab={ currentTab } 
-                    setCurrentTab={setCurrentTab } filters={ filters } 
-                    searchedRecipes={ searchedRecipes } setSearchedRecipes={ setSearchedRecipes }
-                />  */}
                 {/* feedbacks modal */}
                 {
                     isFeedbacksShown &&
@@ -152,6 +174,25 @@ function Search(p) {
                         title={ prevTitle } feedbackCount={ prevfeedbackCount } 
                         setFeedbackCount={ setPrevFeedbackCount } setShowModal={ setIsFeedbacksShown } 
                         formatDate={ formatDate }
+                    />
+                }
+                {/* confirm modal */}
+                {
+                    isConfirmationShown === "remove" &&
+                    <ConfirmModal 
+                        setShowModal={ setIsConfirmationShown } confirmAction={ removeRecipe }
+                        title={ prevTitle } headerText={ "Confirm Removal" }
+                        bodyText={ "Make sure to thoroughly check whether it goes against our content policy. By removing this, your user ID will be saved as the remover." }
+                        icon={ RemoveIcon } isDanger={ true }
+                    />
+                }
+                {
+                    isConfirmationShown === "allow" &&
+                    <ConfirmModal 
+                        setShowModal={ setIsConfirmationShown } confirmAction={ allowRecipe }
+                        title={ prevTitle } headerText={ "Confirm Clearance" } 
+                        bodyText={ "Make sure to thoroughly check whether it is in adherance with our content policy." }
+                        icon={ AllowIcon } isDanger={ false }
                     />
                 }
             </div>

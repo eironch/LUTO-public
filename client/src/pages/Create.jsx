@@ -141,7 +141,7 @@ function Create(p) {
                     })
                 }
                 console.log(preFiles.length)
-                console.log("yes")
+                
                 return { contentType, text, filesLength: preFiles.length - 1, files: [] }
             }
         )))

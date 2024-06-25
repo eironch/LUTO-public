@@ -32,7 +32,7 @@ function SearchBar(p) {
                     />
                     <div className="absolute flex flex-row mr-2 right-0 items-last justify-right pointer-events-none">
                         <button
-                            className="w-12 h-8 rounded-3xl text-zinc-100 bg-zinc-500 hover:bg-zinc-600 pointer-events-auto" 
+                            className="w-12 h-8 rounded-3xl text-zinc-100 hover:bg-zinc-500 pointer-events-auto" 
                             onClick={ () => searchQuery !== "" && navigate('/search') }
                         >
                             ➤

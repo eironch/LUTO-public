@@ -14,7 +14,7 @@ function Feedback(p) {
     const formatDate = p.formatDate
 
     const [formattedDate, setFormattedDate] = useState()
-
+    console.log(p.feedbackId)
     useEffect(() => {
         setFormattedDate(formatDate(new Date(createdAt)))
     })
@@ -52,13 +52,15 @@ function FeedbackSection(p) {
     
     const [userFeedback, setUserFeedback] = useState()
     const [feedbacks, setFeedbacks] = useState()
-    console.log(recipeId)
+    
     function getFeedbacks() {
+        setFeedbackCount(0)
+
         axios.get('http://localhost:8080/feedbacks', { params: { recipeId } })
             .then(res => {
                 console.log('Status Code:' , res.status)
                 console.log('Data:', res.data)
-                console.log("whye")
+                
                 setFeedbackCount(feedbackCount + 1)
                 setFeedbacks(res.data.payload.feedbacks)
                 setFeedbackCount(res.data.payload.feedbackCount.feedbackCount)
@@ -68,7 +70,6 @@ function FeedbackSection(p) {
                 console.log('Error Data:', err.response.data)
             })
     }
-    console.log("tab right now " + p.currentTab)
 
     function submitFeedback() {
         setUserFeedback('')
@@ -123,6 +124,7 @@ function FeedbackSection(p) {
                         feedbacks.map(feedback => 
                             <Feedback 
                                 key={ feedback._id } username={ feedback.userId.username }
+                                feedbackId={ feedback._id }
                                 text={ feedback.text } createdAt={ feedback.createdAt } 
                                 formatDate={ formatDate }
                             />
@@ -133,7 +135,6 @@ function FeedbackSection(p) {
                 <div className="pb-3"></div>
             }
         </div>
-        
     )
 }
 

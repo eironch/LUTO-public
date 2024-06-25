@@ -9,7 +9,7 @@ function PointSection(p) {
     const handleGivePoint = p.handleGivePoint
     const pointStatus = p.pointStatus
     const points = p.points
-    console.log("statusssss" + pointStatus)
+    
     return (
         <div className="flex justify-end items-center h-fit rounded-3xl bg-zinc-700">
             <button className="flex justify-end items-center p-3 gap-4 rounded-3xl hover:bg-zinc-500" onClick={ () => { handleGivePoint("negative") } }>

@@ -121,7 +121,6 @@ function Images(p) {
         const file = e.target.files[0]
         const maxSizeInBytes = 5 * 1024 * 1024
 
-        console.log(key + " current index")
         if (file && file.size > maxSizeInBytes) {
             // placeholder
             return alert('File size exceeds the maximum allowed limit (25MB). Please Select a smaller file.')
@@ -138,7 +137,7 @@ function Images(p) {
                     newObjectValue.push('')
                     setIsNewAdded(true)
                 }
-                console.log(newObjectValue)
+                
                 return { key: objectArray.key, value: newObjectValue }
             }
 

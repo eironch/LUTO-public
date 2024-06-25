@@ -83,7 +83,7 @@ function SidebarCreate(p) {
     function addTag(e) {
         const index = e.target.id
         const tag = tagChoices[index]
-        console.log()
+
         if (!tags.includes(tag)) {
             setTags([...tags, tag])
         }
@@ -115,7 +115,6 @@ function SidebarCreate(p) {
     }
 
     const handleTagSearch = debounce(input => {
-        console.log(input)
         if (!input) {
             return handlePopularTags()
         }

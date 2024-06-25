@@ -41,7 +41,6 @@ function NavBar(p) {
 
     const filters  = p.filters
     const setFilters = p.setFilters
-    console.log(!(title && recipeImage.size && summary && (ingredients.length > 1  || ingredients[0].value)))
     
     return (
         <div>
@@ -129,7 +128,7 @@ function NavBar(p) {
                         {/* profile */}
                         {
                             (currentTab === "Home" || currentTab === "Search" || currentTab === "Settings" || currentTab === "Saved") &&
-                            <Link to={`/${ user.username }`} className="col-span-2 flex items-center justify-end rounded-3xl bg-zinc-900 pointer-events-auto hover:bg-zinc-500">
+                            <Link to={`/${ user.username }`} className={`${ user.accountType === "user" ? "bg-zinc-900" : "bg-orange-500" }  col-span-2 flex items-center justify-end rounded-3xl pointer-events-auto hover:bg-zinc-500`}>
                                 { 
                                     currentTab!=="Profile" && <p className="text-zinc-100 text-end w-full ml-3 text-xl font-semibold overflow-hidden">
                                         { user.username }

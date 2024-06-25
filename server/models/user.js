@@ -1,7 +1,6 @@
 import mongoose from 'mongoose'
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
-import { v4 as uuidv4 } from 'uuid'
 
 const Schema = mongoose.Schema
 
@@ -15,13 +14,13 @@ const userSchema = new Schema({
         type: String,
         required: true
     },
-    bio: {
-        type: String
-    },
-    userType: {
+    accountType: {
         type: String,
         required: true,
         default: 'user'
+    },
+    bio: {
+        type: String
     },
     refreshToken: {
         type: String,
