@@ -50,7 +50,30 @@ function App() {
         console.log('Error Data:', err.response.data)
       })
   }
-  
+
+  function handleRemoveRecipe(removerUserId, recipeId) {
+    axios.post('http://localhost:8080/remove-recipe', { removerUserId, recipeId })
+      .then(res => {
+        console.log('Status Code:' , res.status)
+        console.log('Data:', res.data)
+      })
+      .catch(err => {
+        console.log('Error Status:', err.response.status)
+        console.log('Error Data:', err.response.data)
+      })
+  }
+
+  function handleAllowRecipe(recipeId) {
+    axios.post('http://localhost:8080/allow-recipe', { recipeId })
+      .then(res => {
+        console.log('Status Code:' , res.status)
+        console.log('Data:', res.data)
+      })
+      .catch(err => {
+        console.log('Error Status:', err.response.status)
+        console.log('Error Data:', err.response.data)
+      })
+  }
 
   useLayoutEffect(() => {
     axios.get(`http://localhost:8080/check-auth`, { withCredentials: true })
@@ -59,7 +82,11 @@ function App() {
           console.log('Data:', res.data)
           
           setIsLoading(false)
-          setUser({ username: res.data.payload.username, userId: res.data.payload.userId })
+          setUser({ 
+            username: res.data.payload.username, 
+            userId: res.data.payload.userId, 
+            accountType: res.data.payload.accountType 
+          })
           setIsAuthenticated(res.data.isAuthenticated)
       })
       .catch(error => {
@@ -134,7 +161,8 @@ function App() {
                     filters={ filters } setFilters={ setFilters } filtersRef={ filtersRef }
                     handleGiveRecipePoint={ handleGiveRecipePoint } formatDate={ formatDate }
                     searchQuery={ searchQuery } setSearchQuery={ setSearchQuery }
-                    handleFlagRecipe={ handleFlagRecipe }
+                    handleFlagRecipe={ handleFlagRecipe } handleRemoveRecipe={ handleRemoveRecipe } 
+                    handleAllowRecipe={ handleAllowRecipe } 
                   />
                 }
               />
@@ -142,7 +170,9 @@ function App() {
                   <Profile 
                     user={ user } currentTab={ currentTab } 
                     setCurrentTab={ setCurrentTab } handleGiveRecipePoint={ handleGiveRecipePoint } 
-                    formatDate={ formatDate }
+                    formatDate={ formatDate } searchQuery={ searchQuery } 
+                    setSearchQuery={ setSearchQuery } handleRemoveRecipe={ handleRemoveRecipe } 
+                    handleAllowRecipe={ handleAllowRecipe } handleFlagRecipe={ handleFlagRecipe }
                   />
                 }
               />
@@ -158,8 +188,9 @@ function App() {
                     user={ user } currentTab={ currentTab } 
                     setCurrentTab={ setCurrentTab } filters={ filters }
                     setFilters={ setFilters } formatDate={ formatDate }
-                    handleGiveRecipePoint={ handleGiveRecipePoint }
+                    handleGiveRecipePoint={ handleGiveRecipePoint } handleFlagRecipe={ handleFlagRecipe }
                     searchQuery={ searchQuery } setSearchQuery={ setSearchQuery }
+                    handleRemoveRecipe={ handleRemoveRecipe } handleAllowRecipe={ handleAllowRecipe }
                   /> 
                 } 
               />

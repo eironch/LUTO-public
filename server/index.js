@@ -16,6 +16,7 @@ import Point from './models/point.js'
 import Feedback from './models/feedback.js'
 import Save from './models/save.js'
 import Flag from './models/flag.js'
+import Archive from './models/archive.js'
 
 const PORT = 8080
 
@@ -63,17 +64,7 @@ mongoose.connect(dbURI, { autoIndex: false })
         console.log('Connection error') 
     })
 
-// mongoose.connection.once('open', async () => {
-//     try {
-//         await Recipe.createIndexes()
-//         await RecipeOverview.createIndexes()
-//         await Approval.createIndexes()
 
-//         console.log('Indexes created successfully.')
-//     } catch (error) {
-//         console.error('Error creating indexes:', error)
-//     }
-// })
 
 // mongoose and mongo sandbox routes
 app.get('/', (req, res) => {
@@ -86,7 +77,7 @@ app.post('/create-account', (req, res) => {
         username,
         password,
         bio: '',
-        userType,
+        accountType,
         refreshToken: '',
     })
 
@@ -134,7 +125,7 @@ app.get('/sign-in', (req, res) => {
                         }
                     )
 
-                    return res.status(200).json({ success: true, payload: { username: user.username, userId: user._id }, message: 'User signed in.' })
+                    return res.status(200).json({ success: true, payload: { username: user.username, userId: user._id, accountType: user.accountType }, message: 'User signed in.' })
                 })
                 .catch(err => {
                     console.error('Password comparison error')
@@ -146,32 +137,41 @@ app.get('/sign-in', (req, res) => {
         })
 })
 
-app.get('/check-auth', (req, res) => {
+app.get('/check-auth', async (req, res) => {
     const accessToken = req.cookies.authToken
     const decodedAccessToken = verifyToken(accessToken)
     
-    if (accessToken && decodedAccessToken) {
-        return res.status(200).json({ isAuthenticated: true, payload: { username: decodedAccessToken.username, userId: decodedAccessToken.userId }})
-    }
-    console.log('here')
-    const refreshToken = req.cookies.refreshToken
-    const decodedRefreshToken = verifyToken(refreshToken)
-    console.log('here')
-    if (refreshToken && decodedRefreshToken) {
-        res.cookie(
-            'accessToken',
-            generateAccessToken(decodedRefreshToken.userId, decodedRefreshToken.username), 
-            {
-                httpOnly: true,
-                secure: true,
-                maxAge: 3600000,
-            }
-        )
-        console.log('her3123e')
-        return res.status(200).json({ isAuthenticated: true, payload: { username: decodedRefreshToken.username, userId: decodedRefreshToken.userId }})
-    }
+    try {
+        if (accessToken && decodedAccessToken) {
+            const type = await User.findById(decodedAccessToken.userId).select('accountType')
 
-    return res.status(202).json({ isAuthenticated: false })
+            return res.status(200).json({ isAuthenticated: true, payload: { username: decodedAccessToken.username, userId: decodedAccessToken.userId, accountType: type.accountType}})
+        }
+    
+        const refreshToken = req.cookies.refreshToken
+        const decodedRefreshToken = verifyToken(refreshToken)
+    
+        if (refreshToken && decodedRefreshToken) {
+            const type = await User.findById(decodedRefreshToken.userId).select('accountType')
+    
+            res.cookie(
+                'accessToken',
+                generateAccessToken(decodedRefreshToken.userId, decodedRefreshToken.username), 
+                {
+                    httpOnly: true,
+                    secure: true,
+                    maxAge: 3600000,
+                }
+            )
+    
+            return res.status(200).json({ isAuthenticated: true, payload: { username: decodedRefreshToken.username, userId: decodedRefreshToken.userId, accountType: type.accountType }})
+        }
+    
+        return res.status(202).json({ isAuthenticated: false })
+    } catch (err) {
+        console.log(err)
+        return res.status(500).json({ message:'Internal server error.', err})
+    }
 })
 
 app.post('/publish-recipe', upload.any(), async (req, res) => {
@@ -185,10 +185,6 @@ app.post('/publish-recipe', upload.any(), async (req, res) => {
 
     const recipeFiles = req.files
 
-    // const file = req.files
-    console.log(req.body)
-    console.log(req.files)
-    // uploadFileToStorage(req.files[0])
     const ingredients = JSON.parse(req.body.ingredients)
     const recipeElements = JSON.parse(req.body.recipeElements)
 
@@ -242,18 +238,15 @@ async function uploadFile(files){
     const elementFiles = files.filter(file => file.fieldname !== 'recipeImage')
     const fileLinks = { recipeImage: '', elementFiles: [] }
    
-    console.log('1')
     return await uploadFileToStorage(recipeImage)
         .then(async recipeUrl => {
             fileLinks.recipeImage = recipeUrl
         })
         .then(async () => {
-            console.log('here!')
             const uploadPromises = elementFiles.map(async file => {
                 try {
                     const fileUrl = await uploadFileToStorage(file)
 
-                    console.log('url download:', fileUrl)
                     return fileUrl
                 } catch (error) {
                     console.error('Error uploading element file:', error)
@@ -261,8 +254,7 @@ async function uploadFile(files){
             })
 
             fileLinks.elementFiles = await Promise.all(uploadPromises)
-            console.log('fileLinks')
-            console.log(fileLinks)
+ 
             return fileLinks
         })
 }
@@ -272,7 +264,7 @@ function uploadFileToStorage(file) {
         if (!file.size) {
             return resolve('')
         }
-        console.log('3')
+
         const blob = bucket.file(`media/${uuidv4()}_${uuidv4()}`)
         const blobStream = blob.createWriteStream({
             metadata: {
@@ -280,27 +272,21 @@ function uploadFileToStorage(file) {
             }
         })
         
-        console.log(file)
-        console.log('4')
-        
         blobStream.on('error', err => {
             reject(err)
         })
 
-        console.log('5')
         blobStream.on('finish', async () => {
             try {
                 await blob.makePublic()
                 const publicUrl = `https://storage.googleapis.com/${bucket.name}/${blob.name}`
-                console.log('url')
-                console.log(publicUrl)
+
                 resolve(publicUrl)
             } catch (err) {
                 reject(err)
             }
         })
 
-        console.log('6')
         // uploads file to the space in the cloud
         blobStream.end(file.buffer)
     })
@@ -308,7 +294,7 @@ function uploadFileToStorage(file) {
 
 app.post('/give-point', async (req, res) => {
     const { userId, recipeId, pointStatus } = req.body
-    console.log(req.body)
+
     try {
         const isGivenPoint = await Point.findOne({ userId, recipeId })
 
@@ -338,7 +324,7 @@ app.post('/give-point', async (req, res) => {
                     $currentDate: { updatedAAt: true }
                 }
             )
-            console.log(prevStatus.pointStatus)
+
             if (prevStatus.pointStatus === 'positive') {
                 await Recipe.findByIdAndUpdate(recipeId, { $inc: { points: -2 } })
             } else if (prevStatus.pointStatus === 'negative') {
@@ -346,10 +332,10 @@ app.post('/give-point', async (req, res) => {
             }
 
             const points = await Recipe.findById(recipeId).select('points')
-            console.log('changed')
+
             return res.status(200).json({ success: true, message:'Recipe point status changed.', payload: { pointStatus, points } })
         }
-        console.log('not changed')
+
         const point = new Point({
             userId,
             recipeId,
@@ -374,10 +360,15 @@ app.post('/give-point', async (req, res) => {
 })
 
 app.get('/feed-recipes', async (req, res) => {
-    const { userId, filters } = req.query
+    const { userId, filters, sort } = req.query
+    let aggregatedResults, results, recipes
     const pipeline = []
-    
+
     try {
+        const isAdmin = await User.findById(userId).select('accountType')
+
+        const flagCountSelected = isAdmin.accountType === "admin" && 'flagCount'
+
         if (filters) {
             pipeline.push(
                 { 
@@ -395,32 +386,205 @@ app.get('/feed-recipes', async (req, res) => {
                             }
                         }
                     }
-                },
+                }
             )
         }
 
-        pipeline.push({ $sort: { createdAt: -1 } })
+        if (sort.createdAt) {
+            pipeline.push({ $sort: { createdAt: -1 } })
+        }
 
-        const aggregatedResults = await RecipeOverview.aggregate(pipeline)
-        const results = aggregatedResults.map(result => new RecipeOverview(result))
-
-        const recipes = await RecipeOverview.populate(results, [
+        if (pipeline.length > 0) {
+            aggregatedResults = await RecipeOverview.aggregate(pipeline)
+            results = aggregatedResults.map(result => new RecipeOverview(result))
+            recipes = await RecipeOverview.populate(
+                results, [
                     { path: 'userId', select: 'username' },
-                    { path: 'recipeId', select: ['points', 'feedbackCount']}
+                    { path: 'recipeId', select: ['points', 'feedbackCount', flagCountSelected]}
+                ]
+            )
+        } else {
+            recipes = await RecipeOverview.find()
+                .populate([
+                    { path: 'userId', select: 'username' },
+                    { path: 'recipeId', select: ['points', 'feedbackCount', flagCountSelected]}
                 ])
+        }
 
         if (!recipes.length) {
             return res.status(400).json({ message: 'No recipes found.' })
         }
-
+        
         const pointPromises = recipes.map(async recipe => {
-            const status = await Point.findOne({ userId, recipeId: recipe.recipeId }).select('pointStatus') 
-            console.log(status)
-            return { ...recipe.toObject(), pointStatus: status && status.pointStatus }
+            const recipeId = recipe.recipeId
+            const status = await Point.findOne({ userId, recipeId: recipeId._id }).select('pointStatus') 
+
+            const recipeStatsData = {
+                recipeId: recipeId._id,
+                points: recipeId.points, 
+                feedbackCount: recipeId.feedbackCount,
+                ...(flagCountSelected && { flagCount: recipeId.flagCount }),
+            }
+
+            return {
+                ...recipe.toObject(),
+                ...recipeStatsData,
+                pointStatus: status && status.pointStatus
+            }
         })
         
         return Promise.all(pointPromises)
             .then(recipes => {
+                if (sort.flagCount) {
+                    recipes.sort((a, b) => b.flagCount - a.flagCount)
+                } else {
+                    recipes.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+                }
+                console.log(recipes)
+                return res.status(200).json({ success: true, payload: recipes })
+            })
+    } catch (err) {
+        console.log(err)
+        return res.status(500).json({ message: 'Internal server error.', err })
+    }
+})
+
+
+app.get('/search-recipes', async (req, res) => {
+    const { userId, searchQuery, filters, sort } = req.query
+    let aggregatedResults, results, recipes
+    const pipeline = []
+    
+    try {
+        const isAdmin = await User.findById(userId).select('accountType')
+
+        const flagCountSelected = isAdmin.accountType === "admin" && 'flagCount'
+
+        pipeline.push(
+            { 
+                $match: {
+                    $and: [
+                        filters ? { tags: { $in: filters } } : {},
+                        {
+                            $or: [
+                                { title: { $regex: searchQuery, $options: 'i' } },
+                                { summary: { $regex: searchQuery, $options: 'i' } }
+                            ]
+                        }
+                    ]
+                }
+            }
+        )
+
+        if (sort.createdAt) {
+            pipeline.push({ $sort: { createdAt: -1 } })
+        }
+
+        if (pipeline.length > 0) {
+            aggregatedResults = await RecipeOverview.aggregate(pipeline)
+            results = aggregatedResults.map(result => new RecipeOverview(result))
+            recipes = await RecipeOverview.populate(
+                results, [
+                    { path: 'userId', select: 'username' },
+                    { path: 'recipeId', select: ['points', 'feedbackCount', flagCountSelected]}
+                ]
+            )
+        } else {
+            recipes = await RecipeOverview.find()
+                .populate([
+                    { path: 'userId', select: 'username' },
+                    { path: 'recipeId', select: ['points', 'feedbackCount', flagCountSelected]}
+                ])
+        }
+
+        if (!recipes.length) {
+            return res.status(400).json({ message: 'No recipes found.' })
+        }
+        
+        const pointPromises = recipes.map(async recipe => {
+            const recipeId = recipe.recipeId
+            const status = await Point.findOne({ userId, recipeId: recipeId._id }).select('pointStatus') 
+
+            const recipeStatsData = {
+                recipeId: recipeId._id,
+                points: recipeId.points, 
+                feedbackCount: recipeId.feedbackCount,
+                ...(flagCountSelected && { flagCount: recipeId.flagCount }),
+            }
+
+            return {
+                ...recipe.toObject(),
+                ...recipeStatsData,
+                pointStatus: status && status.pointStatus
+            }
+        })
+        
+        return Promise.all(pointPromises)
+            .then(recipes => {
+                if (sort.flagCount) {
+                    recipes.sort((a, b) => b.flagCount - a.flagCount)
+                } else {
+                    recipes.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+                }
+                
+                return res.status(200).json({ success: true, payload: recipes })
+            })
+    } catch (err) {
+        console.log(err)
+        return res.status(500).json({ message: 'Internal server error.', err })
+    }
+})
+
+
+app.get('/user-recipes', async (req, res) => {
+    const { userId, authorName, sort } = req.query
+    
+    try {
+        const user = await User.find({ username: authorName })
+
+        if (!user.length) {
+            return res.status(400).json({ message: 'No such user found.' })
+        }
+
+        const isAdmin = await User.findById(userId).select('accountType')
+
+        const flagCountSelected = isAdmin.accountType === "admin" && 'flagCount'
+
+        const recipes = await RecipeOverview.find({ userId: user[0]._id })
+            .populate([
+                { path: 'userId', select: 'username' },
+                { path: 'recipeId', select: ['points', 'feedbackCount', flagCountSelected]}
+            ])
+
+        if (!recipes) {
+            return res.status(400).json({ message: 'No recipes found.' })
+        }
+
+        const pointPromises = recipes.map(async recipe => {
+            const recipeId = recipe.recipeId
+            const status = await Point.findOne({ userId: user._id, recipeId: recipeId._id }).select('pointStatus') 
+
+            const recipeStatsData = {
+                recipeId: recipeId._id,
+                points: recipeId.points, 
+                feedbackCount: recipeId.feedbackCount,
+                ...(flagCountSelected && { flagCount: recipeId.flagCount }),
+            }
+
+            return {
+                ...recipe.toObject(),
+                ...recipeStatsData,
+                pointStatus: status && status.pointStatus
+            }
+        })
+        
+        return Promise.all(pointPromises)
+            .then(recipes => {
+                if (sort.flagCount) {
+                    recipes.sort((a, b) => b.flagCount - a.flagCount)
+                } else {
+                    recipes.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+                }
                 console.log(recipes)
                 return res.status(200).json({ success: true, payload: recipes })
             })
@@ -432,7 +596,7 @@ app.get('/feed-recipes', async (req, res) => {
 
 app.get('/recipe', async (req, res) => {
     const { recipeId, userId } = req.query
-    console.log(req.query)
+
     try {
         const recipe = await Recipe.findById( recipeId )
             .populate({
@@ -463,102 +627,13 @@ app.get('/recipe', async (req, res) => {
     }
 })
 
-app.get('/user-recipes', async (req, res) => {
-    const { authorName } = req.query
-    
-    try {
-        const user = await User.find({ username: authorName })
-
-        if (!user.length) {
-            return res.status(400).json({ message: 'No such user found.' })
-        }
-
-        const recipes = await RecipeOverview.find({ userId: user[0]._id }).populate({
-                path: 'userId',
-                select: 'username'
-            }).populate({
-                path: 'recipeId',
-                select: 'points',
-            }).sort({ createdAt: -1 })
-        console.log(recipes)
-        if (!recipes) {
-            return res.status(400).json({ message: 'No recipes found.' })
-        }
-
-        const pointPromises = recipes.map(async recipe => {
-            const status = await Point.findOne({ userId: user[0]._id, recipeId: recipe.recipeId }).select('pointStatus')
-  
-            return { ...recipe.toObject(), pointStatus: status && status.pointStatus }
-        })
-
-        return Promise.all(pointPromises)
-            .then(recipes => {
-                return res.status(200).json({ success: true, payload: recipes })
-            })
-    } catch (err) {
-        console.log(err)
-        return res.status(500).json({ message: 'Internal server error.', err })
-    }
-})
-
-app.get('/find-recipes', async (req, res) => {
-    const { userId, searchQuery, filters } = req.query
-    console.log(req.query)
-    const pipeline = [
-        { 
-            $match: {
-                $and: [
-                    filters ? { tags: { $in: filters } } : {},
-                    {
-                        $or: [
-                            { title: { $regex: searchQuery, $options: 'i' } },
-                            { summary: { $regex: searchQuery, $options: 'i' } }
-                        ]
-                    }
-                ]
-            }
-        },
-        { $sort: { createdAt: -1 } }
-    ]
-    console.log(pipeline)
-    try {
-        const aggregatedResults = await RecipeOverview.aggregate(pipeline)
-        const results = aggregatedResults.map(result => new RecipeOverview(result))
-
-        const recipes = await RecipeOverview.populate(results, [
-                    { path: 'userId', select: 'username' },
-                    { path: 'recipeId', select: ['points', 'feedbackCount']}
-                ])
-
-        if (!recipes.length) {
-            return res.status(400).json({ message: 'No recipes found.' })
-        }
-
-        const pointPromises = recipes.map(async recipe => {
-            const status = await Point.findOne({ userId, recipeId: recipe.recipeId }).select('pointStatus')
-    
-            return { ...recipe.toObject(), pointStatus: status && status.pointStatus }
-        })
-        
-        return Promise.all(pointPromises)
-            .then(recipes => {
-                console.log(recipes)
-                return res.status(200).json({ success: true, payload: recipes })
-            })
-    } catch (err) {
-        console.log(err)
-        return res.status(500).json({ message: 'Internal server error.', err })
-    }
-})
-
 app.post('/submit-feedback', async (req, res) => {
     const { userId, recipeId, text } = req.body
-    console.log(req)
+
     const feedback = new Feedback({
         userId,
         recipeId,
-        text,
-        flag: 0,
+        text
     })
     
     try {
@@ -575,8 +650,7 @@ app.post('/submit-feedback', async (req, res) => {
 
 app.get('/feedbacks', async (req, res) => {
     const { recipeId } = req.query
-    console.log(recipeId)
-    console.log('hererereererr')
+    console.log(req.query)
     const pipeline = [
         { 
             $match: { recipeId: new Types.ObjectId(recipeId) }
@@ -595,7 +669,7 @@ app.get('/feedbacks', async (req, res) => {
         })
 
         const feedbackCount = await Recipe.findById(recipeId).select('feedbackCount')
-
+        console.log(feedbacks)
         return res.status(200).json({ success: true, payload: { feedbacks, feedbackCount } })
     } catch (err) {
         console.log(err)
@@ -651,6 +725,51 @@ app.post('/flag-recipe', async (req, res) => {
         await Recipe.findByIdAndUpdate(recipeId, { $inc: { flagCount: 1 } })
 
         return res.status(200).json({ success: true, message: 'Recipe flagged.' })
+    } catch (err) {
+        console.log(err)
+        return res.status(500).json({ message: 'Internal server error.', err })
+    }
+})
+
+app.post('/remove-recipe', async (req, res) => {
+    const { removerUserId, recipeId } = req.body
+
+    try {
+        const recipe =  await Recipe.findById(recipeId).lean()
+
+        if (!recipe) {
+            return res.status(400).json({ message: 'Error removing recipe.', err })
+        }
+
+        const { _id, __v, ...rest } = recipe
+        console.log(removerUserId)
+        const archive = new Archive({
+            removerUserId,
+            ...rest
+        })
+
+        console.log("archive" + archive)
+
+        await archive.save()
+
+        await Recipe.findByIdAndDelete(recipeId)
+        
+        await RecipeOverview.deleteOne({ recipeId })
+
+        return res.status(200).json({ success: true, message: 'Recipe removed.' })
+    } catch (err) {
+        console.log(err)
+        return res.status(500).json({ message: 'Internal server error.', err })
+    }
+})
+
+app.post('/allow-recipe', async (req, res) => {
+    const { recipeId } = req.body
+
+    try {
+        await Recipe.findByIdAndUpdate(recipeId, { $set: { flagCount: 0 } })
+
+        return res.status(200).json({ success: true, message: 'Recipe allowed.' })
     } catch (err) {
         console.log(err)
         return res.status(500).json({ message: 'Internal server error.', err })

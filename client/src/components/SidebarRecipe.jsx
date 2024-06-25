@@ -45,7 +45,7 @@ function SidebarRecipe(p) {
             })
         }
     }
-    console.log("status " + pointStatus)
+    
     async function handleGivePoint(status) {
         if (pointStatus === status) {
             status = ''

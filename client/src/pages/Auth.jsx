@@ -1,6 +1,8 @@
 import React, { useState } from 'react'
 import axios from 'axios'
+
 import AuthForm from '../components/AuthForm'
+
 import Logo from '../assets/luto-logo-white.png'
 
 function Auth(p) {
@@ -20,7 +22,7 @@ function Auth(p) {
                     p.setModalMessage('Username already exists. Please choose a different username.')
                     setIsCredsCorrect(false)    
                 } else if (res.status === 201) {
-                    p.setUser({ username: '', userId: '' })
+                    p.setUser({ username: '', userId: '', accountType: '' })
                     setPassword('')
                     p.setShowModal(true)
                     p.setModalMessage('Account Created!')
@@ -45,7 +47,11 @@ function Auth(p) {
                     p.setModalMessage('Incorrect username or password. Please try again.')
                     setIsCredsCorrect(false)
                 } else if (res.status === 200) {
-                    p.setUser({ username: res.data.payload.username, userId: res.data.payload.userId })
+                    p.setUser({ 
+                        username: res.data.payload.username, 
+                        userId: res.data.payload.userId, 
+                        accountType: res.data.payload.accountType 
+                    })
                     p.setIsAuthenticated(true)
                 }
             })

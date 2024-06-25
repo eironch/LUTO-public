@@ -6,6 +6,10 @@ import NavBar from '../components/NavBar'
 import RecipeOverview from '../components/RecipeOverview'
 import SearchBar from '../components/SearchBar'
 import FeedbacksModal from '../components/FeedbacksModal'
+import ConfirmModal from '../components/ConfirmModal'
+
+import RemoveIcon from '../assets/remove-icon.png'
+import AllowIcon from '../assets/allow-icon.png'
 
 function Home(p) {
     const user = p.user
@@ -20,20 +24,39 @@ function Home(p) {
     const setSearchQuery = p.setSearchQuery
     const handleGiveRecipePoint = p.handleGiveRecipePoint
     const handleFlagRecipe = p.handleFlagRecipe
+    const handleRemoveRecipe = p.handleRemoveRecipe
+    const handleAllowRecipe = p.handleAllowRecipe
 
     const [feedRecipes, setFeedRecipes] = useState([])
     const [isFeedbacksShown, setIsFeedbacksShown] = useState(false)
+    const [isConfirmationShown, setIsConfirmationShown] = useState()
     const [prevRecipeId, setPrevRecipeId] = useState()
     const [prevTitle, setPrevTitle] = useState()
-    const [prevfeedbackCount, setPrevFeedbackCount] = useState()
+    const [prevFeedbackCount, setPrevFeedbackCount] = useState()
     const [moreModalShown, setMoreModalShown] = useState()
 
+    function removeRecipe() {
+        handleRemoveRecipe(user.userId, prevRecipeId)
+        
+        setIsConfirmationShown()
+
+        setFeedRecipes(feedRecipes.filter(recipe => recipe.recipeId !== prevRecipeId))
+    }
+
+    function allowRecipe() {
+        handleAllowRecipe(prevRecipeId)
+        
+        setIsConfirmationShown()
+        
+        setFeedRecipes(feedRecipes.filter(recipe => recipe.recipeId !== prevRecipeId))
+    }
+
     function fetchFeedRecipes(filters) {
-        axios.get('http://localhost:8080/feed-recipes', { params: { userId: user.userId, filters } })
+        axios.get('http://localhost:8080/feed-recipes', { params: { userId: user.userId, filters, sort: user.accountType === "user" ? { createdAt: -1 } : { flagCount: 1 } } })
             .then(res => {
                 console.log('Status Code:' , res.status)
                 console.log('Data:', res.data)
-                console.log("fetched")
+                
                 setFeedRecipes(res.data.payload)
             })
             .catch(err => {
@@ -67,8 +90,7 @@ function Home(p) {
     if (currentTab !== 'Home') {
         return
     }
-    console.log("Home")
-    console.log("tab now " + currentTab)
+
     return (
         <div className="overflow-y-scroll scrollable-div">
             <NavBar 
@@ -91,17 +113,19 @@ function Home(p) {
                             { 
                                 feedRecipes.map(recipe => 
                                     <RecipeOverview
-                                        key={ recipe.recipeId._id } user={ user }
-                                        recipeId={ recipe.recipeId._id } recipeImage={ recipe.recipeImage } 
+                                        key={ recipe.recipeId } user={ user }
+                                        recipeId={ recipe.recipeId } recipeImage={ recipe.recipeImage } 
                                         title={ recipe.title } summary={ recipe.summary } 
                                         authorName={ recipe.userId.username } pointStatus={ recipe.pointStatus } 
-                                        points={ recipe.recipeId.points } feedbackCount={ recipe.recipeId.feedbackCount } 
+                                        points={ recipe.points } feedbackCount={ recipe.feedbackCount } 
                                         dateCreated={ recipe.createdAt } recipes={ feedRecipes } 
                                         setRecipes={ setFeedRecipes } setPrevRecipeId={ setPrevRecipeId }
                                         setPrevTitle={ setPrevTitle } setIsFeedbacksShown={ setIsFeedbacksShown }
+                                        prevRecipeId={ prevRecipeId } prevFeedbackCount={ prevFeedbackCount } 
                                         moreModalShown={ moreModalShown } setMoreModalShown={ setMoreModalShown }
                                         handleGiveRecipePoint={ handleGiveRecipePoint } formatDate={ formatDate }
-                                        handleFlagRecipe={ handleFlagRecipe }
+                                        handleFlagRecipe={ handleFlagRecipe } flagCount={ recipe.flagCount }
+                                        setIsConfirmationShown={ setIsConfirmationShown } allowRecipe={ allowRecipe }
                                     />
                                 )
                             }
@@ -109,16 +133,35 @@ function Home(p) {
                         <div className="col-span-2"></div>
                     </div>
                 </div>
-                {/* searchbar */} 
+                {/* search */} 
                 <SearchBar searchQuery={ searchQuery } setSearchQuery={ setSearchQuery } />
                 {/* feedbacks modal */}
                 {
                     isFeedbacksShown &&
                     <FeedbacksModal 
-                        user={ user } recipeId={ prevRecipeId }
-                        title={ prevTitle } feedbackCount={ prevfeedbackCount } 
+                        key={ prevRecipeId }  user={ user } recipeId={ prevRecipeId }
+                        title={ prevTitle } feedbackCount={ prevFeedbackCount } 
                         setFeedbackCount={ setPrevFeedbackCount } setShowModal={ setIsFeedbacksShown } 
-                        formatDate={ formatDate }
+                        formatDate={ formatDate } setFeedRecipes={ setFeedRecipes } 
+                    />
+                }
+                {/* confirm modal */}
+                {
+                    isConfirmationShown === "remove" &&
+                    <ConfirmModal 
+                        setShowModal={ setIsConfirmationShown } confirmAction={ removeRecipe }
+                        title={ prevTitle } headerText={ "Confirm Removal" }
+                        bodyText={ "Make sure to thoroughly check whether it goes against our content policy. By removing this, your user ID will be saved as the remover." }
+                        icon={ RemoveIcon } isDanger={ true }
+                    />
+                }
+                {
+                    isConfirmationShown === "allow" &&
+                    <ConfirmModal 
+                        setShowModal={ setIsConfirmationShown } confirmAction={ allowRecipe }
+                        title={ prevTitle } headerText={ "Confirm Clearance" } 
+                        bodyText={ "Make sure to thoroughly check whether it is in adherance with our content policy." }
+                        icon={ AllowIcon } isDanger={ false }
                     />
                 }
             </div>

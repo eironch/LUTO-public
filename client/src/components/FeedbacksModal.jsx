@@ -10,16 +10,16 @@ function FeedbacksModal(p) {
     const feedbackCount = p.feedbackCount
     const setFeedbackCount = p.setFeedbackCount
     const setShowModal = p.setShowModal
-
+    const setFeedRecipes = p.setFeedRecipes
+    
     return (
-        <div className="absolute inset-0 grid place-items-center h-screen pt-3 text-zinc-100 bg-zinc-950 bg-opacity-90 overflow-y-scroll scrollable-div" 
+        <div className="absolute inset-0 grid place-items-center h-screen pt-3 text-zinc-100 bg-zinc-950 bg-opacity-80 overflow-y-scroll scrollable-div" 
             onMouseDownCapture={ 
                 (event) => { 
                     const isOutsideModal = !event.target.closest('.model-inner')
 
                     if (isOutsideModal) {
                         setShowModal(false)
-                        setFeedbackCount(0)
                     }
                 } 
             }
@@ -30,7 +30,7 @@ function FeedbacksModal(p) {
                         <FeedbackSection 
                             user={ user } recipeId={ recipeId } 
                             feedbackCount={ feedbackCount } setFeedbackCount={ setFeedbackCount } 
-                            formatDate={ formatDate }
+                            formatDate={ formatDate } setFeedRecipes={ setFeedRecipes }
                         />
                 </div>
             </div>
