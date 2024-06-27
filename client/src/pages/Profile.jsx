@@ -81,8 +81,11 @@ function Profile(p) {
                     <div className="col-span-4"></div>
                     <div className="col-span-11 block">
                         { 
-                            userRecipes.map((recipe, index) => {
-                                return <RecipeOverview 
+                            userRecipes &&
+                            userRecipes.length > 0 &&
+                            userRecipes.map((recipe, index) => 
+                                recipe &&
+                                <RecipeOverview 
                                     key={ index } user={ user } 
                                     recipeId={ recipe.recipeId } recipeImage={ recipe.recipeImage } 
                                     title={ recipe.title } summary={ recipe.summary } 
@@ -97,7 +100,7 @@ function Profile(p) {
                                     handleFlagRecipe={ handleFlagRecipe } flagCount={ recipe.flagCount }
                                     setIsConfirmationShown={ setIsConfirmationShown } allowRecipe={ allowRecipe }
                                 />
-                            })
+                            )
                         }
                     </div>
                 </div> 

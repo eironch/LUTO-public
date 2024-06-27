@@ -111,7 +111,10 @@ function Home(p) {
                         <div className="col-span-2"></div>
                         <div className="col-span-11 block">
                             { 
+                                feedRecipes &&
+                                feedRecipes.length > 0 &&
                                 feedRecipes.map(recipe => 
+                                    recipe &&
                                     <RecipeOverview
                                         key={ recipe.recipeId } user={ user }
                                         recipeId={ recipe.recipeId } recipeImage={ recipe.recipeImage } 

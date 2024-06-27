@@ -41,7 +41,7 @@ function NavBar(p) {
 
     const filters  = p.filters
     const setFilters = p.setFilters
-    
+    console.log("tasg: " +tags)
     return (
         <div>
             <div className="fixed flex gap-3 flex-col w-full h-svh pointer-events-none">
@@ -97,10 +97,11 @@ function NavBar(p) {
                                         <div className="col-span-9">
 
                                         </div>
-                                        <div className="col-span-2 flex items-center pointer-events-auto w-full h-full rounded-3xl overflow-hidden">
-                                            <button className={`${ (title && recipeImage.size && summary && (ingredients.length > 1 || ingredients[0].value)) && "bg-orange-500 hover:bg-orange-400" } 
-                                                    flex items-center p-4 gap-4 w-full h-full disabled:bg-zinc-900 disabled:cursor-not-allowed overflow-hidden`
-                                                } 
+                                        <div className="col-span-2 flex items-center pointer-events-auto w-full h-full shadow-md shadow-zinc-950 rounded-3xl overflow-hidden">
+                                            <button className={`
+                                                    ${ (title && recipeImage.size && summary && (ingredients.length > 1 || ingredients[0].value)) && "bg-orange-500 hover:bg-orange-400" } 
+                                                    flex items-center p-4 gap-4 w-full h-full disabled:bg-zinc-900 disabled:cursor-not-allowed
+                                                `} 
                                                 onClick={ () => { publishRecipe() } } disabled={ !(title && recipeImage.size && summary && (ingredients.length > 1  || ingredients[0].value)) }
                                             >
                                                 <p className="flex text-zinc-100 text-lg w-full font-semibold">Publish</p>

@@ -212,7 +212,11 @@ function App() {
               <Route path="/saved" element={ 
                   <Saved 
                     user={ user } currentTab={ currentTab } 
-                    setCurrentTab={ setCurrentTab }
+                    setCurrentTab={ setCurrentTab } filters={ filters }
+                    setFilters={ setFilters } formatDate={ formatDate }
+                    filtersRef={ filtersRef } handleGiveRecipePoint={ handleGiveRecipePoint } 
+                    handleFlagRecipe={ handleFlagRecipe } handleRemoveRecipe={ handleRemoveRecipe } 
+                    handleAllowRecipe={ handleAllowRecipe }
                   /> 
                 } 
               />

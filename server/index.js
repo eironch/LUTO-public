@@ -64,8 +64,6 @@ mongoose.connect(dbURI, { autoIndex: false })
         console.log('Connection error') 
     })
 
-
-
 // mongoose and mongo sandbox routes
 app.get('/', (req, res) => {
     res.json('good mourning.')
@@ -373,19 +371,6 @@ app.get('/feed-recipes', async (req, res) => {
             pipeline.push(
                 { 
                     $match: { tags: { $in: filters } }
-                },
-                {
-                    $addFields: {
-                        matchCount: {
-                            $size: {
-                                $filter: {
-                                    input: '$tags',
-                                    as: 'tag',
-                                    cond: { $in: ['$$tag', filters] }
-                                }
-                            }
-                        }
-                    }
                 }
             )
         }
@@ -448,7 +433,6 @@ app.get('/feed-recipes', async (req, res) => {
         return res.status(500).json({ message: 'Internal server error.', err })
     }
 })
-
 
 app.get('/search-recipes', async (req, res) => {
     const { userId, searchQuery, filters, sort } = req.query
@@ -535,6 +519,56 @@ app.get('/search-recipes', async (req, res) => {
     }
 })
 
+app.get('/saved-recipes', async (req, res) => {
+    const { userId, filters } = req.query
+    console.log(req.query)
+    try {
+        const saves = await Save.find({ userId }).sort({createdAt: -1})
+
+        if (saves.length === 0) {
+            return res.status(400).json({ message: 'No recipes found.' })
+        }
+        
+        const pointPromises = saves.map(async save => {
+            const { _id, __v, ...recipe} = await RecipeOverview.findOne({ recipeId: save.recipeId })
+                .populate([
+                    { path: 'userId', select: 'username' },
+                    { path: 'recipeId', select: ['points', 'feedbackCount']}
+                ]).lean()
+                console.log(filters)
+            if (filters) {
+                console.log(recipe)
+                if (!filters.some(tag => recipe.tags.includes(tag))) {
+                    console.log("yes")
+                    return
+                }
+            }
+
+            const status = await Point.findOne({ userId, recipeId: save.recipeId }).select('pointStatus') 
+
+            const recipeStatsData = {
+                recipeId: recipe.recipeId._id,
+                points: recipe.recipeId.points, 
+                feedbackCount: recipe.recipeId.feedbackCount,
+            }
+            
+            return {
+                ...recipe,
+                ...recipeStatsData,
+                pointStatus: status && status.pointStatus
+            }
+        })
+        
+        return Promise.all(pointPromises)
+            .then(recipes => {
+                return res.status(200).json({ success: true, payload: recipes })
+            })
+    } catch (err) {
+        console.log(err)
+        return res.status(500).json({ message: 'Internal server error.', err })
+    }
+})
+
 
 app.get('/user-recipes', async (req, res) => {
     const { userId, authorName, sort } = req.query
@@ -593,6 +627,8 @@ app.get('/user-recipes', async (req, res) => {
         return res.status(500).json({ message: 'Internal server error.', err })
     }
 })
+
+
 
 app.get('/recipe', async (req, res) => {
     const { recipeId, userId } = req.query

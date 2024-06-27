@@ -16,7 +16,6 @@ function SidebarProfile(p) {
                         <p className="px-1  font-semibold overflow-hidden">
                             { authorName }
                         </p>
-                        
                         <button className="py-1 rounded-3xl text-lg text-center font-semibold gap-4 bg-orange-500 hover:bg-orange-400 overflow-hidden">
                             Follow
                         </button>

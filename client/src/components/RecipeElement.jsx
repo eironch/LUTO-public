@@ -57,9 +57,7 @@ function CustomTextarea(p) {
     )
 }
 
-function Subheading(p) {
-    const [isHovered, setIsHovered] = useState(false)
-
+function SectionHeader(p) {
     const keyIndex = p.keyIndex
     const values = p.values
     const setValues = p.setValues
@@ -69,7 +67,7 @@ function Subheading(p) {
         <div className="py-6 px-3 flex flex-col justify-center items-center gap-3 mb-3 rounded-3xl bg-zinc-900">
             <CustomTextarea attribute={`${ !values.some(value => value.key === keyIndex) && "bg-zinc-700" } px-3 text-3xl font-semibold w-full text-justify focus:bg-zinc-700 bg-transparent`} 
                 maxLength={ 50 } keyIndex={ keyIndex } values={ values } setValues={ setValues }
-                placeholder="What do you want to tell?" 
+                placeholder="Enter section title here" 
             />
             <button className="p-3 text-2xl font-semibold rounded-3xl hover:bg-red-600" onClick={ () => { removeElement() } }>
                 <img className="w-8" src={ RemoveIcon } alt="" />
@@ -78,7 +76,7 @@ function Subheading(p) {
     )
 }
 
-function Text(p) {
+function DescriptionText(p) {
     const keyIndex = p.keyIndex
     const values = p.values
     const setValues = p.setValues
@@ -88,24 +86,23 @@ function Text(p) {
         <div className="py-6 px-3 flex flex-col justify-center items-center gap-6 mb-3 rounded-3xl bg-zinc-900">
             <CustomTextarea attribute={`${ !values.some(value => value.key === keyIndex) && "bg-zinc-700" } px-3 text-xl w-full text-justify focus:bg-zinc-700 bg-transparent`} 
                 maxLength={ 2000 } keyIndex={ keyIndex } values={ values } setValues={ setValues }
-                placeholder="What do you want to tell?" 
+                placeholder="Enter description text here" 
             />
-            <button className="p-3 text-2xl font-semibold rounded-3xl hover:bg-green-600" onClick={ () => { removeElement() } }>
+            <button className="p-3 text-2xl font-semibold rounded-3xl hover:bg-red-600" onClick={ () => { removeElement() } }>
                 <img className="w-8" src={ RemoveIcon } alt="" />
             </button>
         </div>
     )
 }
 
-function Images(p) {
-    const divRef = useRef()
-    const [isHovered, setIsHovered] = useState(false)
-    const [isNewAdded, setIsNewAdded] = useState(false)
+function ImageCarousel(p) {
     const keyIndex = p.keyIndex
     const values = p.values
     const setValues = p.setValues
     const removeElement = p.removeElement
 
+    const divRef = useRef()
+    const [isNewAdded, setIsNewAdded] = useState(false)
     const elementFiles = values.find(element => element.key === keyIndex)
 
     useLayoutEffect(() => {
@@ -146,11 +143,11 @@ function Images(p) {
     }
 
     return (
-        <div className="pt-6 pb-3 px-6 flex flex-col justify-center items-center gap-3 mb-3 rounded-3xl overflow-hidden bg-zinc-900" onMouseEnter={() => { setIsHovered(true) }} onMouseLeave={() => { setIsHovered(false) }}>
+        <div className="pt-6 pb-3 px-6 flex flex-col justify-center items-center gap-3 mb-3 rounded-3xl overflow-hidden bg-zinc-900">
             <div className="flex flex-row w-full h-full gap-3 justify-start items-center overflow-x-scroll scrollable-div" ref={ divRef }>
                 {
                     elementFiles.value.map((value, index) => (
-                        <div className="w-full min-w-32 max-w-96 h-full max-h-96 min-h-32 aspect-1 overflow-y-hidden flex-none">
+                        <div className="w-full min-w-32 max-w-96 h-full max-h-96 min-h-32 aspect-1 overflow-y-hidden flex-none" key={ keyIndex }>
                             {
                                 value &&
                                 <div className="w-full h-full bg-zinc-700 rounded-3xl">
@@ -182,29 +179,29 @@ function RecipeElement(p) {
     const setElementFiles = p.setElementFiles
     const recipeElements = p.recipeElements
     const setRecipeElements = p.setRecipeElements
-
+    console.log(keyIndex)
     function removeElement() {
         setElementTexts(elementTexts.filter(element => element.key !== keyIndex))
         setElementFiles(elementFiles.filter(element => element.key !== keyIndex))
         setRecipeElements(recipeElements.filter(element => element.key !== keyIndex))
     }
 
-    if (contentType === 'Subheading') {
-        return <Subheading
+    if (contentType === 'Section Header') {
+        return <SectionHeader
             key={ keyIndex }
             keyIndex={ keyIndex } values={ elementTexts } 
             setValues={ setElementTexts } removeElement={ removeElement }
             recipeElements={ recipeElements } setRecipeElements={ setRecipeElements }
         />
-    } else if (contentType === 'Text') {
-        return <Text
+    } else if (contentType === 'Description Text') {
+        return <DescriptionText
             key={ keyIndex } 
             keyIndex={ keyIndex } values={ elementTexts } 
             setValues={ setElementTexts } removeElement={ removeElement }
             recipeElements={ recipeElements } setRecipeElements={ setRecipeElements }
         />
-    } else if (contentType === 'Images') {
-        return <Images
+    } else if (contentType === 'Image Carousel') {
+        return <ImageCarousel
             key={ keyIndex }
             keyIndex={ keyIndex } values={ elementFiles } addElement={ addElement }
             setValues={ setElementFiles } removeElement={ removeElement }

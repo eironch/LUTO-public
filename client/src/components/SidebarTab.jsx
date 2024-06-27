@@ -128,7 +128,7 @@ function SidebarTab(p) {
                                 <img className="w-6" src={ SearchIcon } alt="" />
                             </div>
                             <input className="w-full px-14 h-10 rounded-3xl bg-transparent text-zinc-100 text-start"
-                                value={ searchValue } onChange={ e => setSearchValue(e.target.value) } type="text" placeholder="Search Tags"
+                                value={ searchValue } onChange={ e => setSearchValue(e.target.value) } type="text" placeholder="Search tags"
                             />
                         </div>
                         {/* tags */}

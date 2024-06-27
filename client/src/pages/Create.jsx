@@ -8,13 +8,16 @@ import NavBar from '../components/NavBar'
 import RecipeElement from '../components/RecipeElement'
 
 import AddIcon from '../assets/add-icon.png'
+import TextIcon from '../assets/text-icon.png'
+import SectionIcon from '../assets/section-icon.png'
+import ImageIcon from '../assets/image-icon.png'
 
 function ElementsModal(p) {
     const setShowModal = p.setShowModal
     const addElement = p.addElement
 
     return (
-        <div className="flex justify-center items-center fixed inset-0 text-zinc-100 bg-zinc-950 bg-opacity-90" 
+        <div className="absolute inset-0 grid place-items-center h-screen pt-3 text-zinc-100 bg-zinc-950 bg-opacity-80 overflow-y-scroll scrollable-div" 
             onMouseDownCapture={ 
                 (event) => { 
                     const isOutsideModal = !event.target.closest('.model-inner')
@@ -25,42 +28,48 @@ function ElementsModal(p) {
                 } 
             }
         >
-            <div className="flex flex-col w-5/12 max-w-lg h-[50%] max-h-lg aspect-1 gap-6 p-6 rounded-3xl bg-zinc-900 model-inner">
-                <div className="flex justify-end">
-                    <button className="p-3 rounded-3xl hover:bg-zinc-500" onClick={ () => { setShowModal(false) } }>
-                        𐌗
-                    </button>
+            <div className="flex flex-col gap-3 justify-center items-center w-5/12 overflow-hidden model-inner">
+                <div className="flex flex-col w-full rounded-3xl bg-zinc-900 overflow-hidden">
+                    <div className="flex flex-row items-center p-6 gap-6 shadow-md shadow-zinc-950">
+                        <img className="w-8" src={ AddIcon } alt="" />
+                        <p className="text-2xl font-semibold">
+                            Add Element
+                        </p>
+                    </div>
+                    <div className="p-6">
+                        <ul className="flex flex-col gap-3 h-full overflow-y-scroll overflow-x-hidden scrollable-div">
+                            <li>
+                                <button className="flex w-full p-3 gap-3 rounded-3xl bg-zinc-700 hover:bg-zinc-500" onClick={ () => { addElement("Description Text") }}>
+                                    <img className="p-3 w-24" src={ TextIcon } alt=""/>
+                                    <div className="flex flex-col h-24 gap-3 justify-center overflow-hidden">
+                                        <p className="w-full text-left text-xl font-semibold">Description Text</p>
+                                        <p className="w-full text-left text-lg">Space for elaborating on recipe steps or additional notes.</p>
+                                    </div>
+                                </button>
+                            </li>
+                            <li>
+                                <button className="flex w-full p-3 gap-3 rounded-3xl bg-zinc-700 hover:bg-zinc-500" onClick={ () => { addElement("Section Header") }}>
+                                <img className="p-3 w-24" src={ SectionIcon } alt="" />
+                                    <div className="flex flex-col h-24 gap-3 justify-center overflow-hidden">
+                                        <p className="w-full text-left text-xl font-semibold">Section Header</p>
+                                        <p className="w-full text-left text-lg">Organizes content into clear sections, such as Ingredients or Instructions.</p>
+                                    </div>
+                                </button>
+                            </li>
+                            <li>
+                                <button className="flex w-full p-3 gap-3 rounded-3xl bg-zinc-700 hover:bg-zinc-500" onClick={ () => { addElement("Image Carousel") }}>
+                                <img className="p-3 w-24" src={ ImageIcon } alt="" />
+                                    <div className="flex flex-col h-24 gap-3 justify-center overflow-hidden">
+                                        <p className="w-full text-left text-xl font-semibold">Image Carousel</p>
+                                        <p className="w-full text-left text-lg">Showcases multiple photos of the recipe or its preparation steps.</p>
+                                    </div>
+                                </button>
+                            </li>
+                        </ul>
+                    </div>
                 </div>
-                <p className="text-3xl font-semibold text-center">Add to Recipe</p>
-                <ul className="flex flex-col gap-3 h-full overflow-y-scroll overflow-x-hidden scrollable-div">
-                    <li>
-                        <button className="flex w-full p-3 rounded-3xl bg-zinc-700 hover:bg-zinc-500" onClick={ () => { addElement("Text") }}>
-                            Text
-                        </button>
-                    </li>
-                    <li>
-                        <button className="flex w-full p-3 rounded-3xl bg-zinc-700 hover:bg-zinc-500" onClick={ () => { addElement("Subheading") }}>
-                            Subheading
-                        </button>
-                    </li>
-                    <li>
-                        <button className="flex w-full p-3 rounded-3xl bg-zinc-700 hover:bg-zinc-500" onClick={ () => { addElement("Images") }}>
-                            Images
-                        </button>
-                    </li>
-                    <li>
-                        <button className="flex w-full p-3 rounded-3xl bg-zinc-700 hover:bg-zinc-500" onClick={ () => { addElement("Image and Text") }}>
-                            Image and Text
-                        </button>
-                    </li>
-                    <li>
-                        <button className="flex w-full p-3 rounded-3xl bg-zinc-700 hover:bg-zinc-500" onClick={ () => { addElement("Video") }}>
-                            Video
-                        </button>
-                    </li>
-                </ul>
             </div>
-        </div>
+        </div>       
     )
 }
 
@@ -75,9 +84,24 @@ function Create(p) {
     const [ingredients, setIngredients] = useState([{ key: uuidv4() }])
     const [title, setTitle] = useState('')
     const [tags, setTags] = useState([])
-    const [elementTexts, setElementTexts] = useState([])
-    const [elementFiles, setElementFiles] = useState([])
-    const [recipeElements, setRecipeElements] = useState([])
+
+    const keys = [uuidv4(), uuidv4(), uuidv4()]
+
+    const [elementTexts, setElementTexts] = useState([
+        { key: keys[0], value: '' },
+        { key: keys[1], value: '' },
+        { key: keys[2], value: '' }
+    ])
+    const [elementFiles, setElementFiles] = useState([
+        { key: keys[0], value: [''] },
+        { key: keys[1], value: [''] },
+        { key: keys[2], value: [''] }
+    ])
+    const [recipeElements, setRecipeElements] = useState([
+        { key: keys[0], value:{ contentType: 'Image Carousel', text: '', files: [] } },
+        { key: keys[1], value:{ contentType: 'Section Header', text: '', files: [] } },
+        { key: keys[2], value:{ contentType: 'Description Text', text: '', files: [] } }
+    ])
     
     useLayoutEffect(() => {
         console.log("text")
@@ -90,7 +114,7 @@ function Create(p) {
 
     function addElement(contentType) {
         const keyIndex = uuidv4()
-        console.log(keyIndex + " new index")
+
         setShowModal(false)
         setElementTexts([...elementTexts, { key: keyIndex, value: '' }])
         setElementFiles([...elementFiles, { key: keyIndex, value: [''] }])
@@ -114,25 +138,30 @@ function Create(p) {
         formData.append('recipeImage', recipeImage)
         formData.append('title', title)
         formData.append('summary', summary)
-        formData.append('ingredients', JSON.stringify(
-            ingredients.filter(ingredient => ingredient.value !== '')
-                .map(ingredient => ingredient.value)
-        ))
-        formData.append('tags', JSON.stringify(tags))
+        if (ingredients) {
+            formData.append('ingredients', JSON.stringify(
+                ingredients.filter(ingredient => ingredient.value !== '')
+                    .map(ingredient => ingredient.value)
+            ))
+        }
+        if (tags) {
+            formData.append('tags', JSON.stringify(tags))
+        }
+
         formData.append('recipeElements', JSON.stringify(
             recipeElements.map((element, objectIndex) => {
                 const contentType = recipeElements.find(
                     elementContent => elementContent.key === element.key
                 ).value.contentType
+                
                 const text = elementTexts.find(
                     elementContent => elementContent.key === element.key
                 ).value
+                
                 const preFiles = elementFiles.find(
                     elementContent => elementContent.key === element.key
                 ).value
 
-                console.log("element files")
-                console.log(preFiles)
                 if (preFiles) {
                     preFiles.forEach((file, arrayIndex) => {
                        if (file !== '') {
@@ -140,7 +169,6 @@ function Create(p) {
                        }
                     })
                 }
-                console.log(preFiles.length)
                 
                 return { contentType, text, filesLength: preFiles.length - 1, files: [] }
             }
@@ -159,9 +187,15 @@ function Create(p) {
             })
     }
 
+    function handlePlaceholderElements() {
+
+    }
+
     useLayoutEffect(() => {
         setCurrentTab('Create')
-    })
+        
+        handlePlaceholderElements()
+    }, [])
 
     if (currentTab !== 'Create') {
         return
@@ -187,7 +221,7 @@ function Create(p) {
                         </p>
                         <div className="flex flex-col items-center w-full mb-3 py-6 px-3 rounded-3xl bg-zinc-900">
                             <Textarea 
-                                attribute={`${ !title && "bg-zinc-700" } px-3 text-3xl font-bold w-full text-center focus:bg-zinc-700 bg-transparent`} 
+                                attribute={`${ !title && "pt-2.5 border border-red-600 bg-zinc-700" } px-3 text-4xl font-bold w-full text-center focus:bg-zinc-700 bg-transparent`} 
                                 maxLength={ 200 } value={ title } setValue={ setTitle } 
                                 placeholder="What is the title of your recipe?" 
                             />
@@ -206,7 +240,7 @@ function Create(p) {
                         }
                         <button className="flex items-center w-full mb-3 p-6 rounded-3xl bg-orange-500 hover:bg-orange-400" onClick={ () => { setShowModal(true) } }>
                             <div className="flex w-full justify-center">
-                                <img className="w-8" src={ AddIcon } alt=""/>
+                                <img className="w-10" src={ AddIcon } alt=""/>
                             </div>
                         </button>
                     </div>     

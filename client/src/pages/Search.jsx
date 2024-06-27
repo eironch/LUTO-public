@@ -137,6 +137,7 @@ function Search(p) {
                             <div className="col-span-11 block">
                                 { 
                                     searchedRecipes.map(recipe => 
+                                        recipe &&
                                         <RecipeOverview
                                             key={ recipe.recipeId } user={ user }
                                             recipeId={ recipe.recipeId } recipeImage={ recipe.recipeImage } 

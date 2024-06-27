@@ -16,7 +16,7 @@ function PointSection(p) {
                 <img className="min-w-10 w-10" src={ pointStatus === "negative" ? GivenPointNegativeIcon : GivePointNegativeIcon } alt="" />
             </button>
             <p className="text-zinc-100 text-lg font-semibold">
-                { points }
+                { points } pts.
             </p>
             <button className="flex justify-end items-center p-3 gap-4 rounded-3xl hover:bg-zinc-500" onClick={ () => { handleGivePoint("positive") } }>
                 <img className="min-w-10 w-10" src={ pointStatus === "positive" ? GivenPointPositiveIcon : GivePointPositiveIcon } alt="" />

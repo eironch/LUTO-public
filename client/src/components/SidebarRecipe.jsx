@@ -10,10 +10,6 @@ import TagIcon from '../assets/tag-icon.png'
 import IngredientsIcon from '../assets/ingredients-icon.png'
 import SummaryIcon from '../assets/summary-icon.png'
 
-
-
-
-
 function SidebarRecipe(p) {
     const user = p.user
     const formatDate = p.formatDate
@@ -119,9 +115,11 @@ function SidebarRecipe(p) {
                         {
                             ingredients &&
                             ingredients.map((ingredient, index) => 
-                                <li className="flex px-3 rounded-3xl text-center items-center" key={ index }>
-                                    <p className="pr-3  text-2xl font-bold">•</p>
-                                    <p className="text-lg">{ ingredient }</p>      
+                                <li className="flex px-3 text-center items-center overflow-hidden" key={ index }>
+                                    <p className="pr-3 text-2xl font-bold">•</p>
+                                    <p className="text-left text-lg w-full">
+                                        { ingredient }
+                                    </p>      
                                 </li>
                             )
                         }
@@ -136,10 +134,15 @@ function SidebarRecipe(p) {
                     <div className="block p-6 text-md font-semibold w-full">
                         {
                             tags &&
-                            tags.map((tag, index) => 
-                                <div className="inline-block m-1 px-3 py-1 w-fit bg-zinc-800 rounded-3xl" key={ index } id={ index }>
-                                    { tag }
-                                </div>
+                            (
+                                tags.length === 0 ?
+                                <p className="text-xl text-center">No tags provided</p>
+                                :
+                                tags.map((tag, index) => 
+                                    <div className="inline-block m-1 px-3 py-1 w-fit bg-zinc-800 rounded-3xl" key={ index } id={ index }>
+                                        { tag }
+                                    </div>
+                                )
                             )
                         }
                     </div>
