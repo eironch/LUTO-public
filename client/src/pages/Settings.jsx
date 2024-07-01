@@ -1,10 +1,17 @@
-import React, { useLayoutEffect } from 'react'
+import React, { useState, useLayoutEffect } from 'react'
+
 import NavBar from '../components/NavBar'
+import ConfirmModal from '../components/ConfirmModal'
+
+import LogOutIcon from '../assets/log-out-icon.png'
 
 function Settings(p) {
     const user = p.user
     const currentTab = p.currentTab
     const setCurrentTab = p.setCurrentTab
+    const handleLogOut = p.handleLogOut
+
+    const [confirmationShown, setConfirmationShown] = useState()
 
     useLayoutEffect(() => {
         setCurrentTab('Settings')
@@ -17,8 +24,8 @@ function Settings(p) {
     return (
         <div>
             <NavBar 
-                user={ p.user } currentTab={ p.currentTab }
-                setCurrentTab={ p.setCurrentTab }
+                user={ user } currentTab={ currentTab }
+                setCurrentTab={ setCurrentTab } setConfirmationShown={ setConfirmationShown }
             />
             <div className="flex flex-col gap-3 p-3 h-svh bg-zinc-950">
                 {/* space for top navbar */}
@@ -57,6 +64,15 @@ function Settings(p) {
                         </div>
                     </div>
                 </div>
+                {/* confirm modal */}
+                {
+                    confirmationShown === "log out" &&
+                    <ConfirmModal 
+                        setShowModal={ setConfirmationShown } confirmAction={ handleLogOut }
+                        headerText={ "Confirm Log Out" } bodyText={ "Are you sure you want to log out?" }
+                        icon={ LogOutIcon } isDanger={ true }
+                    />
+                }
             </div>
         </div>
     )

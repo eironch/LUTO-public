@@ -4,18 +4,18 @@ const Schema = mongoose.Schema
 
 const feedbackSchema = new Schema({
     userId: {
-        type: mongoose.Schema.Types.ObjectId,
+        type: Schema.Types.ObjectId,
         ref: 'User',
-        require: true
+        required: true
     },
     recipeId: {
-        type: mongoose.Schema.Types.ObjectId,
+        type: Schema.Types.ObjectId,
         ref: 'Recipe',
-        require: true
+        required: true
     },
     text: {
         type: String,
-        require: true
+        required: true
     },
     flagCount: {
         type: Number,

@@ -1,4 +1,4 @@
-import React, { useState, useLayoutEffect } from 'react'
+import React, { useState, useRef, useEffect, useLayoutEffect } from 'react'
 import { useParams } from 'react-router-dom'
 import axios from 'axios'
 
@@ -6,6 +6,7 @@ import RecipeOverview from '../components/RecipeOverview'
 import NavBar from '../components/NavBar'
 import FeedbacksModal from '../components/FeedbacksModal'
 import ConfirmModal from '../components/ConfirmModal'
+import RecipeSuspense from '../components/RecipeSuspense'
 
 import RemoveIcon from '../assets/remove-icon.png'
 import AllowIcon from '../assets/allow-icon.png'
@@ -19,36 +20,60 @@ function Profile(p) {
     const handleFlagRecipe = p.handleFlagRecipe
     const handleRemoveRecipe = p.handleRemoveRecipe
     const handleAllowRecipe = p.handleAllowRecipe
-
     
     const { authorName } = useParams()
     const [userRecipes, setUserRecipes] = useState([])
     const [isFeedbacksShown, setIsFeedbacksShown] = useState(false)
-    const [isConfirmationShown, setIsConfirmationShown] = useState()
+    const [confirmationShown, setConfirmationShown] = useState()
     const [prevRecipeId, setPrevRecipeId] = useState()
     const [prevTitle, setPrevTitle] = useState()
     const [prevFeedbackCount, setPrevFeedbackCount] = useState()
     const [moreModalShown, setMoreModalShown] = useState()
+    const [fetchedRecipeIds, setFetchedRecipeIds] = useState([])
+    const [isFetching, setIsFetching] = useState(false)
+    const [isFetchedAll, setIsFetchedAll] = useState(false)
+    const scrollDivRef = useRef(null)
 
-    useLayoutEffect(() => {
-        axios.get('http://localhost:8080/user-recipes', { params: { userId: user.userId, authorName, sort: user.accountType === "user" ? { createdAt: -1 } : { flagCount: 1 } } })
+    function fetchUserRecipes() {
+        setIsFetching(true)
+
+        axios.get('http://localhost:8080/user-recipes', { params: { userId: user.userId, authorName, sort: user.accountType === "user" ? { createdAt: -1 } : { flagCount: 1 }, fetchedRecipeIds } })
             .then(res => {
                 console.log('Status Code:', res.status)
                 console.log('Data:', res.data)
                 
-                setUserRecipes(res.data.payload)
+                setIsFetching(false)
+
+                if (res.status === 202) {
+                    setIsFetchedAll(true)
+
+                    return
+                }
+
+                if (res.data.payload.length < 10) {
+                    setIsFetchedAll(true)
+                }
+
+                setUserRecipes(userRecipes.length > 0 ? [...userRecipes, ...res.data.payload] : res.data.payload)
+                setFetchedRecipeIds([...fetchedRecipeIds, ...res.data.payload.map(recipe => recipe.recipeId)])
             })
             .catch(err => {
                 console.log('Error Status:', err.response.status)
                 console.log('Error Data:', err.response.data)
+
+                setIsFetching(false)
             })
+    }
+
+    useLayoutEffect(() => {
+        fetchUserRecipes()
     }, [authorName])
 
     
     function removeRecipe() {
         handleRemoveRecipe(user.userId, prevRecipeId)
         
-        setIsConfirmationShown()
+        setConfirmationShown()
 
         setUserRecipes(userRecipes.filter(recipe => recipe.recipeId !== prevRecipeId))
     }
@@ -56,10 +81,31 @@ function Profile(p) {
     function allowRecipe() {
         handleAllowRecipe(prevRecipeId)
         
-        setIsConfirmationShown()
+        setConfirmationShown()
         
         setUserRecipes(userRecipes.filter(recipe => recipe.recipeId !== prevRecipeId))
     }
+
+    useEffect(() => {
+        const scrollDiv = scrollDivRef.current
+        
+        if (!scrollDiv) return
+
+        function handleScroll() {
+            if (isFetching || isFetchedAll) return
+            const { scrollTop, scrollHeight, clientHeight } = scrollDiv
+
+            if (scrollTop + clientHeight >= scrollHeight - (scrollHeight * 0.05)) {
+                fetchUserRecipes()
+            }
+        }
+            
+        scrollDiv.addEventListener('scroll', handleScroll)
+
+        return () => {
+            scrollDiv.removeEventListener('scroll', handleScroll)
+        }
+    })
 
     useLayoutEffect(() => {
         setCurrentTab('Profile')
@@ -70,7 +116,7 @@ function Profile(p) {
     }
 
     return (
-       <div className="scrollable-div overflow-y-scroll">
+       <div className="scrollable-div overflow-y-scroll" ref={ scrollDivRef }>
             <NavBar
                 user={ user }authorName={ authorName } 
                 currentTab={ currentTab } setCurrentTab={ setCurrentTab }
@@ -81,8 +127,11 @@ function Profile(p) {
                     <div className="col-span-4"></div>
                     <div className="col-span-11 block">
                         { 
-                            userRecipes.map((recipe, index) => {
-                                return <RecipeOverview 
+                            userRecipes &&
+                            userRecipes.length > 0 &&
+                            userRecipes.map((recipe, index) => 
+                                recipe &&
+                                <RecipeOverview 
                                     key={ index } user={ user } 
                                     recipeId={ recipe.recipeId } recipeImage={ recipe.recipeImage } 
                                     title={ recipe.title } summary={ recipe.summary } 
@@ -95,9 +144,17 @@ function Profile(p) {
                                     prevRecipeId={ prevRecipeId } prevFeedbackCount={ prevFeedbackCount } 
                                     moreModalShown={ moreModalShown } setMoreModalShown={ setMoreModalShown }
                                     handleFlagRecipe={ handleFlagRecipe } flagCount={ recipe.flagCount }
-                                    setIsConfirmationShown={ setIsConfirmationShown } allowRecipe={ allowRecipe }
+                                    setConfirmationShown={ setConfirmationShown } currentTab={ currentTab } 
                                 />
-                            })
+                            )
+                        }
+                        {
+                            userRecipes &&
+                            (isFetching || !isFetchedAll && (userRecipes.length > 10 || userRecipes.length === 0)) &&
+                            <>
+                                <RecipeSuspense />
+                                <RecipeSuspense />
+                            </>
                         }
                     </div>
                 </div> 
@@ -113,18 +170,18 @@ function Profile(p) {
                 }
                 {/* confirm modal */}
                 {
-                    isConfirmationShown === "remove" &&
+                    confirmationShown === "remove" &&
                     <ConfirmModal 
-                        setShowModal={ setIsConfirmationShown } confirmAction={ removeRecipe }
+                        setShowModal={ setConfirmationShown } confirmAction={ removeRecipe }
                         title={ prevTitle } headerText={ "Confirm Removal" }
                         bodyText={ "Make sure to thoroughly check whether it goes against our content policy. By removing this, your user ID will be saved as the remover." }
                         icon={ RemoveIcon } isDanger={ true }
                     />
                 }
                 {
-                    isConfirmationShown === "allow" &&
+                    confirmationShown === "allow" &&
                     <ConfirmModal 
-                        setShowModal={ setIsConfirmationShown } confirmAction={ allowRecipe }
+                        setShowModal={ setConfirmationShown } confirmAction={ allowRecipe }
                         title={ prevTitle } headerText={ "Confirm Clearance" } 
                         bodyText={ "Make sure to thoroughly check whether it is in adherance with our content policy." }
                         icon={ AllowIcon } isDanger={ false }

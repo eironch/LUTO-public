@@ -4,17 +4,17 @@ const Schema = mongoose.Schema
 
 const preferenceSchema = new Schema({
     userId: {
-        type: mongoose.Schema.Types.ObjectId,
+        type: Schema.Types.ObjectId,
         ref: 'User',
-        require: true
+        required: true
     },
     filters: {
-        type: [string]
+        type: [String],
+        default: []
     },
     darkMode: {
         type: Boolean,
         default: false,
-        required: true
     },
 }, { timestamps: { createdAt: true, updatedAt: false } })
 

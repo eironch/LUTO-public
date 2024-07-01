@@ -40,9 +40,9 @@ function IngredientForm(p) {
             <p className="flex items-center px-3 text-2xl font-bold">
                 •
             </p>
-            <input className={`${ (ingredient === "") ? "bg-zinc-700" : "bg-zinc-900" } p-3 w-full  rounded-3xl focus:bg-zinc-700 hover:bg-zinc-700`} 
+            <input className={`${ (ingredient === "") ? "bg-zinc-700 border border-red-600" : "bg-zinc-900" } p-3 w-full rounded-3xl focus:bg-zinc-700 hover:bg-zinc-700`} 
                 value={ ingredientValue } onChange={ e => setIngredientValue(e.target.value) } 
-                placeholder="What Ingredient?" 
+                placeholder="What Ingredient?" maxLength={ 30 }
             />
         </li>
     )
@@ -58,27 +58,11 @@ function SidebarCreate(p) {
     const setIngredients = p.setIngredients
     const tags = p.tags
     const setTags = p.setTags
-
+    const systemTags = p.systemTags
     const [preRecipeImage, setPreRecipeImage] = useState()
     const [searchValue, setSearchValue] = useState('')
     const [tagChoices, setTagChoices] = useState([])
-    const systemTags = ['Vegetarian',
-        'Vegan',
-        'Pescatarian',
-        'Flexitarian',
-        'Paleo',
-        'Keto',
-        'Low-Carb',
-        'Low-Fat',
-        'High-Protein',
-        'Gluten-Free',
-        'Dairy-Free',
-        'Nut-Free',
-        'Soy-Free',
-        'Sugar-Free',
-        'Low-Sodium',
-        'Whole30',
-    ]
+    
 
     function addTag(e) {
         const index = e.target.id
@@ -168,8 +152,8 @@ function SidebarCreate(p) {
                                 <div className="flex justify-end items-center p-3 gap-4 rounded-3xl">
                                     <img className="min-w-10 w-10" src={ GivePointNegativeIcon } alt="" />
                                 </div>
-                                <p className="text-zinc-100 text-lg font-semibold">
-                                    0
+                                <p className="text-zinc-100 text-lg font-semibold line-clamp-1">
+                                    0 pts.
                                 </p>
                                 <div className="flex justify-end items-center p-3 gap-4 rounded-3xl">
                                     <img className="min-w-10 w-10" src={ GivePointPositiveIcon } alt="" />
@@ -195,7 +179,7 @@ function SidebarCreate(p) {
                     </div>
                     <div className="flex flex-col p-3">
                         <Textarea 
-                            attribute={`${summary ?  "bg-transparent" : "bg-zinc-700"} text-justify text-lg focus:bg-zinc-700`} 
+                            attribute={`${summary ?  "bg-transparent" : "pt-2.5 bg-zinc-700 border border-red-600"} text-justify text-lg focus:bg-zinc-700`} 
                             maxLength={ 300 } value={ summary || "" } setValue={ setSummary }
                             placeholder="What would you describe your dish?"
                         />
@@ -256,7 +240,7 @@ function SidebarCreate(p) {
                                 <img className="w-6" src={ SearchIcon } alt="" />
                             </div>
                             <input className="w-full h-10 px-14 rounded-3xl bg-transparent text-zinc-100 text-start"
-                                value={ searchValue } onChange={ e => setSearchValue(e.target.value) } type="text" placeholder="Search Tags"
+                                value={ searchValue } onChange={ e => setSearchValue(e.target.value) } type="text" placeholder="Search tags"
                             />
                         </div>
                     </div>

@@ -2,6 +2,7 @@ import React from 'react'
 import { useNavigate } from 'react-router-dom'
 
 import SearchIcon from '../assets/search-icon.png'
+import RemoveIcon from '../assets/remove-icon.png'
 
 function SearchBar(p) {
     const searchQuery = p.searchQuery
@@ -25,19 +26,27 @@ function SearchBar(p) {
                         <img className="w-6" src={ SearchIcon } alt="" />
                     </div>
                     <input 
-                        className="w-full px-16 h-10 rounded-3xl bg-transparent text-zinc-100 placeholder:text-zinc-400 text-center pointer-events-auto" 
+                        className="w-full px-28 h-10 rounded-3xl bg-transparent text-zinc-100 placeholder:text-zinc-400 text-center pointer-events-auto" 
                         value={ searchQuery } onChange={ (e) => setSearchQuery(e.target.value) }
                         onKeyDown={ e => handleEnterKey(e) }
                         type="text" placeholder="Search LUTO"
                     />
                     <div className="absolute flex flex-row mr-2 right-0 items-last justify-right pointer-events-none">
                         <button
-                            className="w-12 h-8 rounded-3xl text-zinc-100 hover:bg-zinc-500 pointer-events-auto" 
+                            className="flex justify-center items-center w-12 h-8 rounded-3xl text-zinc-100 hover:bg-zinc-500 pointer-events-auto" 
                             onClick={ () => searchQuery !== "" && navigate('/search') }
                         >
                             ➤
                         </button>
                     </div>
+                    {
+                        searchQuery &&
+                        <div className="absolute flex mr-28 pr-2 w-full justify-end pointer-events-none">
+                            <button className="p-2 rounded-3xl hover:bg-zinc-500 pointer-events-auto" onClick={ () => setSearchQuery('') }>
+                                <img className="w-4" src={ RemoveIcon } alt=""/>
+                            </button>
+                        </div>
+                    }
                 </div>
             </div>
             <div className="col-span-2"></div>

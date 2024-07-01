@@ -5,7 +5,7 @@ const Schema = mongoose.Schema
 const elementSchema = new Schema({
     contentType: {
         type: String,
-        require: true,
+        required: true,
     },
     text: {
         type: String,
@@ -17,29 +17,29 @@ const elementSchema = new Schema({
 
 const archiveSchema = new Schema({
     removerUserId: {
-        type: mongoose.Schema.Types.ObjectId,
+        type: Schema.Types.ObjectId,
         ref: 'User',
-        require: true
+        required: true
     },
     userId: {
-        type: mongoose.Schema.Types.ObjectId,
+        type: Schema.Types.ObjectId,
         ref: 'User',
-        require: true
+        required: true
     },
     recipeImage:{
         type: String,
-        require: true
+        required: true
     },
     title: {
         type: String,
-        require: true,
+        required: true,
     },
     summary: {
         type: String
     },
     ingredients: {
         type: [String],
-        require: true
+        required: true
     },
     tags: {
         type: [String]

@@ -1,4 +1,4 @@
-import React, { useState, useRef, useLayoutEffect } from 'react'
+import React, { useState, useRef, useEffect, useLayoutEffect } from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom'
 import axios from 'axios'
 import { format, getYear } from 'date-fns'
@@ -11,6 +11,7 @@ import Search from './pages/Search'
 import Recipe from './pages/Recipe'
 import Create from './pages/Create'
 import Saved from './pages/Saved'
+import Popular from './pages/Popular'
 
 import Modal from './components/Modal'
 
@@ -21,9 +22,88 @@ function App() {
   const [modalMessage, setModalMessage] = useState('')
   const [showModal, setShowModal] = useState(false)
   const [currentTab, setCurrentTab] = useState('Home')
-  const [filters, setFilters] = useState([])
+  const [filters, setFilters] = useState()
   const filtersRef = useRef(filters)
   const [searchQuery, setSearchQuery] = useState("")
+  const systemTags = [
+    'Vegetarian',
+    'Vegan',
+    'Pescatarian',
+    'Paleo',
+    'Keto',
+    'Low-Carb',
+    'High-Protein',
+    'Whole30',
+    'Gluten-Free',
+    'Dairy-Free',
+    'Nut-Free',
+    'Soy-Free',
+    'Shellfish-Free',
+    'Egg-Free',
+    'Fish-Free',
+    'Peanut-Free',
+    'Tree-Nut-Free',
+    'Sesame-Free',
+    'Italian',
+    'Mexican',
+    'Chinese',
+    'Indian',
+    'French',
+    'Thai',
+    'Japanese',
+    'Mediterranean',
+    'American',
+    'Greek',
+    'Spanish',
+    'Middle Eastern',
+    'Korean',
+    'Breakfast',
+    'Brunch',
+    'Lunch',
+    'Dinner',
+    'Snack',
+    'Dessert',
+    'Appetizer',
+    'Side Dish',
+    'Chicken',
+    'Beef',
+    'Fish',
+    'Tofu',
+    'Pasta',
+    'Rice',
+    'Quinoa',
+    'Beans',
+    'Lentils',
+    'Vegetables',
+    'Fruits',
+    'Grilling',
+    'Baking',
+    'Roasting',
+    'Frying',
+    'Steaming',
+    'Slow-cooking',
+    'Pressure cooking',
+    'Easy',
+    'Moderate',
+    'Difficult',
+    'Holiday',
+    'Party',
+    'Picnic',
+    'Potluck',
+    'Barbecue',
+    'Thanksgiving',
+    'Christmas',
+    'Easter',
+    'Halloween',
+    'Winter',
+    'Spring',
+    'Summer',
+    'Fall',
+    'Quick (under 30 minutes)',
+    'Very Quick (under 15 minutes)',
+    'Medium (30 to 60 minutes)',
+    'Long (over 60 minutes)',
+  ]
 
   async function handleGiveRecipePoint(userId, recipeId, pointStatus) {
     return await axios.post('http://localhost:8080/give-point', { userId, recipeId, pointStatus })
@@ -75,6 +155,47 @@ function App() {
       })
   }
 
+  function handleLogOut() {
+    axios.get('http://localhost:8080/log-out', { withCredentials: true })
+      .then(res => {
+        console.log('Status Code:' , res.status)
+        console.log('Data:', res.data)
+
+        setIsAuthenticated(false)
+        setUser({ username: '', userId: ''})
+      })
+      .catch(err => {
+        console.log('Error Status:', err.response.status)
+        console.log('Error Data:', err.response.data)
+      })
+  }
+
+  function handleSaveFilters() {
+    axios.post('http://localhost:8080/save-filters', { userId: user.userId, filters })
+      .then(res => {
+        console.log('Status Code:' , res.status)
+        console.log('Data:', res.data)
+      })
+      .catch(err => {
+        console.log('Error Status:', err.response.status)
+        console.log('Error Data:', err.response.data)
+      })
+  }
+
+  function handleGetPreferences() {
+    axios.get('http://localhost:8080/get-preferences', { params: { userId: user.userId } })
+      .then(res => {
+        console.log('Status Code:' , res.status)
+        console.log('Data:', res.data)
+
+        setFilters(res.data.payload.preferences.filters)
+      })
+      .catch(err => {
+        console.log('Error Status:', err.response.status)
+        console.log('Error Data:', err.response.data)
+      })
+  }
+
   useLayoutEffect(() => {
     axios.get(`http://localhost:8080/check-auth`, { withCredentials: true })
       .then(res => {
@@ -103,6 +224,18 @@ function App() {
           setIsAuthenticated(false)
       })
   }, [])
+
+  useEffect(() => {
+    if (isAuthenticated && filters) {
+      handleSaveFilters()
+    }
+  }, [filters])
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      handleGetPreferences()
+    }
+  }, [isAuthenticated])
 
   function calculateDiffInTime(dateNow, pastDate, unitsOfTime) {
     const diffInMilliseconds = dateNow - pastDate
@@ -162,7 +295,8 @@ function App() {
                     handleGiveRecipePoint={ handleGiveRecipePoint } formatDate={ formatDate }
                     searchQuery={ searchQuery } setSearchQuery={ setSearchQuery }
                     handleFlagRecipe={ handleFlagRecipe } handleRemoveRecipe={ handleRemoveRecipe } 
-                    handleAllowRecipe={ handleAllowRecipe } 
+                    handleAllowRecipe={ handleAllowRecipe } handleLogOut={ handleLogOut }
+                    systemTags={ systemTags }
                   />
                 }
               />
@@ -180,6 +314,7 @@ function App() {
                   <Settings 
                     user={ user } currentTab={ currentTab } 
                     setCurrentTab={ setCurrentTab }
+                    handleLogOut={ handleLogOut }
                   />
                 } 
               />
@@ -191,13 +326,14 @@ function App() {
                     handleGiveRecipePoint={ handleGiveRecipePoint } handleFlagRecipe={ handleFlagRecipe }
                     searchQuery={ searchQuery } setSearchQuery={ setSearchQuery }
                     handleRemoveRecipe={ handleRemoveRecipe } handleAllowRecipe={ handleAllowRecipe }
+                    handleLogOut={ handleLogOut } systemTags={ systemTags }
                   /> 
                 } 
               />
               <Route path="/create" element={ 
                   <Create
                     user={ user } currentTab={ currentTab } 
-                    setCurrentTab={ setCurrentTab }
+                    setCurrentTab={ setCurrentTab } systemTags={ systemTags }
                   />
                 } 
               />
@@ -212,7 +348,22 @@ function App() {
               <Route path="/saved" element={ 
                   <Saved 
                     user={ user } currentTab={ currentTab } 
-                    setCurrentTab={ setCurrentTab }
+                    setCurrentTab={ setCurrentTab } filters={ filters }
+                    setFilters={ setFilters } formatDate={ formatDate }
+                    filtersRef={ filtersRef } handleGiveRecipePoint={ handleGiveRecipePoint } 
+                    handleFlagRecipe={ handleFlagRecipe } handleLogOut={ handleLogOut }
+                    systemTags={ systemTags }
+                  /> 
+                } 
+              />
+              <Route path="/popular" element={ 
+                  <Popular 
+                    user={ user } currentTab={ currentTab } 
+                    setCurrentTab={ setCurrentTab } filters={ filters }
+                    setFilters={ setFilters } formatDate={ formatDate }
+                    filtersRef={ filtersRef } handleGiveRecipePoint={ handleGiveRecipePoint } 
+                    handleFlagRecipe={ handleFlagRecipe } handleLogOut={ handleLogOut }
+                    systemTags={ systemTags }
                   /> 
                 } 
               />

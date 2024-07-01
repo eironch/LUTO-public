@@ -54,6 +54,7 @@ function Recipe(p) {
                 setSummary(res.data.payload.recipeContents.summary)
                 setIngredients(res.data.payload.recipeContents.ingredients)
                 setTags(res.data.payload.recipeContents.tags)
+                console.log(res.data.payload.recipeContents.tags)
                 setRecipeElements(res.data.payload.recipeContents.recipeElements)
                 setPoints(res.data.payload.recipeContents.points)
                 setPointStatus(res.data.payload.recipeStatus.pointStatus)
@@ -92,15 +93,19 @@ function Recipe(p) {
                 <div className="grid w-full gap-3" style={ { gridTemplateColumns: "repeat(15, minmax(0, 1fr))" } }>
                     <div className="col-span-4"></div>
                     <div className="col-span-11 flex flex-col rounded-3xl text-zinc-100">
-                        <div className="flex flex-col items-center w-full mb-3 p-6 rounded-3xl bg-zinc-900">
-                            <p className="text-3xl font-bold w-full text-center">
-                                { title }
-                            </p>
-                        </div>
+                        {
+                            title &&
+                            <div className="flex flex-col items-center w-full mb-3 p-6 rounded-3xl bg-zinc-900">
+                                <p className="text-4xl font-bold w-full text-center">
+                                    { title }
+                                </p>
+                            </div>
+                        }
                         {
                             recipeElements &&
+                            recipeElements.length > 0 &&
                             recipeElements.map((element, key) => {
-                                if (element.contentType === "Subheading") {
+                                if (element.contentType === "Section Header") {
                                     return (
                                         <div className="py-6 px-3 flex flex-col gap-3 mb-3 rounded-3xl bg-zinc-900" key={ key }>
                                             <p className="px-3 text-3xl font-semibold w-full text-justify">
@@ -108,7 +113,7 @@ function Recipe(p) {
                                             </p>
                                         </div>
                                     )
-                                } else if (element.contentType === "Text") {
+                                } else if (element.contentType === "Description Text") {
                                     return (
                                         <div className="py-6 px-3 flex flex-col gap-3 mb-3 rounded-3xl bg-zinc-900" key={ key }>
                                             <p className="px-3 text-xl w-full text-justify">
@@ -116,7 +121,7 @@ function Recipe(p) {
                                             </p>
                                         </div>
                                     )
-                                } else if (element.contentType === "Images") {
+                                } else if (element.contentType === "Image Carousel") {
                                     return (
                                         <div className="pt-6 pb-3 px-6 flex flex-col justify-center items-center gap-3 mb-3 rounded-3xl overflow-hidden bg-zinc-900" key={ key }>
                                             <div className={`${ element.files.length > 2 ? "lg:justify-start" : "lg:justify-center" } flex flex-row w-full h-full gap-3 items-center overflow-x-scroll scrollable-div md:justify-start`}>

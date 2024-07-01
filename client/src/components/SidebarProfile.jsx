@@ -7,27 +7,31 @@ function SidebarProfile(p) {
     const authorName = p.authorName
 
     return (
-        <div className="grid pl-3 gap-3 w-full h-full overflow-hidden" style={ { gridTemplateColumns: "repeat(15, minmax(0, 1fr))" } }>
-            <div className="flex flex-col gap-3 text-zinc-100 col-span-4 pointer-events-auto">
+        <div className="grid pl-3 w-full h-full overflow-hidden" style={ { gridTemplateColumns: "repeat(15, minmax(0, 1fr))" } }>
+            <div className="flex flex-col gap-3 text-zinc-100 col-span-4 pointer-events-auto overflow-y-scroll scrollable-div">
                 {/* user  */}
-                <div className="flex flex-row p-6 gap-6 items-center text-2xl rounded-3xl bg-zinc-900 overflow-hidden">
+                <div className="flex flex-row p-6 gap-6 items-center text-2xl rounded-3xl bg-zinc-900">
                     <img className="w-28" src={ ProfilePicture } alt="" />
                     <div className="grid grid-row-2 w-full gap-3">
-                        <p className="px-1  font-semibold overflow-hidden">
-                            { authorName }
+                        <div className="flex flex-row">
+                            <p className="px-1 w-full font-semibold overflow-hidden">
+                                { authorName }
+                            </p>
+                            <button className="w-full py-1 rounded-3xl text-lg text-center font-semibold gap-4 bg-orange-500 hover:bg-orange-400 overflow-hidden">
+                                Follow
+                            </button>
+                           
+                        </div>
+                        <p className="px-1 text-lg">
+                            1.1k followers
                         </p>
-                        
-                        <button className="py-1 rounded-3xl text-lg text-center font-semibold gap-4 bg-orange-500 hover:bg-orange-400 overflow-hidden">
-                            Follow
-                        </button>
                     </div>
                 </div>
                 {/* bio */}
                 <div className="flex flex-col gap-3 p-6 rounded-3xl bg-zinc-900">
                     <p className="text-2xl font-semibold">Bio</p>
-                    <p>
-                        An aspiring cook from the Pearl of the Orient Sea, the
-                        Philippines. Here to learn and be part of the cooking community.
+                    <p className="w-full">
+                        An aspiring cook from the Pearl of the Orient Sea, the Philippines. Here to learn and be part of the cooking community.
                     </p>
                 </div>
                 {/* friends */}
