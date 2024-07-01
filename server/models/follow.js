@@ -2,7 +2,7 @@ import mongoose from 'mongoose'
 
 const Schema = mongoose.Schema
 
-const flagSchema = new Schema({
+const followSchema = new Schema({
     userId: {
         type: Schema.Types.ObjectId,
         ref: 'User',
@@ -15,5 +15,5 @@ const flagSchema = new Schema({
     },
 }, { timestamps: { createdAt: true, updatedAt: false } })
 
-const Flag = mongoose.model('Flag', flagSchema)
-export default Flag
+const Follow = mongoose.model('Follow', followSchema)
+export default Follow

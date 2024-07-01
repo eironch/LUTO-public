@@ -4,25 +4,25 @@ const Schema = mongoose.Schema
 
 const recipeOverviewSchema = new Schema({
     recipeId: {
-        type: mongoose.Schema.Types.ObjectId,
+        type: Schema.Types.ObjectId,
         ref: 'Recipe',
         required: true,
     },
     userId: {
-        type: mongoose.Schema.Types.ObjectId,
+        type: Schema.Types.ObjectId,
         ref: 'User',
-        require: true,
+        required: true,
     },
     tags: {
         type: [String],
     },
     recipeImage:{
         type: String,
-        require: true,
+        required: true,
     },
     title: {
         type: String,
-        require: true,
+        required: true,
     },
     summary: {
         type: String,

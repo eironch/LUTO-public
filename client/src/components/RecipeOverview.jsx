@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useLayoutEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
 
-import PointSection from '../components/PointSection'
+import ActionSection from './PointSection'
 
 import FeedbackIcon from '../assets/feedback-icon.png'
 import RemoveIcon from '../assets/remove-icon.png'
@@ -9,6 +9,9 @@ import AllowIcon from '../assets/allow-icon.png'
 
 function RecipeOverview(p) {
     const user = p.user
+    const currentTab = p.currentTab
+    const formatDate = p.formatDate
+
     const recipes = p.recipes
     const setRecipes = p.setRecipes
     const authorName = p.authorName
@@ -24,13 +27,11 @@ function RecipeOverview(p) {
     const setPrevTitle = p.setPrevTitle
     const setIsFeedbacksShown = p.setIsFeedbacksShown
     const handleGiveRecipePoint = p.handleGiveRecipePoint
-    const formatDate = p.formatDate
     const moreModalShown = p.moreModalShown
     const setMoreModalShown = p.setMoreModalShown
     const handleFlagRecipe = p.handleFlagRecipe
     const flagCount = p.flagCount
-    const setIsConfirmationShown = p.setIsConfirmationShown
-    const allowRecipe = p.allowRecipe
+    const setConfirmationShown = p.setConfirmationShown
 
     const dateCreated = new Date(p.dateCreated)
     const [pointStatus, setPointStatus] = useState(p.pointStatus)
@@ -83,13 +84,13 @@ function RecipeOverview(p) {
     function handleRemove() {
         setPrevRecipeId(recipeId)
         setPrevTitle(title)
-        setIsConfirmationShown("remove")
+        setConfirmationShown("remove")
     }
 
     function handleRecipe() {
         setPrevRecipeId(recipeId)
         setPrevTitle(title)
-        setIsConfirmationShown("allow")
+        setConfirmationShown("allow")
     }
 
     function handleShowMoreModal() {
@@ -122,7 +123,7 @@ function RecipeOverview(p) {
     }, [prevFeedbackCount])
 
     return (
-        <div className="grid grid-cols-12 mb-3 rounded-3xl bg-zinc-900 overflow-hidden">
+        <div className={`${ currentTab === "Popular" ? "rounded-r-3xl" : "rounded-3xl" } grid grid-cols-12 mb-3 w-full bg-zinc-900 overflow-hidden`}>
             {/* recipe image */}
             <Link to={`/recipe/${ recipeId }`}  className="flex col-span-4 rounded-3xl p-2 shadow-zinc-950 shadow-right bg-gradient-to-br from-orange-600 to-orange-400">
                 <div className="w-full aspect-w-1 aspect-h-1 overflow-hidden">
@@ -177,20 +178,20 @@ function RecipeOverview(p) {
                     </div>
                     <div className="flex justify-end items-end w-full mr-6 gap-3 text-zinc-100 text-lg font-semibold overflow-hidden">
                         {
-                            user.accountType === "user" ?
-                            <PointSection 
+                            user.accountType === "user" || currentTab === "Popular" || currentTab === "Saved" ?
+                            <ActionSection 
                                 handleGivePoint={ handleGivePoint } pointStatus={ pointStatus }
                                 points={ points }
                             />
                             :
-                            <div className="flex gap-3 justify-end items-center rounded-3xl bg-zinc-700">
-                                <button className="flex justify-end items-center p-4 gap-4 rounded-3xl hover:bg-red-700" onClick={ () => { handleRemove() } }>
+                            <div className="flex justify-end items-center rounded-3xl bg-zinc-700">
+                                <button className="flex justify-end items-center p-4 rounded-3xl hover:bg-red-700" onClick={ () => { handleRemove() } }>
                                     <img className="min-w-8 w-8" src={ RemoveIcon } alt="" />
                                 </button>
                                 <p>
-                                    { flagCount }
+                                    { flagCount } flags
                                 </p>
-                                <button className="flex justify-end items-center p-4 gap-4 rounded-3xl hover:bg-zinc-500" onClick={ () => { handleRecipe() } }>
+                                <button className="flex justify-end items-center p-4 rounded-3xl hover:bg-zinc-500" onClick={ () => { handleRecipe() } }>
                                     <img className="min-w-8 w-8" src={ AllowIcon } alt="" />
                                 </button>
                             </div>

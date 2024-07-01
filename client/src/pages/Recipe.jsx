@@ -93,13 +93,17 @@ function Recipe(p) {
                 <div className="grid w-full gap-3" style={ { gridTemplateColumns: "repeat(15, minmax(0, 1fr))" } }>
                     <div className="col-span-4"></div>
                     <div className="col-span-11 flex flex-col rounded-3xl text-zinc-100">
-                        <div className="flex flex-col items-center w-full mb-3 p-6 rounded-3xl bg-zinc-900">
-                            <p className="text-4xl font-bold w-full text-center">
-                                { title }
-                            </p>
-                        </div>
+                        {
+                            title &&
+                            <div className="flex flex-col items-center w-full mb-3 p-6 rounded-3xl bg-zinc-900">
+                                <p className="text-4xl font-bold w-full text-center">
+                                    { title }
+                                </p>
+                            </div>
+                        }
                         {
                             recipeElements &&
+                            recipeElements.length > 0 &&
                             recipeElements.map((element, key) => {
                                 if (element.contentType === "Section Header") {
                                     return (

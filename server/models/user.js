@@ -16,7 +16,6 @@ const userSchema = new Schema({
     },
     accountType: {
         type: String,
-        required: true,
         default: 'user'
     },
     bio: {
@@ -25,7 +24,6 @@ const userSchema = new Schema({
     refreshToken: {
         type: String,
         unique: true,
-        require: true
     },
 }, { timestamps: true })
 // placeholder

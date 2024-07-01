@@ -191,21 +191,18 @@ function RecipeElement(p) {
             key={ keyIndex }
             keyIndex={ keyIndex } values={ elementTexts } 
             setValues={ setElementTexts } removeElement={ removeElement }
-            recipeElements={ recipeElements } setRecipeElements={ setRecipeElements }
         />
     } else if (contentType === 'Description Text') {
         return <DescriptionText
             key={ keyIndex } 
             keyIndex={ keyIndex } values={ elementTexts } 
             setValues={ setElementTexts } removeElement={ removeElement }
-            recipeElements={ recipeElements } setRecipeElements={ setRecipeElements }
         />
     } else if (contentType === 'Image Carousel') {
         return <ImageCarousel
             key={ keyIndex }
             keyIndex={ keyIndex } values={ elementFiles } addElement={ addElement }
             setValues={ setElementFiles } removeElement={ removeElement }
-            recipeElements={ recipeElements } setRecipeElements={ setRecipeElements }
         />
     }
     

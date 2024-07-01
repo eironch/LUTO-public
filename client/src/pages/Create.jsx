@@ -1,16 +1,21 @@
 import React, { useState, useLayoutEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import { v4 as uuidv4 } from 'uuid'
-import { Link } from 'react-router-dom'
 
 import Textarea from '../components/Textarea'
 import NavBar from '../components/NavBar'
 import RecipeElement from '../components/RecipeElement'
+import ConfirmModal from '../components/ConfirmModal'
 
 import AddIcon from '../assets/add-icon.png'
 import TextIcon from '../assets/text-icon.png'
 import SectionIcon from '../assets/section-icon.png'
 import ImageIcon from '../assets/image-icon.png'
+import BackIcon from '../assets/back-icon.png'
+import LoadingIcon from '../assets/loading-icon.png'
+import AllowIcon from '../assets/allow-icon.png'
+import RemoveIcon from '../assets/remove-icon.png'
 
 function ElementsModal(p) {
     const setShowModal = p.setShowModal
@@ -37,7 +42,7 @@ function ElementsModal(p) {
                         </p>
                     </div>
                     <div className="p-6">
-                        <ul className="flex flex-col gap-3 h-full overflow-y-scroll overflow-x-hidden scrollable-div">
+                        <ul className="flex flex-col gap-3 w-full h-full scrollable-div">
                             <li>
                                 <button className="flex w-full p-3 gap-3 rounded-3xl bg-zinc-700 hover:bg-zinc-500" onClick={ () => { addElement("Description Text") }}>
                                     <img className="p-3 w-24" src={ TextIcon } alt=""/>
@@ -78,12 +83,17 @@ function Create(p) {
     const currentTab = p.currentTab
     const setCurrentTab = p.setCurrentTab
     
+    const systemTags = p.systemTags
+    
+    const [publishState, setPublishState] = useState() 
+    const [confirmationShown, setConfirmationShown] = useState()
     const [showModal, setShowModal] = useState(false)
     const [recipeImage, setRecipeImage] = useState(new Blob())
     const [summary, setSummary] = useState('')
     const [ingredients, setIngredients] = useState([{ key: uuidv4() }])
     const [title, setTitle] = useState('')
     const [tags, setTags] = useState([])
+    const navigate = useNavigate()
 
     const keys = [uuidv4(), uuidv4(), uuidv4()]
 
@@ -98,19 +108,14 @@ function Create(p) {
         { key: keys[2], value: [''] }
     ])
     const [recipeElements, setRecipeElements] = useState([
-        { key: keys[0], value:{ contentType: 'Image Carousel', text: '', files: [] } },
-        { key: keys[1], value:{ contentType: 'Section Header', text: '', files: [] } },
-        { key: keys[2], value:{ contentType: 'Description Text', text: '', files: [] } }
+        { key: keys[0], value:{ contentType: 'Image Carousel' } },
+        { key: keys[1], value:{ contentType: 'Section Header' } },
+        { key: keys[2], value:{ contentType: 'Description Text' } }
     ])
     
-    useLayoutEffect(() => {
-        console.log("text")
-        console.log(elementTexts)
-        console.log("file")
-        console.log(elementFiles)
-        console.log("elements")
-        console.log(recipeElements)
-    }, [elementTexts, elementFiles, recipeElements])
+    function navigateToHome() {
+        navigate('/home')
+    }
 
     function addElement(contentType) {
         const keyIndex = uuidv4()
@@ -118,7 +123,7 @@ function Create(p) {
         setShowModal(false)
         setElementTexts([...elementTexts, { key: keyIndex, value: '' }])
         setElementFiles([...elementFiles, { key: keyIndex, value: [''] }])
-        setRecipeElements([...recipeElements, { key: keyIndex, value:{ contentType, text: '', files: [] } }])
+        setRecipeElements([...recipeElements, { key: keyIndex, value:{ contentType } }])
     }
 
     function publishRecipe() {
@@ -134,16 +139,19 @@ function Create(p) {
         })
 
         const formData = new FormData()
+
         formData.append('userId', p.user.userId)
         formData.append('recipeImage', recipeImage)
         formData.append('title', title)
         formData.append('summary', summary)
+        
         if (ingredients) {
             formData.append('ingredients', JSON.stringify(
                 ingredients.filter(ingredient => ingredient.value !== '')
                     .map(ingredient => ingredient.value)
             ))
         }
+
         if (tags) {
             formData.append('tags', JSON.stringify(tags))
         }
@@ -161,8 +169,12 @@ function Create(p) {
                 const preFiles = elementFiles.find(
                     elementContent => elementContent.key === element.key
                 ).value
+                
+                if (text === '' && preFiles[0] === '') {
+                    return
+                }
 
-                if (preFiles) {
+                if (preFiles.length > 1 || preFiles[0] !== '') {
                     preFiles.forEach((file, arrayIndex) => {
                        if (file !== '') {
                         formData.append(`files-${ objectIndex }-${ arrayIndex }`, file)
@@ -173,28 +185,28 @@ function Create(p) {
                 return { contentType, text, filesLength: preFiles.length - 1, files: [] }
             }
         )))
-        console.log(formData.get('recipeElements'))
+
+        setPublishState('publishing')
+
         axios.post(`http://localhost:8080/publish-recipe`, formData, { 
-            headers: { 'Content-Type': 'multipart/form-data' } 
+                headers: { 'Content-Type': 'multipart/form-data' } 
             })
             .then(response => {
                 console.log('Status Code:' , response.status)
                 console.log('Data:', response.data)
+
+                setPublishState('published')
             })
             .catch(err => {
                 console.log('Error Status:', err.response.status)
                 console.log('Error Data:', err.response.data)
+
+                setPublishState('not published')
             })
-    }
-
-    function handlePlaceholderElements() {
-
     }
 
     useLayoutEffect(() => {
         setCurrentTab('Create')
-        
-        handlePlaceholderElements()
     }, [])
 
     if (currentTab !== 'Create') {
@@ -204,13 +216,14 @@ function Create(p) {
     return (
         <div>
             <NavBar
-                title={ title }
+                user={ user } currentTab={ currentTab } 
+                setCurrentTab={ setCurrentTab } title={ title }
                 recipeImage={ recipeImage } setRecipeImage={ setRecipeImage }
                 summary={ summary } setSummary={ setSummary } 
                 ingredients={ ingredients } setIngredients={ setIngredients }
-                tags={ tags } setTags={ setTags }
-                publishRecipe={ publishRecipe }
-                user={ user } currentTab={ currentTab } setCurrentTab={ setCurrentTab } 
+                tags={ tags } setTags={ setTags } 
+                publishRecipe={ publishRecipe } systemTags={ systemTags }
+                setConfirmationShown={ setConfirmationShown } 
             />
             <div className="pr-0 flex flex-col gap-3 p-3 h-svh overflow-y-scroll scrollable-div bg-zinc-950">
                 <div className="grid w-full gap-3" style={ { gridTemplateColumns: "repeat(15, minmax(0, 1fr))" } }>
@@ -248,6 +261,66 @@ function Create(p) {
                 { 
                     showModal && 
                     <ElementsModal setShowModal={ setShowModal } addElement={ addElement } /> 
+                }
+                {/* confirm modal */}
+                {
+                    confirmationShown === "exit" &&
+                    <ConfirmModal 
+                        setShowModal={ setConfirmationShown } confirmAction={ navigateToHome }
+                        headerText={ "Confirm Exit" } bodyText={ "Are you sure you want to exit? You will lose all your progress." }
+                        icon={ BackIcon } isDanger={ true }
+                    />
+                }
+                {
+                    publishState &&
+                    <div className="absolute inset-0 grid place-items-center h-screen pt-3 text-zinc-100 bg-zinc-950 bg-opacity-80 overflow-y-scroll scrollable-div"
+                            onMouseDownCapture={e => { 
+                                if (publishState === 'published') {
+                                    navigate('/home')
+
+                                    return
+                                }
+
+                                const isOutsideModal = !e.target.closest('.model-inner')
+                                
+                                if (isOutsideModal && publishState !== 'publishing') {
+                                    setPublishState()
+                                }
+                            } 
+                        }
+                    >
+                        <div className="flex flex-col gap-3 justify-center items-center w-4/12 overflow-hidden model-inner">
+                            <div className="flex flex-col w-full py-20 gap-12 items-center rounded-3xl bg-zinc-900 overflow-hidden">
+                                {
+                                    publishState === "publishing" &&
+                                    <>
+                                        <p className="w-full text-center text-2xl font-semibold">
+                                            Publishing Recipe...
+                                        </p>
+                                        <img className="animate-spin-continuous w-24" src={ LoadingIcon } alt="" />
+                                    </>
+                                }
+                                {
+                                    publishState === "published" &&
+                                    <>
+                                        <p className="w-full text-center text-2xl font-semibold">
+                                            Your recipe is now published!
+                                        </p>
+                                        <img className="w-24" src={ AllowIcon } alt="" />
+                                    </>
+                                }
+                                {
+                                    publishState === "not published" &&
+                                    <>
+                                        <p className="w-full text-red-600 text-center text-2xl font-semibold">
+                                            Your recipe is not published.<br/>Please try publishing again.
+                                        </p>
+                                        <img className="w-24" src={ RemoveIcon } alt="" />
+                                    </>
+                                }
+                            </div>
+                        </div>
+                    </div>
                 }
             </div>
         </div>

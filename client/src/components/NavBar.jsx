@@ -12,11 +12,12 @@ import CreateIcon from '../assets/create-icon.png'
 import SaveIcon from '../assets/saved-icon.png'
 
 function NavBar(p) {
+    const user = p.user
     const currentTab = p.currentTab
     const setCurrentTab = p.setCurrentTab
-    const user = p.user
     const authorName = p.authorName
     const formatDate = p.formatDate
+    const setConfirmationShown = p.setConfirmationShown
 
     const recipeId = p.recipeId
     const recipeImage = p.recipeImage
@@ -38,10 +39,10 @@ function NavBar(p) {
     const publishRecipe = p.publishRecipe
     const handleSaveRecipe = p.handleSaveRecipe
     const handleGiveRecipePoint = p.handleGiveRecipePoint
-
+    const systemTags = p.systemTags
     const filters  = p.filters
     const setFilters = p.setFilters
-    console.log("tasg: " +tags)
+
     return (
         <div>
             <div className="fixed flex gap-3 flex-col w-full h-svh pointer-events-none">
@@ -50,7 +51,11 @@ function NavBar(p) {
                     <div className="grid gap-3 w-full min-h-16 pointer-events-none" style={ { gridTemplateColumns: "repeat(15, minmax(0, 1fr))" } }>
                         {/* logo navbar side*/}
                         {
-                            (currentTab === "Home" || currentTab === "Search" || currentTab === "Settings" || currentTab === "Saved") &&
+                            (
+                                currentTab === "Home" || currentTab === "Search" 
+                                || currentTab === "Settings" || currentTab === "Saved" 
+                                || currentTab === "Popular"
+                            ) &&
                             <Link to="/home" className="pointer-events-auto rounded-3xl flex col-span-2 items-center justify-center bg-zinc-900 hover:bg-zinc-500">
                                 <img className="px-4 w-48" src={ Logo } alt="" />
                             </Link>
@@ -59,9 +64,16 @@ function NavBar(p) {
                         {
                             (currentTab === "Profile" || currentTab === "Create" || currentTab === "Recipe") &&
                             <>
-                                <Link to="/home" className="col-span-2 items-center gap-4 bg-zinc-900 pointer-events-auto flex flex-row justify-center w-full h-full rounded-3xl overflow-hidden hover:bg-zinc-500">
-                                    <img className="px-4 w-48 " src={ Logo } alt="" />
-                                </Link>
+                                {
+                                    currentTab === "Create" ?
+                                    <button className="col-span-2 items-center gap-4 bg-zinc-900 pointer-events-auto flex flex-row justify-center w-full h-full rounded-3xl overflow-hidden hover:bg-zinc-500" onClick={ () => { setConfirmationShown("exit") } }>
+                                        <img className="px-4 w-48 " src={ Logo } alt="" />
+                                    </button>
+                                    :
+                                    <Link to="/home" className="col-span-2 items-center gap-4 bg-zinc-900 pointer-events-auto flex flex-row justify-center w-full h-full rounded-3xl overflow-hidden hover:bg-zinc-500">
+                                        <img className="px-4 w-48 " src={ Logo } alt="" />
+                                    </Link>
+                                }
                                 <div className="col-span-2 flex items-center pointer-events-auto w-full h-full rounded-3xl overflow-hidden">
                                     {
                                         currentTab === "Profile" &&
@@ -74,11 +86,16 @@ function NavBar(p) {
                                     }
                                     {
                                         currentTab === "Create" &&
-                                        <button className="flex items-center p-4 gap-4 w-full h-full bg-zinc-700 hover:bg-zinc-500 overflow-hidden">
-                                            <p className="flex text-zinc-100 text-lg w-full font-semibold">
-                                                Drafts
-                                            </p>
-                                            <img className="w-8" src={ CreateIcon } alt="" />
+                                        <button className="flex items-center w-full h-full bg-zinc-700 rounded-3xl overflow-hidden">
+                                            <button className={`
+                                                    ${ (title && recipeImage.size && summary && (ingredients.length > 1 || ingredients[0].value)) && "bg-orange-500 hover:bg-orange-400" } 
+                                                    rounded-3xl flex items-center p-4 gap-4 w-full h-full disabled:bg-zinc-900 disabled:cursor-not-allowed
+                                                `} 
+                                                onClick={ () => { publishRecipe() } } disabled={ !(title && recipeImage.size && summary && (ingredients.length > 1  || ingredients[0].value)) }
+                                            >
+                                                <p className="flex text-zinc-100 text-lg w-full font-semibold">Publish</p>
+                                                <img className="w-8" src={ CreateIcon } alt="" />
+                                            </button>
                                         </button>
                                     }
                                     {
@@ -90,33 +107,18 @@ function NavBar(p) {
                                             <img className="w-8" src={ SaveIcon } alt="" />
                                         </button>
                                     }
-                                </div>
-                                {
-                                    currentTab === "Create" &&
-                                    <>
-                                        <div className="col-span-9">
-
-                                        </div>
-                                        <div className="col-span-2 flex items-center pointer-events-auto w-full h-full shadow-md shadow-zinc-950 rounded-3xl overflow-hidden">
-                                            <button className={`
-                                                    ${ (title && recipeImage.size && summary && (ingredients.length > 1 || ingredients[0].value)) && "bg-orange-500 hover:bg-orange-400" } 
-                                                    flex items-center p-4 gap-4 w-full h-full disabled:bg-zinc-900 disabled:cursor-not-allowed
-                                                `} 
-                                                onClick={ () => { publishRecipe() } } disabled={ !(title && recipeImage.size && summary && (ingredients.length > 1  || ingredients[0].value)) }
-                                            >
-                                                <p className="flex text-zinc-100 text-lg w-full font-semibold">Publish</p>
-                                                <img className="w-8" src={ CreateIcon } alt="" />
-                                            </button>
-                                        </div>
-                                    </>
-                                }                               
+                                </div>                           
                             </>
                         }
                         {/* logo navbar middle */}
                         {
-                            (currentTab === "Home" || currentTab === "Search" || currentTab === "Settings" || currentTab === "Saved" || currentTab === "Saved") &&
-                            <div className={`${ (currentTab!=="Home" && currentTab!=="Profile" && currentTab!=="Search" && currentTab !== "Saved") && "bg-zinc-900" } rounded-3xl flex items-center justify-center`} 
-                                style={ { gridColumn: (currentTab === "Home" || currentTab === "Search" || currentTab === "Settings" || currentTab === "Saved") ? "span 11" : "span 13" } }
+                            (
+                                currentTab === "Home" || currentTab === "Search" || 
+                                currentTab === "Settings" || currentTab === "Saved" || 
+                                currentTab === "Popular"
+                            ) &&
+                            <div className={`${ (currentTab === "Recipe" && currentTab === "Settings") && "bg-zinc-900" } rounded-3xl flex items-center justify-center`} 
+                                style={ { gridColumn: (currentTab === "Home" || currentTab === "Search" || currentTab === "Settings" || currentTab === "Saved" || currentTab === "Popular") ? "span 11" : "span 13" } }
                             >
                                 { 
                                     (currentTab === "Settings") &&
@@ -128,7 +130,11 @@ function NavBar(p) {
                         }
                         {/* profile */}
                         {
-                            (currentTab === "Home" || currentTab === "Search" || currentTab === "Settings" || currentTab === "Saved") &&
+                            (
+                                currentTab === "Home" || currentTab === "Search" || 
+                                currentTab === "Settings" || currentTab === "Saved" || 
+                                currentTab === "Popular"
+                            ) &&
                             <Link to={`/${ user.username }`} className={`${ user.accountType === "user" ? "bg-zinc-900" : "bg-orange-500" }  col-span-2 flex items-center justify-end rounded-3xl pointer-events-auto hover:bg-zinc-500`}>
                                 { 
                                     currentTab!=="Profile" && <p className="text-zinc-100 text-end w-full ml-3 text-xl font-semibold overflow-hidden">
@@ -142,10 +148,15 @@ function NavBar(p) {
                 </div>
                 {/* content */}
                 { 
-                    (currentTab === "Home" || currentTab === "Search" || currentTab === "Settings" || currentTab === "Saved") && 
+                    (
+                        currentTab === "Home" || currentTab === "Search" || 
+                        currentTab === "Settings" || currentTab === "Saved" || 
+                        currentTab === "Popular"
+                    ) && 
                     <SidebarTab 
                         filters={ filters } setFilters={ setFilters }
-                        currentTab={ currentTab } 
+                        currentTab={ currentTab } setConfirmationShown={ setConfirmationShown }
+                        systemTags={ systemTags }
                     /> 
                 }
                 { 
@@ -162,6 +173,7 @@ function NavBar(p) {
                             ingredients={ ingredients || null } setIngredients={ setIngredients || null }
                             tags={ tags || null } setTags={ setTags || null }
                             currentTab={ currentTab } setCurrentTab={ setCurrentTab } 
+                            systemTags={ systemTags }
                         />
                     )
                 }

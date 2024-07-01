@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react'
 import { Link } from 'react-router-dom'
 
-import PointSection from '../components/PointSection'
+import ActionSection from './PointSection'
 import FeedbackSection from '../components/FeedbackSection'
 
 import ProfilePicture from '../assets/profile-picture.png'
@@ -79,7 +79,7 @@ function SidebarRecipe(p) {
                             </button>
                         </div>
                         <div className="flex justify-end items-end w-full overflow-hidden">
-                            <PointSection 
+                            <ActionSection 
                                 handleGivePoint={ handleGivePoint } pointStatus={ pointStatus }
                                 points={ points }
                             />

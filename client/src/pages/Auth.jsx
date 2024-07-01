@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
 
 import AuthForm from '../components/AuthForm'
@@ -6,26 +7,34 @@ import AuthForm from '../components/AuthForm'
 import Logo from '../assets/luto-logo-white.png'
 
 function Auth(p) {
+    const user = p.user
+    const setUser = p.setUser
+    const showModal = p.showModal
+    const setShowModal = p.setShowModal
+    const setModalMessage = p.setModalMessage
+    const setIsAuthenticated = p.setIsAuthenticated
+
     const [action, setAction] = useState('Sign In')
     const [isCredsCorrect, setIsCredsCorrect] = useState(true)
     const [password, setPassword] = useState('')
     const [passwordAgain, setPasswordAgain] = useState('')
+    const navigate = useNavigate()
 
     function createAccount() {
-        axios.post(`http://localhost:8080/create-account`, { username: p.user.username, password })
+        axios.post(`http://localhost:8080/create-account`, { username: user.username, password })
             .then(res => {
                 console.log('Status Code:' , res.status)
                 console.log('Data:', res.data)
                 
                 if (res.status === 202) {
-                    p.setShowModal(true)
-                    p.setModalMessage('Username already exists. Please choose a different username.')
+                    setShowModal(true)
+                    setModalMessage('Username already exists. Please choose a different username.')
                     setIsCredsCorrect(false)    
                 } else if (res.status === 201) {
-                    p.setUser({ username: '', userId: '', accountType: '' })
+                    setUser({ username: '', userId: '', accountType: '' })
                     setPassword('')
-                    p.setShowModal(true)
-                    p.setModalMessage('Account Created!')
+                    setShowModal(true)
+                    setModalMessage('Account Created!')
                     setIsCredsCorrect(true)
                     setAction("Sign In")
                 }
@@ -37,22 +46,23 @@ function Auth(p) {
     }
 
     function signIn() {
-        axios.get(`http://localhost:8080/sign-in`, { params: { username: p.user.username, password }, withCredentials: true })
+        axios.get(`http://localhost:8080/sign-in`, { params: { username: user.username, password }, withCredentials: true })
             .then(res => {
                 console.log('Status Code:' , res.status)
                 console.log('Data:', res.data)
                 
                 if (res.status === 202) {
-                    p.setShowModal(true)
-                    p.setModalMessage('Incorrect username or password. Please try again.')
+                    setShowModal(true)
+                    setModalMessage('Incorrect username or password. Please try again.')
                     setIsCredsCorrect(false)
                 } else if (res.status === 200) {
-                    p.setUser({ 
+                    setUser({ 
                         username: res.data.payload.username, 
                         userId: res.data.payload.userId, 
                         accountType: res.data.payload.accountType 
                     })
-                    p.setIsAuthenticated(true)
+                    setIsAuthenticated(true)
+                    navigate('/')
                 }
             })
             .catch(error => {
@@ -75,9 +85,9 @@ function Auth(p) {
             </div>
             <AuthForm 
                 createAccount={ createAccount } signIn={ signIn } action={ action } setAction={ setAction }
-                showModal={ p.showModal } setShowModal={ p.setShowModal } setModalMessage={ p.setModalMessage }
+                showModal={ showModal } setShowModal={ setShowModal } setModalMessage={ setModalMessage }
                 isCredsCorrect={ isCredsCorrect } setIsCredsCorrect={ setIsCredsCorrect } 
-                user={ p.user } setUser={ p.setUser } password={ password } setPassword={ setPassword }
+                user={ user } setUser={ setUser } password={ password } setPassword={ setPassword }
                 passwordAgain={ passwordAgain } setPasswordAgain={ setPasswordAgain } 
             />
         </div>

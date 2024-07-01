@@ -4,14 +4,14 @@ const Schema = mongoose.Schema
 
 const saveSchema = new Schema({
     userId: {
-        type: mongoose.Schema.Types.ObjectId,
+        type: Schema.Types.ObjectId,
         ref: 'User',
-        require: true
+        required: true
     },
     recipeId: {
-        type: mongoose.Schema.Types.ObjectId,
+        type: Schema.Types.ObjectId,
         ref: 'Recipe',
-        require: true
+        required: true
     },
 }, { timestamps: { createdAt: true, updatedAt: false } })
 

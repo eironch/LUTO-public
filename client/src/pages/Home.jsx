@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useLayoutEffect } from 'react'
+import React, { useState, useRef, useCallback, useLayoutEffect, useEffect } from 'react'
 import axios from 'axios'
 import { debounce } from 'lodash'
 
@@ -7,16 +7,20 @@ import RecipeOverview from '../components/RecipeOverview'
 import SearchBar from '../components/SearchBar'
 import FeedbacksModal from '../components/FeedbacksModal'
 import ConfirmModal from '../components/ConfirmModal'
+import RecipeSuspense from '../components/RecipeSuspense'
 
 import RemoveIcon from '../assets/remove-icon.png'
 import AllowIcon from '../assets/allow-icon.png'
+import LogOutIcon from '../assets/log-out-icon.png'
 
 function Home(p) {
     const user = p.user
     const currentTab = p.currentTab
     const setCurrentTab = p.setCurrentTab
     const formatDate = p.formatDate
-    
+    const handleLogOut = p.handleLogOut
+
+    const systemTags = p.systemTags
     const filters = p.filters
     const setFilters = p.setFilters
     const filtersRef = p.filtersRef
@@ -29,16 +33,20 @@ function Home(p) {
 
     const [feedRecipes, setFeedRecipes] = useState([])
     const [isFeedbacksShown, setIsFeedbacksShown] = useState(false)
-    const [isConfirmationShown, setIsConfirmationShown] = useState()
+    const [confirmationShown, setConfirmationShown] = useState()
     const [prevRecipeId, setPrevRecipeId] = useState()
     const [prevTitle, setPrevTitle] = useState()
     const [prevFeedbackCount, setPrevFeedbackCount] = useState()
     const [moreModalShown, setMoreModalShown] = useState()
+    const [fetchedRecipeIds, setFetchedRecipeIds] = useState([])
+    const [isFetching, setIsFetching] = useState(false)
+    const [isFetchedAll, setIsFetchedAll] = useState(false)
+    const scrollDivRef = useRef(null)
 
     function removeRecipe() {
         handleRemoveRecipe(user.userId, prevRecipeId)
         
-        setIsConfirmationShown()
+        setConfirmationShown()
 
         setFeedRecipes(feedRecipes.filter(recipe => recipe.recipeId !== prevRecipeId))
     }
@@ -46,31 +54,47 @@ function Home(p) {
     function allowRecipe() {
         handleAllowRecipe(prevRecipeId)
         
-        setIsConfirmationShown()
+        setConfirmationShown()
         
         setFeedRecipes(feedRecipes.filter(recipe => recipe.recipeId !== prevRecipeId))
     }
 
     function fetchFeedRecipes(filters) {
-        axios.get('http://localhost:8080/feed-recipes', { params: { userId: user.userId, filters, sort: user.accountType === "user" ? { createdAt: -1 } : { flagCount: 1 } } })
+        setIsFetching(true)
+        
+        axios.get('http://localhost:8080/feed-recipes', { params: { userId: user.userId, filters, sort: user.accountType === "user" ? { createdAt: -1 } : { flagCount: 1 }, fetchedRecipeIds }})
             .then(res => {
                 console.log('Status Code:' , res.status)
                 console.log('Data:', res.data)
                 
-                setFeedRecipes(res.data.payload)
+                setIsFetching(false)
+
+                if (res.status === 202) {
+                    setIsFetchedAll(true)
+
+                    return
+                }
+
+                if (res.data.payload.length < 10) {
+                    setIsFetchedAll(true)
+                }
+
+                setFeedRecipes(feedRecipes.length > 0 ? [...feedRecipes, ...res.data.payload] : res.data.payload)
+                setFetchedRecipeIds([...fetchedRecipeIds, ...res.data.payload.map(recipe => recipe.recipeId)])
             })
             .catch(err => {
                 console.log('Error Status:', err.response.status)
                 console.log('Error Data:', err.response.data)
 
-                if (err.response.status === 400) {
-                    return setFeedRecipes([])
-                }
+                setIsFetching(false)
             })
     }
 
     const debouncedFetch = useCallback(
         debounce(() => {
+            setFeedRecipes([])
+            setFetchedRecipeIds([])
+            setIsFetchedAll(false)
             fetchFeedRecipes(filtersRef.current)
         }, 300), []
     )
@@ -86,17 +110,39 @@ function Home(p) {
     useLayoutEffect(() => {
         setCurrentTab('Home')
     }, [])
+
+    useEffect(() => {
+        const scrollDiv = scrollDivRef.current
+        
+        if (!scrollDiv) return
+
+        function handleScroll() {
+            if (isFetching || isFetchedAll) return
+            const { scrollTop, scrollHeight, clientHeight } = scrollDiv
+
+            if (scrollTop + clientHeight >= scrollHeight - (scrollHeight * 0.05)) {
+                fetchFeedRecipes(filters)
+            }
+        }
+            
+        scrollDiv.addEventListener('scroll', handleScroll)
+
+        return () => {
+            scrollDiv.removeEventListener('scroll', handleScroll)
+        }
+    })
     
     if (currentTab !== 'Home') {
         return
     }
 
     return (
-        <div className="overflow-y-scroll scrollable-div">
+        <div className="overflow-y-scroll scrollable-div" ref={ scrollDivRef }>
             <NavBar 
-                user={ user } 
-                filters={ filters } setFilters={ setFilters }
-                currentTab={ currentTab } setCurrentTab={ setCurrentTab } 
+                user={ user } filters={ filters } 
+                setFilters={ setFilters } currentTab={ currentTab } 
+                setCurrentTab={ setCurrentTab } setConfirmationShown={ setConfirmationShown }
+                systemTags={ systemTags }
             />
             <div className="flex flex-col pr-0 gap-3 h-svh">
                 <div className="flex flex-col gap-3 p-3 pr-0">
@@ -109,7 +155,7 @@ function Home(p) {
                     {/* content */}
                     <div className="grid w-full gap-3 h-full" style={ { gridTemplateColumns: "repeat(15, minmax(0, 1fr))" } }>
                         <div className="col-span-2"></div>
-                        <div className="col-span-11 block">
+                        <div className="col-span-11 block -mb-3">
                             { 
                                 feedRecipes &&
                                 feedRecipes.length > 0 &&
@@ -128,9 +174,16 @@ function Home(p) {
                                         moreModalShown={ moreModalShown } setMoreModalShown={ setMoreModalShown }
                                         handleGiveRecipePoint={ handleGiveRecipePoint } formatDate={ formatDate }
                                         handleFlagRecipe={ handleFlagRecipe } flagCount={ recipe.flagCount }
-                                        setIsConfirmationShown={ setIsConfirmationShown } allowRecipe={ allowRecipe }
+                                        setConfirmationShown={ setConfirmationShown } currentTab={ currentTab } 
                                     />
                                 )
+                            }
+                            {
+                                (isFetching || !isFetchedAll && (feedRecipes.length > 10 || feedRecipes.length === 0)) &&
+                                <>
+                                    <RecipeSuspense />
+                                    <RecipeSuspense />
+                                </>
                             }
                         </div>
                         <div className="col-span-2"></div>
@@ -150,21 +203,29 @@ function Home(p) {
                 }
                 {/* confirm modal */}
                 {
-                    isConfirmationShown === "remove" &&
+                    confirmationShown === "remove" &&
                     <ConfirmModal 
-                        setShowModal={ setIsConfirmationShown } confirmAction={ removeRecipe }
+                        setShowModal={ setConfirmationShown } confirmAction={ removeRecipe }
                         title={ prevTitle } headerText={ "Confirm Removal" }
                         bodyText={ "Make sure to thoroughly check whether it goes against our content policy. By removing this, your user ID will be saved as the remover." }
                         icon={ RemoveIcon } isDanger={ true }
                     />
                 }
                 {
-                    isConfirmationShown === "allow" &&
+                    confirmationShown === "allow" &&
                     <ConfirmModal 
-                        setShowModal={ setIsConfirmationShown } confirmAction={ allowRecipe }
+                        setShowModal={ setConfirmationShown } confirmAction={ allowRecipe }
                         title={ prevTitle } headerText={ "Confirm Clearance" } 
                         bodyText={ "Make sure to thoroughly check whether it is in adherance with our content policy." }
                         icon={ AllowIcon } isDanger={ false }
+                    />
+                }
+                {
+                    confirmationShown === "log out" &&
+                    <ConfirmModal 
+                        setShowModal={ setConfirmationShown } confirmAction={ handleLogOut }
+                        headerText={ "Confirm Log Out" } bodyText={ "Are you sure you want to log out?" }
+                        icon={ LogOutIcon } isDanger={ true }
                     />
                 }
             </div>
