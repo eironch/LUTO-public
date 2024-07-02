@@ -9,7 +9,7 @@ function SidebarProfile(p) {
     const authorName = p.authorName
     
     const [isFollowed, setIsFollowed] = useState()
-    const [followCount, setFollowCount] = useState()
+    const [followCount, setFollowCount] = useState(0)
 
     function handleFollowUser() {
         setIsFollowed(!isFollowed)

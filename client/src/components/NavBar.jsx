@@ -52,9 +52,8 @@ function NavBar(p) {
                         {/* logo navbar side*/}
                         {
                             (
-                                currentTab === "Home" || currentTab === "Search" 
-                                || currentTab === "Settings" || currentTab === "Saved" 
-                                || currentTab === "Popular"
+                                currentTab === "Home" || currentTab === "Search" || 
+                                currentTab === "Saved" || currentTab === "Popular"
                             ) &&
                             <Link to="/home" className="pointer-events-auto rounded-3xl flex col-span-2 items-center justify-center bg-zinc-900 hover:bg-zinc-500">
                                 <img className="px-4 w-48" src={ Logo } alt="" />
@@ -118,7 +117,7 @@ function NavBar(p) {
                                 currentTab === "Popular"
                             ) &&
                             <div className={`${ (currentTab === "Recipe" && currentTab === "Settings") && "bg-zinc-900" } rounded-3xl flex items-center justify-center`} 
-                                style={ { gridColumn: (currentTab === "Home" || currentTab === "Search" || currentTab === "Settings" || currentTab === "Saved" || currentTab === "Popular") ? "span 11" : "span 13" } }
+                                style={ { gridColumn: (currentTab === "Home" || currentTab === "Search" || currentTab === "Saved" || currentTab === "Popular") ? "span 11" : "span 13" } }
                             >
                                 { 
                                     (currentTab === "Settings") &&
