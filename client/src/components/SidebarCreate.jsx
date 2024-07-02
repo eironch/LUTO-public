@@ -163,12 +163,12 @@ function SidebarCreate(p) {
                     </div>
                 </div>
                 {/* user */}
-                <Link to={`/${ user.username }`} className="flex gap-6 flex-row items-center mb-3 p-6 rounded-3xl bg-zinc-900 hover:bg-zinc-500">
+                <div className="flex gap-6 flex-row items-center mb-3 p-6 rounded-3xl bg-zinc-900">
                     <img className="w-14" src={ ProfilePicture } alt="" />
                     <p className="text-xl font-semibold">
                         { user.username }
                     </p>
-                </Link>
+                </div>
                 {/* summary */}
                 <div className="flex flex-col mb-3 rounded-3xl bg-zinc-900">
                     <div className="flex flex-row p-6 gap-6 items-center shadow-md shadow-zinc-950">
