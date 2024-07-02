@@ -8,9 +8,9 @@ const followSchema = new Schema({
         ref: 'User',
         required: true
     },
-    recipeId: {
+    followedId: {
         type: Schema.Types.ObjectId,
-        ref: 'Recipe',
+        ref: 'User',
         required: true
     },
 }, { timestamps: { createdAt: true, updatedAt: false } })
