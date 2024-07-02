@@ -11,7 +11,7 @@ function PointSection(p) {
     const points = p.points
     
     return (
-        <div className="flex justify-end items-center h-fit rounded-3xl bg-zinc-700">
+        <div className="flex justify-end items-center h-fit rounded-3xl bg-zinc-600">
             <button className="flex justify-end items-center p-3 rounded-3xl hover:bg-zinc-500" onClick={ () => { handleGivePoint("negative") } }>
                 <img className="min-w-10 w-10" src={ pointStatus === "negative" ? GivenPointNegativeIcon : GivePointNegativeIcon } alt="" />
             </button>

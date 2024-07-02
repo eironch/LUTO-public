@@ -18,7 +18,7 @@ import Modal from './components/Modal'
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState()
   const [isLoading, setIsLoading] = useState(true) 
-  const [user, setUser] = useState({ username: '', userId: ''})
+  const [user, setUser] = useState({ username: '', userId: '', profilePicture: '', bio: ''})
   const [modalMessage, setModalMessage] = useState('')
   const [showModal, setShowModal] = useState(false)
   const [currentTab, setCurrentTab] = useState('Home')
@@ -26,83 +26,83 @@ function App() {
   const filtersRef = useRef(filters)
   const [searchQuery, setSearchQuery] = useState("")
   const systemTags = [
-    'Vegetarian',
-    'Vegan',
-    'Pescatarian',
-    'Paleo',
-    'Keto',
-    'Low-Carb',
-    'High-Protein',
-    'Whole30',
-    'Gluten-Free',
-    'Dairy-Free',
-    'Nut-Free',
-    'Soy-Free',
-    'Shellfish-Free',
-    'Egg-Free',
-    'Fish-Free',
-    'Peanut-Free',
-    'Tree-Nut-Free',
-    'Sesame-Free',
-    'Italian',
-    'Mexican',
-    'Chinese',
-    'Indian',
-    'French',
-    'Thai',
-    'Japanese',
-    'Mediterranean',
     'American',
-    'Greek',
-    'Spanish',
-    'Middle Eastern',
-    'Korean',
+    'Appetizer',
+    'Baking',
+    'Barbecue',
+    'Beans',
+    'Beef',
     'Breakfast',
     'Brunch',
-    'Lunch',
-    'Dinner',
-    'Snack',
-    'Dessert',
-    'Appetizer',
-    'Side Dish',
+    'Chinese',
     'Chicken',
-    'Beef',
-    'Fish',
-    'Tofu',
-    'Pasta',
-    'Rice',
-    'Quinoa',
-    'Beans',
-    'Lentils',
-    'Vegetables',
-    'Fruits',
-    'Grilling',
-    'Baking',
-    'Roasting',
-    'Frying',
-    'Steaming',
-    'Slow-cooking',
-    'Pressure cooking',
-    'Easy',
-    'Moderate',
-    'Difficult',
-    'Holiday',
-    'Party',
-    'Picnic',
-    'Potluck',
-    'Barbecue',
-    'Thanksgiving',
     'Christmas',
+    'Dessert',
+    'Difficult',
+    'Dinner',
+    'Dairy-Free',
     'Easter',
-    'Halloween',
-    'Winter',
-    'Spring',
-    'Summer',
+    'Easy',
+    'Egg-Free',
     'Fall',
-    'Quick (under 30 minutes)',
-    'Very Quick (under 15 minutes)',
+    'Fish',
+    'French',
+    'Fruits',
+    'Frying',
+    'Gluten-Free',
+    'Greek',
+    'Grilling',
+    'Halloween',
+    'High-Protein',
+    'Holiday',
+    'Indian',
+    'Italian',
+    'Japanese',
+    'Keto',
+    'Korean',
+    'Lunch',
+    'Low-Carb',
+    'Lentils',
+    'Lunch',
     'Medium (30 to 60 minutes)',
-    'Long (over 60 minutes)',
+    'Mediterranean',
+    'Mexican',
+    'Middle Eastern',
+    'Moderate',
+    'Nut-Free',
+    'Party',
+    'Paleo',
+    'Pasta',
+    'Peanut-Free',
+    'Picnic',
+    'Pescatarian',
+    'Pork',
+    'Potluck',
+    'Pressure cooking',
+    'Quick (under 30 minutes)',
+    'Quinoa',
+    'Rice',
+    'Roasting',
+    'Sesame-Free',
+    'Shellfish-Free',
+    'Side Dish',
+    'Slow-cooking',
+    'Snack',
+    'Soy-Free',
+    'Spanish',
+    'Spring',
+    'Steaming',
+    'Summer',
+    'Thai',
+    'Thanksgiving',
+    'Tofu',
+    'Tree-Nut-Free',
+    'Vegan',
+    'Vegetarian',
+    'Vegetables',
+    'Very Quick (under 15 minutes)',
+    'Winter',
+    'Whole30'
   ]
 
   async function handleGiveRecipePoint(userId, recipeId, pointStatus) {
@@ -205,8 +205,10 @@ function App() {
           setIsLoading(false)
           setUser({ 
             username: res.data.payload.username, 
-            userId: res.data.payload.userId, 
-            accountType: res.data.payload.accountType 
+            userId: res.data.payload.userId,
+            accountType: res.data.payload.accountType,
+            profilePicture: res.data.payload.profilePicture,
+            bio: res.data.payload.bio
           })
           setIsAuthenticated(res.data.isAuthenticated)
       })
@@ -312,9 +314,10 @@ function App() {
               />
               <Route path="/settings" element={ 
                   <Settings 
-                    user={ user } currentTab={ currentTab } 
-                    setCurrentTab={ setCurrentTab }
-                    handleLogOut={ handleLogOut }
+                    user={ user } setUser={ setUser }
+                    currentTab={ currentTab } setCurrentTab={ setCurrentTab } 
+                    handleLogOut={ handleLogOut } setShowModal={ setShowModal } 
+                    setModalMessage={ setModalMessage } 
                   />
                 } 
               />

@@ -150,17 +150,17 @@ app.get('/check-auth', async (req, res) => {
     
     try {
         if (accessToken && decodedAccessToken) {
-            const type = await User.findById(decodedAccessToken.userId).select('accountType')
+            const user = await User.findById(decodedAccessToken.userId)
 
-            return res.status(200).json({ isAuthenticated: true, payload: { username: decodedAccessToken.username, userId: decodedAccessToken.userId, accountType: type.accountType}})
+            return res.status(200).json({ isAuthenticated: true, payload: { username: user.username, userId: user._id, accountType: user.accountType, profilePicture: user.profilePicture }})
         }
     
         const refreshToken = req.cookies.refreshToken
         const decodedRefreshToken = verifyToken(refreshToken)
     
         if (refreshToken && decodedRefreshToken) {
-            const type = await User.findById(decodedRefreshToken.userId).select('accountType')
-    
+            const user = await User.findById(decodedRefreshToken.userId)
+
             res.cookie(
                 'accessToken',
                 generateAccessToken(decodedRefreshToken.userId, decodedRefreshToken.username), 
@@ -171,7 +171,7 @@ app.get('/check-auth', async (req, res) => {
                 }
             )
     
-            return res.status(200).json({ isAuthenticated: true, payload: { username: decodedRefreshToken.username, userId: decodedRefreshToken.userId, accountType: type.accountType }})
+            return res.status(200).json({ isAuthenticated: true, payload: { username: user.username, userId: user._id, accountType: user.accountType, profilePicture: user.profilePicture, bio: user.bio }})
         }
     
         return res.status(202).json({ isAuthenticated: false })
@@ -375,7 +375,7 @@ app.get('/feed-recipes', async (req, res) => {
 
     try {
         const isAdmin = await User.findById(userId).select('accountType')
-
+        console.log(isAdmin)
         const flagCountSelected = isAdmin.accountType === "admin" && 'flagCount'
 
         if (fetchedRecipeIds && fetchedRecipeIds.length > 0) {
@@ -628,7 +628,7 @@ app.get('/popular-recipes', async (req, res) => {
 
 app.get('/user-recipes', async (req, res) => {
     const { userId, authorName, sort, fetchedRecipeIds } = req.query
-    
+    console.log(fetchedRecipeIds)
     try {
         const user = await User.find({ username: authorName })
 
@@ -685,7 +685,7 @@ app.get('/user-recipes', async (req, res) => {
 
 
 
-app.get('/recipe', async (req, res) => {
+app.get('/get-recipe', async (req, res) => {
     const { recipeId, userId } = req.query
 
     try {
@@ -693,7 +693,7 @@ app.get('/recipe', async (req, res) => {
             .populate({
                 path: 'userId',
                 model: 'User',
-                select: 'username'
+                select: ['username', 'profilePicture']
             })
             .lean()
         
@@ -706,7 +706,7 @@ app.get('/recipe', async (req, res) => {
         const isSaved = await Save.findOne({ userId, recipeId }) !== null
     
         const response = {
-            userInfo: { username: recipe.userId.username },
+            userInfo: { username: recipe.userId.username, profilePicture: recipe.userId.profilePicture },
             recipeContents: { ...recipe },
             recipeStatus: { pointStatus: status && status.pointStatus, isSaved }
         }
@@ -739,7 +739,7 @@ app.post('/submit-feedback', async (req, res) => {
     }
 })
 
-app.get('/feedbacks', async (req, res) => {
+app.get('/get-feedbacks', async (req, res) => {
     const { recipeId } = req.query
 
     const pipeline = [
@@ -756,9 +756,9 @@ app.get('/feedbacks', async (req, res) => {
 
         const feedbacks = await User.populate(aggregatedResults, {
             path: 'userId',
-            select: 'username'
+            select: ['username', 'profilePicture']
         })
-
+        console.log(feedbacks)
         const feedbackCount = await Recipe.findById(recipeId).select('feedbackCount')
 
         return res.status(200).json({ success: true, payload: { feedbacks, feedbackCount } })
@@ -826,11 +826,13 @@ app.post('/remove-recipe', async (req, res) => {
     const { removerUserId, recipeId } = req.body
 
     try {
-        const { _id, __v, ...recipe } =  await Recipe.findById(recipeId).lean()
+        const recipeResult =  await Recipe.findById(recipeId).lean()
 
-        if (!recipe) {
+        if (!recipeResult) {
             return res.status(400).json({ message: 'Error removing recipe.', err })
         }
+
+        const { _id, __v, ...recipe } = recipeResult
 
         const archive = new Archive({
             removerUserId,
@@ -890,7 +892,7 @@ app.post('/save-filters', async (req, res) => {
     }
 })
 
-app.get('/get-follows', async (req, res) => {
+app.get('/get-author-info', async (req, res) => {
     const { userId, authorName } = req.query
 
     try {
@@ -904,15 +906,15 @@ app.get('/get-follows', async (req, res) => {
 
         const follows = await User.findById(user._id).select('followCount')
 
-        const followerResults = await Follow.find({ followedId: user._id }).populate({            path: 'userId',
+        const followerResults = await Follow.find({ followedId: user._id }).populate({
             path: 'userId',
-            select: 'username'
+            select: ['username', 'profilePicture']
         }).limit(10)
-
-        const followers = followerResults.map(follower => follower.userId.username)
+        console.log(user)
+        const followers = followerResults.map(follower => { return { username: follower.userId.username, profilePicture: follower.userId.profilePicture } })
        
         if (!isFollowed) {
-            return res.status(200).json({ status: true, payload: { isFollowed: false, followCount: follows.followCount, followers: followers } })
+            return res.status(200).json({ status: true, payload: { isFollowed: false, followCount: follows.followCount, followers: followers, profilePicture: user.profilePicture, bio: user.bio } })
         }
 
         return res.status(200).json({ status: true, payload: { isFollowed: true, followCount: follows.followCount, followers: followers } })
@@ -941,11 +943,11 @@ app.post('/follow-user', async (req, res) => {
 
             const followerResults = await Follow.find({ followedId: user._id }).populate({            path: 'userId',
                 path: 'userId',
-                select: 'username'
+                select: ['username', 'profilePicture']
             }).limit(10)
     
-            const followers = followerResults.map(follower => follower.userId.username)
-       
+            const followers = followerResults.map(follower => { return { username: follower.userId.username, profilePicture: follower.userId.profilePicture } })
+    
             const follows = await User.findById(user._id).select('followCount')
 
             return res.status(200).json({ status: true, message: 'User unfollowed.', payload: { isFollowed: false, followCount: follows.followCount, followers } })
@@ -962,10 +964,10 @@ app.post('/follow-user', async (req, res) => {
 
                 const followerResults = await Follow.find({ followedId: user._id }).populate({            path: 'userId',
                     path: 'userId',
-                    select: 'username'
+                    select: ['username', 'profilePicture']
                 }).limit(10)
         
-                const followers = followerResults.map(follower => follower.userId.username)
+                const followers = followerResults.map(follower => { return { username: follower.userId.username, profilePicture: follower.userId.userName } })
        
                 const follows = await User.findById(user._id).select('followCount')
                 
@@ -980,7 +982,7 @@ app.post('/follow-user', async (req, res) => {
     }
 })
 
-app.post('get-followers', async (req, res) => {
+app.post('/get-followers', async (req, res) => {
     const { authorName } = req.body
 
     try {
@@ -992,7 +994,73 @@ app.post('get-followers', async (req, res) => {
 
         const followers = await Follow.find({ followedId: user._id })
 
-        return res.status(201).json({ success: true, message: 'User followed.', payload: { followers }})
+        return res.status(200).json({ success: true, message: 'Got user followers.', payload: { followers }})
+    } catch (err) {
+        console.log(err)
+        return res.status(500).json({ message:'Internal server error.', err})
+    }
+})
+
+app.post('/change-password', async (req, res) => {
+    const { userId, password } = req.body
+console.log("dasdasd;sa")
+    try {
+        const user = await User.findById(userId)
+        
+        if (!user) {
+            return res.status(400).json({ success: false, message: 'User not found.' })
+        }
+
+        user.password = password
+
+        await user.save()
+
+        return res.status(200).json({ success: true, message: 'Password changed.'})
+    } catch (err) {
+        console.log(err)
+        return res.status(500).json({ message:'Internal server error.', err})
+    }
+})
+
+app.post('/change-profile-picture', upload.any(), async (req, res) => {
+    const { userId } = req.body
+    const profilePicture = req.files
+
+    try {
+        const user = await User.findById(userId)
+
+        if (!user) {
+            return res.status(400).json({ success: false, message: 'User not found.' })
+        }
+
+        const profilePictureLink = await uploadFileToStorage(profilePicture[0])
+
+        user.profilePicture = profilePictureLink
+
+        await user.save()
+        
+        return res.status(201).json({ success: true, message: 'Profile picture changed.'})
+    } catch (err) {
+        console.log(err)
+        return res.status(500).json({ message:'Internal server error.', err})
+    }
+})
+
+app.post('/change-bio', async (req, res) => {
+    const { userId, bio } = req.body
+
+    try {
+        const user = await User.findById(userId)
+        
+        if (!user) {
+            return res.status(400).json({ success: false, message: 'User not found.' })
+        }
+
+        user.bio = bio
+
+        await user.save()
+
+        return res.status(200).json({ success: true, message: 'Bio changed.'})
     } catch (err) {
         console.log(err)
         return res.status(500).json({ message:'Internal server error.', err})

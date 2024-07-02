@@ -5,7 +5,7 @@ import debounce from 'lodash.debounce'
 
 import Textarea from './Textarea'
 
-import ProfilePicture from '../assets/profile-picture.png'
+import ProfileIcon from '../assets/profile-icon.png'
 import ApproveIcon from '../assets/approve-icon.png'
 import FeedbackIcon from '../assets/feedback-icon.png'
 import AddIcon from '../assets/add-icon.png'
@@ -40,7 +40,7 @@ function IngredientForm(p) {
             <p className="flex items-center px-3 text-2xl font-bold">
                 •
             </p>
-            <input className={`${ (ingredient === "") ? "bg-zinc-700 border border-red-600" : "bg-zinc-900" } p-3 w-full rounded-3xl focus:bg-zinc-700 hover:bg-zinc-700`} 
+            <input className={`${ (ingredient === "") ? "bg-zinc-600 border border-red-600" : "bg-zinc-875" } p-3 w-full rounded-3xl focus:bg-zinc-600 hover:bg-zinc-600`} 
                 value={ ingredientValue } onChange={ e => setIngredientValue(e.target.value) } 
                 placeholder="What Ingredient?" maxLength={ 30 }
             />
@@ -124,7 +124,7 @@ function SidebarCreate(p) {
         <div className="pl-3 grid w-full h-full overflow-hidden" style={ { gridTemplateColumns: "repeat(15, minmax(0, 1fr))" } }>
             <div className="flex overflow-x-hidden overflow-y-scroll h-full scrollable-div flex-col text-zinc-100 col-span-4 pointer-events-auto">
                 {/* recipe image */}
-                <div className="mb-3 rounded-3xl bg-zinc-900">
+                <div className="mb-3 rounded-3xl bg-zinc-875">
                     <div className="p-2 rounded-3xl bg-gradient-to-tr from-orange-500 to-orange-400">
                         <div className="relative w-full h-auto aspect-w-2 aspect-h-2">
                             {
@@ -148,7 +148,7 @@ function SidebarCreate(p) {
                             </div>
                         </div>
                         <div className="flex justify-end items-end w-full overflow-hidden">
-                            <div className="flex justify-end items-center h-fit rounded-3xl bg-zinc-700">
+                            <div className="flex justify-end items-center h-fit rounded-3xl bg-zinc-600">
                                 <div className="flex justify-end items-center p-3 gap-4 rounded-3xl">
                                     <img className="min-w-10 w-10" src={ GivePointNegativeIcon } alt="" />
                                 </div>
@@ -162,15 +162,8 @@ function SidebarCreate(p) {
                         </div>
                     </div>
                 </div>
-                {/* user */}
-                <div className="flex gap-6 flex-row items-center mb-3 p-6 rounded-3xl bg-zinc-900">
-                    <img className="w-14" src={ ProfilePicture } alt="" />
-                    <p className="text-xl font-semibold">
-                        { user.username }
-                    </p>
-                </div>
                 {/* summary */}
-                <div className="flex flex-col mb-3 rounded-3xl bg-zinc-900">
+                <div className="flex flex-col mb-3 rounded-3xl bg-zinc-875">
                     <div className="flex flex-row p-6 gap-6 items-center shadow-md shadow-zinc-950">
                         <img className="w-10" src={ SummaryIcon } alt="" />
                         <p className="text-2xl font-semibold">
@@ -179,7 +172,7 @@ function SidebarCreate(p) {
                     </div>
                     <div className="flex flex-col p-3">
                         <Textarea 
-                            attribute={`${summary ?  "bg-transparent" : "pt-2.5 bg-zinc-700 border border-red-600"} text-justify text-lg focus:bg-zinc-700`} 
+                            attribute={`${summary ?  "bg-transparent" : "pt-2.5 bg-zinc-600 border border-red-600"} text-justify text-lg focus:bg-zinc-600`} 
                             maxLength={ 300 } value={ summary || "" } setValue={ setSummary }
                             placeholder="What would you describe your dish?"
                         />
@@ -189,7 +182,7 @@ function SidebarCreate(p) {
                     </div>
                 </div>
                 {/* ingredients */}
-                <div className="flex flex-col mb-3 rounded-3xl bg-zinc-900">
+                <div className="flex flex-col mb-3 rounded-3xl bg-zinc-875">
                     <div className="flex flex-row p-6 gap-6 items-center shadow-md shadow-zinc-950">
                         <img className="w-10" src={ IngredientsIcon } alt="" />
                         <p className="text-2xl font-semibold">Ingredients</p>
@@ -204,13 +197,20 @@ function SidebarCreate(p) {
                                 />
                             )
                         }
-                        <button className="flex justify-center p-3 my-3 rounded-3xl shadow-md shadow-zinc-950 bg-zinc-700 hover:bg-zinc-500" onClick={ () => addIngredient() }>
+                        <button className="flex justify-center p-3 my-3 rounded-3xl shadow-md shadow-zinc-950 bg-zinc-600 hover:bg-zinc-500" onClick={ () => addIngredient() }>
                             <img className="w-5" src={ AddIcon } alt="" />
                         </button>
                     </ul>
                 </div>
+                {/* user */}
+                <div className="flex gap-6 flex-row items-center mb-3 p-6 rounded-3xl bg-zinc-875">
+                    <img className="w-14 h-14 rounded-full object-cover" src={ user.profilePicture || ProfileIcon } alt="" />
+                    <p className="text-xl font-semibold">
+                        { user.username }
+                    </p>
+                </div>
                 {/* tags */}
-                <div className="flex flex-col mb-3 gap-3 rounded-3xl bg-zinc-900">
+                <div className="flex flex-col mb-3 gap-3 rounded-3xl bg-zinc-875">
                     {/* header */}
                     <div className="flex flex-row gap-6 p-6 mb-3 items-center shadow-md shadow-zinc-950">
                         <img className="w-10" src={ TagIcon } alt="" />
@@ -223,19 +223,25 @@ function SidebarCreate(p) {
                         <div className="block px-6 text-md font-semibold w-full">
                             {
                                 tags.map((tag, index) => 
-                                    <button className="m-1 px-3 py-1 w-fit bg-zinc-700 rounded-3xl hover:bg-zinc-500" key={ index } id={ index } onClick={ e => { removeTag(e) } }>
+                                    <button className="m-1 px-3 py-1 w-fit bg-zinc-600 rounded-3xl hover:bg-zinc-500" key={ index } id={ index } onClick={ e => { removeTag(e) } }>
                                         { tag }
                                     </button>
                                 )
                             }
                         </div>
                     }
+                    {
+                        tags.length > 0 &&
+                        <button className="mx-6 py-2 font-semibold rounded-3xl shadow-md shadow-zinc-950 bg-zinc-600 hover:bg-zinc-500" onClick={ () => setTags([]) }>
+                            Clear filters
+                        </button>
+                    }
                     {/* search input */}
                     <div className="flex flex-row px-6 gap-3 items-center">
                         {
                             !searchValue && <p className="text-xl font-bold">Popular</p>
                         }
-                        <div className="relative flex w-full items-center justify-center rounded-3xl shadow-md shadow-zinc-950 bg-zinc-700">
+                        <div className="relative flex w-full items-center justify-center rounded-3xl shadow-md shadow-zinc-950 bg-zinc-600">
                             <div className="absolute flex ml-4 left-0 right-0 items-start justify-left pointer-events-none">
                                 <img className="w-6" src={ SearchIcon } alt="" />
                             </div>
@@ -252,7 +258,7 @@ function SidebarCreate(p) {
                                 const isAdded = tags.find(recipeTag => recipeTag === tag)
 
                                 return (
-                                    <button className={`${ isAdded ? "bg-zinc-800" : "bg-zinc-700 hover:bg-zinc-500" } m-1 px-3 py-1 w-fit rounded-3xl`} 
+                                    <button className={`${ isAdded ? "bg-zinc-700" : "bg-zinc-600 hover:bg-zinc-500" } m-1 px-3 py-1 w-fit rounded-3xl`} 
                                         disabled={ isAdded } key={ index } id={ index } onClick={ e => { addTag(e) } }
                                     >
                                         { tag }

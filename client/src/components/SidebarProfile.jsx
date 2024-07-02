@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import axios from 'axios'
 import { Link } from 'react-router-dom'
 
-import ProfilePicture from '../assets/profile-picture.png'
+import ProfileIcon from '../assets/profile-icon.png'
 
 function SidebarProfile(p) {
     const user = p.user
@@ -11,6 +11,8 @@ function SidebarProfile(p) {
     const [isFollowed, setIsFollowed] = useState()
     const [followCount, setFollowCount] = useState(0)
     const [followers, setFollowers] = useState()
+    const [authorBio, setAuthorBio] = useState('')
+    const [authorProfilePicture, setAuthorProfilePicture] = useState()
 
     function handleFollowUser() {
         setIsFollowed(!isFollowed)
@@ -33,8 +35,8 @@ function SidebarProfile(p) {
             })
     }
 
-    function handleGetUserFollows() {
-        axios.get('http://localhost:8080/get-follows', { params: { userId: user.userId, authorName } })
+    function handleAuthorInfo() {
+        axios.get('http://localhost:8080/get-author-info', { params: { userId: user.userId, authorName } })
             .then(res => {
                 console.log('Status Code:' , res.status)
                 console.log('Data:', res.data)
@@ -42,22 +44,8 @@ function SidebarProfile(p) {
                 setIsFollowed(res.data.payload.isFollowed)
                 setFollowCount(res.data.payload.followCount)
                 setFollowers(res.data.payload.followers)
-            })
-            .catch(err => {
-                console.log(err)
-                console.log('Error Status:', err.response.status)
-                console.log('Error Data:', err.response.data)
-            })
-    }
-
-    function handleGetFollowers() {
-        axios.get('http://localhost:8080/get-followers', { params: { authorName } })
-            .then(res => {
-                console.log('Status Code:' , res.status)
-                console.log('Data:', res.data)
-                
-                setIsFollowed(res.data.payload.isFollowed)
-                setFollowCount(res.data.payload.followCount)
+                setAuthorProfilePicture(res.data.payload.profilePicture)
+                setAuthorBio(res.data.payload.bio)
             })
             .catch(err => {
                 console.log(err)
@@ -67,16 +55,21 @@ function SidebarProfile(p) {
     }
 
     useEffect(() => {
-        handleGetUserFollows()
+        setIsFollowed()
+        setFollowCount()
+        setFollowers()
+        setAuthorProfilePicture()
+        setAuthorBio()
+        handleAuthorInfo()
     }, [authorName])
 
     return (
         <div className="grid pl-3 w-full h-full overflow-hidden" style={ { gridTemplateColumns: "repeat(15, minmax(0, 1fr))" } }>
             <div className="flex flex-col gap-3 text-zinc-100 col-span-4 pointer-events-auto overflow-y-scroll scrollable-div">
                 {/* user  */}
-                <div className="flex flex-row p-6 gap-6 items-center text-2xl rounded-3xl bg-zinc-900">
-                    <img className="w-28" src={ ProfilePicture } alt="" />
-                    <div className="grid grid-row-2 w-full gap-3">
+                <div className="flex flex-row p-6 gap-6 items-center text-2xl rounded-3xl bg-zinc-875">
+                    <img className="w-28 h-28 aspect-1 rounded-full object-cover" src={ authorProfilePicture || ProfileIcon } alt="" />
+                    <div className="grid grid-row-2 w-full gap-3 overflow-hidden">
                         <div className="flex flex-row h-12 pr-1 items-center">
                             <p className="px-1 w-full font-semibold overflow-hidden">
                                 { authorName }
@@ -94,29 +87,32 @@ function SidebarProfile(p) {
                                 </button>
                             }
                         </div>
-                        <p className="px-1 text-lg">
+                        <p className="px-1 text-lg line-clamp-1">
                             { followCount } followers
                         </p>
                     </div>
                 </div>
                 {/* bio */}
-                <div className="flex flex-col gap-3 p-6 rounded-3xl bg-zinc-900">
-                    <p className="text-2xl font-semibold">Bio</p>
-                    <p className="w-full">
-                        An aspiring cook from the Pearl of the Orient Sea, the Philippines. Here to learn and be part of the cooking community.
-                    </p>
-                </div>
+                {
+                    authorBio &&
+                    <div className="flex flex-col gap-3 p-6 rounded-3xl bg-zinc-875">
+                        <p className="text-2xl font-semibold">Bio</p>
+                        <p className="w-full">
+                            { authorBio }                        
+                        </p>
+                    </div>
+                }
                 {/* friends */}
-                <div className="flex flex-col gap-3 p-3 rounded-3xl bg-zinc-900">
-                    <p className="text-2xl px-3 pt-3 font-semibold">Friends</p>
+                <div className="flex flex-col gap-3 p-3 rounded-3xl bg-zinc-875">
+                    <p className="text-2xl px-3 pt-3 font-semibold">Followers</p>
                     <div className="flex flex-col gap-3">
                         {
                             followers &&
                             followers.length > 0 &&
                             followers.map(follower => 
-                                <Link to={`/${ follower }`} className="flex flex-row items-center p-3 gap-6 text-xl rounded-3xl hover:bg-zinc-500">
-                                    <img className="w-16" src={ ProfilePicture } alt="" />
-                                    <p>{ follower }</p>
+                                <Link to={`/${ follower.username }`} className="flex flex-row items-center p-3 gap-6 text-xl rounded-3xl hover:bg-zinc-500">
+                                    <img className="w-16 h-16 aspect-1 rounded-full object-cover" src={ follower.profilePicture || ProfileIcon } alt="" />
+                                    <p>{ follower.username }</p>
                                 </Link>
                             )
                         }

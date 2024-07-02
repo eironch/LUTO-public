@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom'
 import ActionSection from './PointSection'
 import FeedbackSection from '../components/FeedbackSection'
 
-import ProfilePicture from '../assets/profile-picture.png'
+import ProfileIcon from '../assets/profile-icon.png'
 import FeedbackIcon from '../assets/feedback-icon.png'
 import TagIcon from '../assets/tag-icon.png'
 import IngredientsIcon from '../assets/ingredients-icon.png'
@@ -16,6 +16,7 @@ function SidebarRecipe(p) {
     
     const recipeId = p.recipeId
     const authorName = p.authorName
+    const profilePicture = p.profilePicture
     const recipeImage = p.recipeImage
     const summary = p.summary
     const ingredients = p.ingredients
@@ -57,7 +58,7 @@ function SidebarRecipe(p) {
         <div className="pl-3 grid w-full h-full overflow-hidden" style={ { gridTemplateColumns: "repeat(15, minmax(0, 1fr))" } }>
             <div className="flex overflow-x-hidden overflow-y-scroll h-full scrollable-div flex-col text-zinc-100 col-span-4 pointer-events-auto" ref={ divRef }>
                 {/* recipe image */}
-                <div className="mb-3 rounded-3xl bg-zinc-900">
+                <div className="mb-3 rounded-3xl bg-zinc-875">
                     <div className="p-2 rounded-3xl bg-gradient-to-tr from-orange-500 to-orange-400">
                         <div className="relative w-full h-auto aspect-w-2 aspect-h-2 rounded-3xl">
                             {
@@ -86,15 +87,8 @@ function SidebarRecipe(p) {
                         </div>
                     </div>
                 </div>
-                {/* user */}
-                <Link to={`/${ authorName }`} className="flex gap-6 flex-row items-center mb-3 p-6 rounded-3xl bg-zinc-900 hover:bg-zinc-500">
-                    <img className="w-14" src={ ProfilePicture } alt="" />
-                    <p className="text-xl font-semibold">
-                        { authorName }
-                    </p>
-                </Link>
                 {/* summary */}
-                <div className="flex flex-col mb-3 rounded-3xl bg-zinc-900">
+                <div className="flex flex-col mb-3 rounded-3xl bg-zinc-875">
                     <div className="flex flex-row p-6 gap-6 items-center shadow-md shadow-zinc-950">
                         <img className="w-10" src={ SummaryIcon } alt="" />
                         <p className="text-2xl font-semibold">
@@ -106,7 +100,7 @@ function SidebarRecipe(p) {
                     </p>        
                 </div>
                 {/* ingredients */}
-                <div className="flex flex-col mb-3 rounded-3xl bg-zinc-900">
+                <div className="flex flex-col mb-3 rounded-3xl bg-zinc-875">
                     <div className="flex flex-row p-6 gap-6 items-center shadow-md shadow-zinc-950">
                         <img className="w-10" src={ IngredientsIcon } alt="" />
                         <p className="text-2xl font-semibold">Ingredients</p>
@@ -125,8 +119,15 @@ function SidebarRecipe(p) {
                         }
                     </ul>
                 </div>
+                {/* user */}
+                <Link to={`/${ authorName }`} className="flex gap-6 flex-row items-center mb-3 p-6 rounded-3xl bg-zinc-875 hover:bg-zinc-500">
+                    <img className="w-14 h-14 aspect-1 rounded-full object-cover" src={ profilePicture || ProfileIcon } alt="" />
+                    <p className="text-xl font-semibold">
+                        { authorName }
+                    </p>
+                </Link>
                 {/* tags */}
-                <div className="flex flex-col mb-3 rounded-3xl bg-zinc-900">
+                <div className="flex flex-col mb-3 rounded-3xl bg-zinc-875">
                     <div className="flex flex-row p-6 gap-6 items-center shadow-md shadow-zinc-950">
                         <img className="w-10" src={ TagIcon } alt="" />
                         <p className="text-2xl font-semibold">Tags</p>
@@ -139,7 +140,7 @@ function SidebarRecipe(p) {
                                 <p className="text-xl text-center">No tags provided</p>
                                 :
                                 tags.map((tag, index) => 
-                                    <div className="inline-block m-1 px-3 py-1 w-fit bg-zinc-800 rounded-3xl" key={ index } id={ index }>
+                                    <div className="inline-block m-1 px-3 py-1 w-fit bg-zinc-700 rounded-3xl" key={ index } id={ index }>
                                         { tag }
                                     </div>
                                 )
