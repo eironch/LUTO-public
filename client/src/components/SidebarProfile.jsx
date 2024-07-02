@@ -10,6 +10,7 @@ function SidebarProfile(p) {
     
     const [isFollowed, setIsFollowed] = useState()
     const [followCount, setFollowCount] = useState()
+    const [followers, setFollowers] = useState()
 
     function handleFollowUser() {
         setIsFollowed(!isFollowed)
@@ -21,6 +22,7 @@ function SidebarProfile(p) {
                 
                 setIsFollowed(res.data.payload.isFollowed)
                 setFollowCount(res.data.payload.followCount)
+                setFollowers(res.data.payload.followers)
             })
             .catch(err => {
                 console.log(err)
@@ -39,6 +41,23 @@ function SidebarProfile(p) {
                 
                 setIsFollowed(res.data.payload.isFollowed)
                 setFollowCount(res.data.payload.followCount)
+                setFollowers(res.data.payload.followers)
+            })
+            .catch(err => {
+                console.log(err)
+                console.log('Error Status:', err.response.status)
+                console.log('Error Data:', err.response.data)
+            })
+    }
+
+    function handleGetFollowers() {
+        axios.get('http://localhost:8080/get-followers', { params: { authorName } })
+            .then(res => {
+                console.log('Status Code:' , res.status)
+                console.log('Data:', res.data)
+                
+                setIsFollowed(res.data.payload.isFollowed)
+                setFollowCount(res.data.payload.followCount)
             })
             .catch(err => {
                 console.log(err)
@@ -49,7 +68,7 @@ function SidebarProfile(p) {
 
     useEffect(() => {
         handleGetUserFollows()
-    }, [])
+    }, [authorName])
 
     return (
         <div className="grid pl-3 w-full h-full overflow-hidden" style={ { gridTemplateColumns: "repeat(15, minmax(0, 1fr))" } }>
@@ -91,42 +110,16 @@ function SidebarProfile(p) {
                 <div className="flex flex-col gap-3 p-3 rounded-3xl bg-zinc-900">
                     <p className="text-2xl px-3 pt-3 font-semibold">Friends</p>
                     <div className="flex flex-col gap-3">
-                        <Link className="flex flex-row items-center p-3 gap-6 text-xl rounded-3xl hover:bg-zinc-500">
-                            <img className="w-16" src={ ProfilePicture } alt="" />
-                            <p>Friend 1</p>
-                        </Link>
-                        <Link className="flex flex-row items-center p-3 gap-6 text-xl rounded-3xl hover:bg-zinc-500">
-                            <img className="w-16" src={ ProfilePicture } alt="" />
-                            <p>Friend 2</p>
-                        </Link>
-                        <Link className="flex flex-row items-center p-3 gap-6 text-xl rounded-3xl hover:bg-zinc-500">
-                            <img className="w-16" src={ ProfilePicture } alt="" />
-                            <p>Friend 3</p>
-                        </Link>
-                        <Link className="flex flex-row items-center p-3 gap-6 text-xl rounded-3xl hover:bg-zinc-500">
-                            <img className="w-16" src={ ProfilePicture } alt="" />
-                            <p>Friend 4</p>
-                        </Link>
-                        <Link className="flex flex-row items-center p-3 gap-6 text-xl rounded-3xl hover:bg-zinc-500">
-                            <img className="w-16" src={ ProfilePicture } alt="" />
-                            <p>Friend 4</p>
-                        </Link>
-                        <Link className="flex flex-row items-center p-3 gap-6 text-xl rounded-3xl hover:bg-zinc-500">
-                            <img className="w-16" src={ ProfilePicture } alt="" />
-                            <p>Friend 4</p>
-                        </Link>
-                        <Link className="flex flex-row items-center p-3 gap-6 text-xl rounded-3xl hover:bg-zinc-500">
-                            <img className="w-16" src={ ProfilePicture } alt="" />
-                            <p>Friend 4</p>
-                        </Link>
-                        <Link className="flex flex-row items-center p-3 gap-6 text-xl rounded-3xl hover:bg-zinc-500">
-                            <img className="w-16" src={ ProfilePicture } alt="" />
-                            <p>Friend 4</p>
-                        </Link>
-                        <Link className="flex flex-row items-center p-3 gap-6 text-xl rounded-3xl hover:bg-zinc-500">
-                            <img className="w-16" src={ ProfilePicture } alt="" />
-                            <p>Friend 4</p>
-                        </Link>
+                        {
+                            followers &&
+                            followers.length > 0 &&
+                            followers.map(follower => 
+                                <Link to={`/${ follower }`} className="flex flex-row items-center p-3 gap-6 text-xl rounded-3xl hover:bg-zinc-500">
+                                    <img className="w-16" src={ ProfilePicture } alt="" />
+                                    <p>{ follower }</p>
+                                </Link>
+                            )
+                        }
                     </div>
                 </div>
             </div>

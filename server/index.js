@@ -189,7 +189,7 @@ app.post('/publish-recipe', upload.any(), async (req, res) => {
         title,
         summary,
     } = req.body
-    console.log(req.body)
+
     const recipeFiles = req.files
 
     const ingredients = JSON.parse(req.body.ingredients)
@@ -210,7 +210,7 @@ app.post('/publish-recipe', upload.any(), async (req, res) => {
         const fileLinks = await uploadFile(recipeFiles)
         const elementLinks = fileLinks.elementFiles
         recipeFormat.recipeImage = fileLinks.recipeImage
-        console.log(recipeElements)
+
         if (recipeElements && recipeElements.length > 0) {
             recipeElements.forEach((element) => {
                 for (let x = 0; x < element.filesLength; x++) {
@@ -372,7 +372,7 @@ app.get('/feed-recipes', async (req, res) => {
     const { userId, filters, sort, fetchedRecipeIds } = req.query
     let aggregatedResults, results, recipes
     const pipeline = []
-    console.log(fetchedRecipeIds)
+
     try {
         const isAdmin = await User.findById(userId).select('accountType')
 
@@ -393,7 +393,7 @@ app.get('/feed-recipes', async (req, res) => {
         pipeline.push({ $limit: 10 })
 
         aggregatedResults = await RecipeOverview.aggregate(pipeline)
-        console.log(aggregatedResults.map(recipe => recipe.recipeId))
+
         results = aggregatedResults.map(result => new RecipeOverview(result))
         recipes = await RecipeOverview.populate(
             results, [
@@ -646,7 +646,7 @@ app.get('/user-recipes', async (req, res) => {
                 { path: 'recipeId', select: ['points', 'feedbackCount', flagCountSelected]}
             ]).sort({ createdAt: -1 }).limit(10)
 
-        console.log(recipes)
+
         if (recipes.length === 0) {
             return res.status(202).json({ status: false, message: 'No recipes found.' })
         }
@@ -904,11 +904,18 @@ app.get('/get-follows', async (req, res) => {
 
         const follows = await User.findById(user._id).select('followCount')
 
+        const followerResults = await Follow.find({ followedId: user._id }).populate({            path: 'userId',
+            path: 'userId',
+            select: 'username'
+        }).limit(10)
+
+        const followers = followerResults.map(follower => follower.userId.username)
+       
         if (!isFollowed) {
-            return res.status(200).json({ status: true, payload: { isFollowed: false, followCount: follows.followCount } })
+            return res.status(200).json({ status: true, payload: { isFollowed: false, followCount: follows.followCount, followers: followers } })
         }
 
-        return res.status(200).json({ status: true, payload: { isFollowed: true, followCount: follows.followCount } })
+        return res.status(200).json({ status: true, payload: { isFollowed: true, followCount: follows.followCount, followers: followers } })
     } catch (err) {
         console.log(err)
         return res.status(500).json({ message:'Internal server error.', err})
@@ -932,9 +939,16 @@ app.post('/follow-user', async (req, res) => {
 
             await User.findByIdAndUpdate(user._id, { $inc: { followCount: -1 } })
 
+            const followerResults = await Follow.find({ followedId: user._id }).populate({            path: 'userId',
+                path: 'userId',
+                select: 'username'
+            }).limit(10)
+    
+            const followers = followerResults.map(follower => follower.userId.username)
+       
             const follows = await User.findById(user._id).select('followCount')
 
-            return res.status(200).json({ status: true, message: 'User unfollowed.', payload: { isFollowed: false, followCount: follows.followCount } })
+            return res.status(200).json({ status: true, message: 'User unfollowed.', payload: { isFollowed: false, followCount: follows.followCount, followers } })
         }
 
         const follow = new Follow({
@@ -946,13 +960,39 @@ app.post('/follow-user', async (req, res) => {
             .then(async () => {
                 await User.findByIdAndUpdate(user._id, { $inc: { followCount: 1 } })
 
+                const followerResults = await Follow.find({ followedId: user._id }).populate({            path: 'userId',
+                    path: 'userId',
+                    select: 'username'
+                }).limit(10)
+        
+                const followers = followerResults.map(follower => follower.userId.username)
+       
                 const follows = await User.findById(user._id).select('followCount')
                 
-                return res.status(201).json({ success: true, message: 'User followed.', payload: { isFollowed: true, followCount: follows.followCount }})
+                return res.status(201).json({ success: true, message: 'User followed.', payload: { isFollowed: true, followCount: follows.followCount, followers }})
             })
             .catch(() => {
                 return res.status(202).json({ success: false, message: 'Error following user.' })
             })
+    } catch (err) {
+        console.log(err)
+        return res.status(500).json({ message:'Internal server error.', err})
+    }
+})
+
+app.post('get-followers', async (req, res) => {
+    const { authorName } = req.body
+
+    try {
+        const user = await User.findOne({ username: authorName })
+        
+        if (!user) {
+            return res.status(400).json({ success: false, message: 'User not found.' })
+        }
+
+        const followers = await Follow.find({ followedId: user._id })
+
+        return res.status(201).json({ success: true, message: 'User followed.', payload: { followers }})
     } catch (err) {
         console.log(err)
         return res.status(500).json({ message:'Internal server error.', err})
