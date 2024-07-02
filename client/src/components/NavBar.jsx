@@ -161,7 +161,7 @@ function NavBar(p) {
                 }
                 { 
                     currentTab === "Profile" && 
-                    <SidebarProfile authorName={ authorName } />
+                    <SidebarProfile user={ user } authorName={ authorName } />
                 }
                 { 
                     currentTab === "Create" &&

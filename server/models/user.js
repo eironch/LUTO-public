@@ -18,6 +18,10 @@ const userSchema = new Schema({
         type: String,
         default: 'user'
     },
+    followCount: {
+        type: Number,
+        default: 0
+    },
     bio: {
         type: String
     },

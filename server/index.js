@@ -17,6 +17,7 @@ import Feedback from './models/feedback.js'
 import Save from './models/save.js'
 import Flag from './models/flag.js'
 import Archive from './models/archive.js'
+import Follow from './models/follow.js'
 
 const PORT = 8080
 
@@ -883,6 +884,75 @@ app.post('/save-filters', async (req, res) => {
         await Preference.findOneAndUpdate({ userId }, { $set: { filters } }, { upsert: true })
 
         return res.status(201).json({ success: true, message: 'User filters updated.' })
+    } catch (err) {
+        console.log(err)
+        return res.status(500).json({ message:'Internal server error.', err})
+    }
+})
+
+app.get('/get-follows', async (req, res) => {
+    const { userId, authorName } = req.query
+
+    try {
+        const user = await User.findOne({ username: authorName })
+        
+        if (!user) {
+            return res.status(400).json({ success: false, message: 'User not found.' })
+        }
+
+        const isFollowed = await Follow.findOne({ userId, followedId: user._id }) !== null
+
+        const follows = await User.findById(user._id).select('followCount')
+
+        if (!isFollowed) {
+            return res.status(200).json({ status: true, payload: { isFollowed: false, followCount: follows.followCount } })
+        }
+
+        return res.status(200).json({ status: true, payload: { isFollowed: true, followCount: follows.followCount } })
+    } catch (err) {
+        console.log(err)
+        return res.status(500).json({ message:'Internal server error.', err})
+    }
+})
+
+app.post('/follow-user', async (req, res) => {
+    const { userId, authorName } = req.body
+
+    try {
+        const user = await User.findOne({ username: authorName })
+        
+        if (!user) {
+            return res.status(400).json({ success: false, message: 'User not found.' })
+        }
+
+        const isFollowed = await Follow.findOne({ userId, followedId: user._id }) !== null
+        
+        if (isFollowed) {
+            await Follow.findOneAndDelete({ userId, followedId: user._id })
+
+            await User.findByIdAndUpdate(user._id, { $inc: { followCount: -1 } })
+
+            const follows = await User.findById(user._id).select('followCount')
+
+            return res.status(200).json({ status: true, message: 'User unfollowed.', payload: { isFollowed: false, followCount: follows.followCount } })
+        }
+
+        const follow = new Follow({
+            userId,
+            followedId: user._id
+        })
+
+        await follow.save()
+            .then(async () => {
+                await User.findByIdAndUpdate(user._id, { $inc: { followCount: 1 } })
+
+                const follows = await User.findById(user._id).select('followCount')
+                
+                return res.status(201).json({ success: true, message: 'User followed.', payload: { isFollowed: true, followCount: follows.followCount }})
+            })
+            .catch(() => {
+                return res.status(202).json({ success: false, message: 'Error following user.' })
+            })
     } catch (err) {
         console.log(err)
         return res.status(500).json({ message:'Internal server error.', err})
