@@ -42,17 +42,6 @@ function Settings(p) {
                         <p className="text-lg mb-6">Account Preferences</p>
                         <div className="grid grid-cols-2 mb-6">
                             <div>
-                                <p className="text-xl">Email Address</p>
-                                <p className="text-lg text-zinc-400">sampleemail@gmail.com</p>
-                            </div>
-                            <div className="flex flex-row items-center justify-end">
-                                <button className="w-44 h-10 rounded-3xl bg-zinc-700 hover:bg-zinc-500">
-                                    Change
-                                </button>
-                            </div>
-                        </div>
-                        <div className="grid grid-cols-2 mb-6">
-                            <div>
                                 <p className="text-xl">Change Password</p>
                                 <p className="text-lg text-zinc-400">Pasword must be at least 8 characters long</p>
                             </div>
