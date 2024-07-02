@@ -12,7 +12,7 @@ const preferenceSchema = new Schema({
         type: [String],
         default: []
     },
-    darkMode: {
+    isDarkMode: {
         type: Boolean,
         default: false,
     },

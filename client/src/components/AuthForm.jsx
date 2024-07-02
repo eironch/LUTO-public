@@ -102,7 +102,7 @@ function AuthForm(p) {
     }
 
     return (
-        <div className="flex flex-col shadow-md shadow-zinc-950 bg-zinc-900 rounded-3xl justify-center py-5">
+        <div className="flex flex-col shadow-md shadow-zinc-950 bg-zinc-875 rounded-3xl justify-center py-5">
             <div className="flex flex-col items-center">
                 <h1 className="text-zinc-100 text-5xl font-bold">{ action }</h1>
             </div>
@@ -134,11 +134,11 @@ function AuthForm(p) {
                 <div className="grid items-center w-10/12 gap-3">
                     {
                         action === "Sign In"? (
-                            <button className="shadow-md shadow-zinc-950 hover:bg-zinc-800 text-xl font-semibold rounded-3xl text-zinc-100 bg-zinc-700 p-3 w-full" onClick={ () => { handleSignIn() } }> 
+                            <button className="shadow-md shadow-zinc-950 hover:bg-zinc-700 text-xl font-semibold rounded-3xl text-zinc-100 bg-zinc-600 p-3 w-full" onClick={ () => { handleSignIn() } }> 
                                 Log In
                             </button>
                         ) : (
-                            <button className="shadow-md shadow-zinc-950 hover:bg-zinc-800 text-xl font-semibold rounded-3xl text-center text-zinc-100 bg-zinc-700 p-3 w-full" onClick={ () => { handleSignUp() }}> 
+                            <button className="shadow-md shadow-zinc-950 hover:bg-zinc-700 text-xl font-semibold rounded-3xl text-center text-zinc-100 bg-zinc-600 p-3 w-full" onClick={ () => { handleSignUp() }}> 
                                 Create Account
                             </button>
                         )
@@ -148,16 +148,16 @@ function AuthForm(p) {
             <div className="flex flex-col items-center mt-5"> 
                 {
                     action === "Sign In" ? 
-                    <div className="grid grid-cols-3 text-zinc-100 w-10/12">
+                    <div className="grid grid-cols-3 gap-6 text-zinc-100 w-10/12">
                         <p className="text-xl py-4 text-center overflow-hidden text-ellipsis line-clamp-2">Don't have an account?</p> 
-                        <button className="shadow-md shadow-zinc-950 hover:bg-zinc-800 col-span-2 text-xl font-semibold rounded-3xl text-zinc-100 bg-zinc-700 p-3 w-full" onClick={ () => { handleActionChange("Sign Up") } }> 
+                        <button className="shadow-md shadow-zinc-950 hover:bg-zinc-700 col-span-2 text-xl font-semibold rounded-3xl text-zinc-100 bg-zinc-600 p-3 w-full" onClick={ () => { handleActionChange("Sign Up") } }> 
                             Sign Up
                         </button>
                     </div> 
                     :
-                    <div className="grid grid-cols-3 text-zinc-100 w-10/12">
+                    <div className="grid grid-cols-3 gap-6 text-zinc-100 w-10/12">
                         <p className="text-xl py-4 text-center overflow-hidden text-ellipsis line-clamp-2">Already have an account?</p> 
-                        <button className="shadow-md shadow-zinc-950 hover:bg-zinc-800 col-span-2 text-xl font-semibold rounded-3xl text-center text-zinc-100 bg-zinc-700 p-3 w-full" onClick={ () => { handleActionChange("Sign In") } }> 
+                        <button className="shadow-md shadow-zinc-950 hover:bg-zinc-700 col-span-2 text-xl font-semibold rounded-3xl text-center text-zinc-100 bg-zinc-600 p-3 w-full" onClick={ () => { handleActionChange("Sign In") } }> 
                             Sign In
                         </button>
                     </div>

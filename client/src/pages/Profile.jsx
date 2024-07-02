@@ -15,6 +15,7 @@ function Profile(p) {
     const user = p.user
     const currentTab = p.currentTab
     const setCurrentTab = p.setCurrentTab
+
     const handleGiveRecipePoint = p.handleGiveRecipePoint
     const formatDate = p.formatDate
     const handleFlagRecipe = p.handleFlagRecipe
@@ -33,28 +34,31 @@ function Profile(p) {
     const [isFetching, setIsFetching] = useState(false)
     const [isFetchedAll, setIsFetchedAll] = useState(false)
     const scrollDivRef = useRef(null)
+    const fetchedRecipeIdsRef = useRef(fetchedRecipeIds)
+    const userRecipeRef = useRef(userRecipes)
 
     function fetchUserRecipes() {
         setIsFetching(true)
 
-        axios.get('http://localhost:8080/user-recipes', { params: { userId: user.userId, authorName, sort: user.accountType === "user" ? { createdAt: -1 } : { flagCount: 1 }, fetchedRecipeIds } })
+        axios.get('http://localhost:8080/user-recipes', { params: { userId: user.userId, authorName, sort: user.accountType === "user" ? { createdAt: -1 } : { flagCount: 1 }, fetchedRecipeIds: fetchedRecipeIdsRef.current } })
             .then(res => {
                 console.log('Status Code:', res.status)
                 console.log('Data:', res.data)
-                
+                console.log("asdasdsa" + [...userRecipes])
                 setIsFetching(false)
 
                 if (res.status === 202) {
                     setIsFetchedAll(true)
-
+                    setUserRecipes([])
+                    
                     return
                 }
 
                 if (res.data.payload.length < 10) {
                     setIsFetchedAll(true)
                 }
-
-                setUserRecipes(userRecipes.length > 0 ? [...userRecipes, ...res.data.payload] : res.data.payload)
+         
+                setUserRecipes(userRecipeRef.current.length > 0 ? [...userRecipeRef.current, ...res.data.payload] : res.data.payload)
                 setFetchedRecipeIds([...fetchedRecipeIds, ...res.data.payload.map(recipe => recipe.recipeId)])
             })
             .catch(err => {
@@ -64,11 +68,6 @@ function Profile(p) {
                 setIsFetching(false)
             })
     }
-
-    useLayoutEffect(() => {
-        fetchUserRecipes()
-    }, [authorName])
-
     
     function removeRecipe() {
         handleRemoveRecipe(user.userId, prevRecipeId)
@@ -106,6 +105,22 @@ function Profile(p) {
             scrollDiv.removeEventListener('scroll', handleScroll)
         }
     })
+
+    useLayoutEffect(() => {
+        fetchedRecipeIdsRef.current = fetchedRecipeIds
+    }, [fetchedRecipeIds])
+
+    
+    useLayoutEffect(() => {
+        userRecipeRef.current = userRecipes
+    }, [userRecipes])
+
+
+    useEffect(() => {
+        userRecipeRef.current = []
+        fetchedRecipeIdsRef.current = []
+        fetchUserRecipes()
+    }, [authorName])
 
     useLayoutEffect(() => {
         setCurrentTab('Profile')

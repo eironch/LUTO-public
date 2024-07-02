@@ -3,18 +3,19 @@ import axios from 'axios'
 
 import Textarea from '../components/Textarea'
 
-import ProfilePicture from '../assets/profile-picture.png'
+import ProfileIcon from '../assets/profile-icon.png'
 import MoreIcon from '../assets/more-icon.png'
 import FeedbackIcon from '../assets/feedback-icon.png'
 
 function Feedback(p) {
     const username = p.username
+    const profilePicture = p.profilePicture
     const text = p.text
     const createdAt = p.createdAt
     const formatDate = p.formatDate
 
     const [formattedDate, setFormattedDate] = useState()
-    console.log(p.feedbackId)
+
     useEffect(() => {
         setFormattedDate(formatDate(new Date(createdAt)))
     })
@@ -22,7 +23,7 @@ function Feedback(p) {
     return (
         <div className="flex flex-row gap-4">
             <div className="h-full w-12">
-                <img className="" src={ ProfilePicture } alt="" />
+                <img className="w-10 h-10 aspect-1 rounded-full object-cover" src={ profilePicture || ProfileIcon } alt="" />
             </div>
             <div className="flex flex-col gap-1 w-full">
                 <div className="flex flex-row font-semibold">
@@ -32,9 +33,6 @@ function Feedback(p) {
                             • said { formattedDate }
                         </p>
                     </div>
-                    <button className="flex px-3 items-center justify-center rounded-3xl hover:bg-zinc-500">
-                        <img className="w-5" src={ MoreIcon } alt="" />
-                    </button>
                 </div>
                 <p>{ text }</p>
             </div>
@@ -56,7 +54,7 @@ function FeedbackSection(p) {
     function getFeedbacks() {
         setFeedbackCount(0)
 
-        axios.get('http://localhost:8080/feedbacks', { params: { recipeId } })
+        axios.get('http://localhost:8080/get-feedbacks', { params: { recipeId } })
             .then(res => {
                 console.log('Status Code:' , res.status)
                 console.log('Data:', res.data)
@@ -92,7 +90,7 @@ function FeedbackSection(p) {
     }, [])
 
     return (
-        <div className="flex flex-col w-full mb-3 rounded-3xl bg-zinc-900 overflow-hidden">
+        <div className="flex flex-col w-full mb-3 rounded-3xl bg-zinc-875 overflow-hidden">
             {/* header */}
             <div className="flex flex-row items-center p-6 gap-6 shadow-md shadow-zinc-950">
                 <img className="w-10" src={ FeedbackIcon } alt="" />
@@ -103,13 +101,13 @@ function FeedbackSection(p) {
             </div>
             {/* feedback input */}
             <div className="flex flex-row items-center p-6 -mb-3 gap-3">
-                <img className="w-10" src={ ProfilePicture } alt="" />
+                <img className="w-12 h-12 aspect-1 rounded-full object-cover" src={ user.profilePicture || ProfileIcon } alt="" />
                 <Textarea 
-                    attribute="w-full text-justify text-md bg-zinc-700 focus:bg-zinc-700" 
+                    attribute="w-full text-justify text-md bg-zinc-600 focus:bg-zinc-600" 
                     maxLength={ 500 } value={ userFeedback || "" } setValue={ setUserFeedback }
                     placeholder="Got Feedbacks?"
                 />
-                <button className={`${ userFeedback ? "hover:bg-zinc-500 bg-zinc-700" : "bg-zinc-800" } p-3 rounded-3xl disabled:cursor-not-allowed`} 
+                <button className={`${ userFeedback ? "hover:bg-zinc-500 bg-zinc-600" : "bg-zinc-700" } p-3 rounded-3xl disabled:cursor-not-allowed`} 
                     disabled={ !userFeedback } onClick={ () => { submitFeedback() } }
                 >
                     Send
@@ -124,9 +122,9 @@ function FeedbackSection(p) {
                         feedbacks.map(feedback => 
                             <Feedback 
                                 key={ feedback._id } username={ feedback.userId.username }
-                                feedbackId={ feedback._id }
-                                text={ feedback.text } createdAt={ feedback.createdAt } 
-                                formatDate={ formatDate }
+                                feedbackId={ feedback._id } text={ feedback.text } 
+                                createdAt={ feedback.createdAt } formatDate={ formatDate }
+                                profilePicture={ feedback.userId.profilePicture }
                             />
                         )
                     }

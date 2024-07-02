@@ -108,13 +108,13 @@ function Search(p) {
                     {/* search */}
                     <div className="min-h-52 grid w-full gap-3" style={ { gridTemplateColumns: "repeat(15, minmax(0, 1fr))" } }>
                         <div className="col-span-2"></div>
-                        <div className="flex flex-col justify-center items-center col-span-11 h-full rounded-3xl bg-zinc-900">
+                        <div className="flex flex-col justify-center items-center col-span-11 h-full rounded-3xl bg-zinc-875">
                             {/* search context */}
                             <p className="text-zinc-400 text-4xl mt-7 py-1.5 pt-2 overflow-hidden text-ellipsis line-clamp-1 mx-6">
                                 What are you looking up?
                             </p> 
                             {/* search bar */}
-                            <div className="relative flex my-10 items-center justify-center shadow-md shadow-zinc-950 rounded-3xl m-3 w-8/12 h-10 bg-zinc-700 pointer-events-auto">
+                            <div className="relative flex my-10 items-center justify-center shadow-md shadow-zinc-950 rounded-3xl m-3 w-8/12 h-10 bg-zinc-600 pointer-events-auto">
                                 <div className="absolute flex ml-6 left-0 right-0 items-start justify-left pointer-events-none">
                                     <img className="w-6" src={ SearchIcon } alt="" />
                                 </div>

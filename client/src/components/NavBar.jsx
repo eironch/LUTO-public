@@ -7,7 +7,7 @@ import SidebarProfile from '../components/SidebarProfile'
 import SidebarRecipe from '../components/SidebarRecipe'
 
 import Logo from '../assets/luto-logo-gradient.png'
-import ProfilePicture from '../assets/profile-picture.png'
+import ProfileIcon from '../assets/profile-icon.png'
 import CreateIcon from '../assets/create-icon.png'
 import SaveIcon from '../assets/saved-icon.png'
 
@@ -15,10 +15,11 @@ function NavBar(p) {
     const user = p.user
     const currentTab = p.currentTab
     const setCurrentTab = p.setCurrentTab
-    const authorName = p.authorName
     const formatDate = p.formatDate
     const setConfirmationShown = p.setConfirmationShown
 
+    const authorName = p.authorName
+    const profilePicture = p.profilePicture
     const recipeId = p.recipeId
     const recipeImage = p.recipeImage
     const setRecipeImage = p.setRecipeImage 
@@ -52,11 +53,10 @@ function NavBar(p) {
                         {/* logo navbar side*/}
                         {
                             (
-                                currentTab === "Home" || currentTab === "Search" 
-                                || currentTab === "Settings" || currentTab === "Saved" 
-                                || currentTab === "Popular"
+                                currentTab === "Home" || currentTab === "Search" || 
+                                currentTab === "Saved" || currentTab === "Popular"
                             ) &&
-                            <Link to="/home" className="pointer-events-auto rounded-3xl flex col-span-2 items-center justify-center bg-zinc-900 hover:bg-zinc-500">
+                            <Link to="/home" className="pointer-events-auto rounded-3xl flex col-span-2 items-center justify-center bg-zinc-875 hover:bg-zinc-500">
                                 <img className="px-4 w-48" src={ Logo } alt="" />
                             </Link>
                         }
@@ -66,11 +66,11 @@ function NavBar(p) {
                             <>
                                 {
                                     currentTab === "Create" ?
-                                    <button className="col-span-2 items-center gap-4 bg-zinc-900 pointer-events-auto flex flex-row justify-center w-full h-full rounded-3xl overflow-hidden hover:bg-zinc-500" onClick={ () => { setConfirmationShown("exit") } }>
+                                    <button className="col-span-2 items-center gap-4 bg-zinc-875 pointer-events-auto flex flex-row justify-center w-full h-full rounded-3xl overflow-hidden hover:bg-zinc-500" onClick={ () => { setConfirmationShown("exit") } }>
                                         <img className="px-4 w-48 " src={ Logo } alt="" />
                                     </button>
                                     :
-                                    <Link to="/home" className="col-span-2 items-center gap-4 bg-zinc-900 pointer-events-auto flex flex-row justify-center w-full h-full rounded-3xl overflow-hidden hover:bg-zinc-500">
+                                    <Link to="/home" className="col-span-2 items-center gap-4 bg-zinc-875 pointer-events-auto flex flex-row justify-center w-full h-full rounded-3xl overflow-hidden hover:bg-zinc-500">
                                         <img className="px-4 w-48 " src={ Logo } alt="" />
                                     </Link>
                                 }
@@ -86,10 +86,10 @@ function NavBar(p) {
                                     }
                                     {
                                         currentTab === "Create" &&
-                                        <button className="flex items-center w-full h-full bg-zinc-700 rounded-3xl overflow-hidden">
+                                        <button className="flex items-center w-full h-full bg-zinc-600 rounded-3xl overflow-hidden">
                                             <button className={`
                                                     ${ (title && recipeImage.size && summary && (ingredients.length > 1 || ingredients[0].value)) && "bg-orange-500 hover:bg-orange-400" } 
-                                                    rounded-3xl flex items-center p-4 gap-4 w-full h-full disabled:bg-zinc-900 disabled:cursor-not-allowed
+                                                    rounded-3xl flex items-center p-4 gap-4 w-full h-full disabled:bg-zinc-875 disabled:cursor-not-allowed
                                                 `} 
                                                 onClick={ () => { publishRecipe() } } disabled={ !(title && recipeImage.size && summary && (ingredients.length > 1  || ingredients[0].value)) }
                                             >
@@ -100,7 +100,9 @@ function NavBar(p) {
                                     }
                                     {
                                         currentTab === "Recipe" &&
-                                        <button className={`${ isRecipeSaved ? "bg-zinc-900 hover:bg-zinc-500" : " bg-orange-500 hover:bg-orange-400"} flex items-center p-4 gap-4 w-full h-full rounded-3xl overflow-hidden`} onClick={ () => handleSaveRecipe() }>
+                                        <button className={`${ isRecipeSaved ? "bg-zinc-875 hover:bg-zinc-500" : "bg-orange-500 disabled:cursor-not-allowed disabled:bg-zinc-800 hover:bg-orange-400"} flex items-center p-4 gap-4 w-full h-full rounded-3xl overflow-hidden`} 
+                                            onClick={ () => handleSaveRecipe() } disabled={ !title }
+                                        >
                                             <p className="flex text-zinc-100 text-lg w-full font-semibold">
                                                 { isRecipeSaved ? "Unsave" :"Save" }
                                             </p>
@@ -117,8 +119,8 @@ function NavBar(p) {
                                 currentTab === "Settings" || currentTab === "Saved" || 
                                 currentTab === "Popular"
                             ) &&
-                            <div className={`${ (currentTab === "Recipe" && currentTab === "Settings") && "bg-zinc-900" } rounded-3xl flex items-center justify-center`} 
-                                style={ { gridColumn: (currentTab === "Home" || currentTab === "Search" || currentTab === "Settings" || currentTab === "Saved" || currentTab === "Popular") ? "span 11" : "span 13" } }
+                            <div className={`${ (currentTab === "Recipe" && currentTab === "Settings") && "bg-zinc-875" } rounded-3xl flex items-center justify-center`} 
+                                style={ { gridColumn: (currentTab === "Home" || currentTab === "Search" || currentTab === "Saved" || currentTab === "Popular") ? "span 11" : "span 13" } }
                             >
                                 { 
                                     (currentTab === "Settings") &&
@@ -135,13 +137,13 @@ function NavBar(p) {
                                 currentTab === "Settings" || currentTab === "Saved" || 
                                 currentTab === "Popular"
                             ) &&
-                            <Link to={`/${ user.username }`} className={`${ user.accountType === "user" ? "bg-zinc-900" : "bg-orange-500" }  col-span-2 flex items-center justify-end rounded-3xl pointer-events-auto hover:bg-zinc-500`}>
+                            <Link to={`/${ user.username }`} className={`${ user.accountType === "user" ? "bg-zinc-875" : "bg-orange-500" }  col-span-2 flex items-center justify-end rounded-3xl pointer-events-auto hover:bg-zinc-500`}>
                                 { 
                                     currentTab!=="Profile" && <p className="text-zinc-100 text-end w-full ml-3 text-xl font-semibold overflow-hidden">
                                         { user.username }
                                     </p> 
                                 }
-                                <img className="m-3 w-10" src={ ProfilePicture } alt="" />
+                                <img className="m-3 w-10 h-10 aspect-1 rounded-full object-cover" src={ user.profilePicture || ProfileIcon } alt="" />
                             </Link>
                         }
                     </div>
@@ -189,6 +191,7 @@ function NavBar(p) {
                             setFeedbackCount={ setFeedbackCount } currentTab={ currentTab } 
                             pointStatus={ pointStatus || null } setPointStatus={ setPointStatus || null }
                             formatDate={ formatDate || null } handleGiveRecipePoint={ handleGiveRecipePoint }
+                            profilePicture={ profilePicture }
                         />
                     )
                 }                 

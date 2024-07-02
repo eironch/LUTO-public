@@ -9,11 +9,12 @@ function Recipe(p) {
     const currentTab = p.currentTab
     const setCurrentTab = p.setCurrentTab
     const formatDate = p.formatDate
-    
+
     const handleGiveRecipePoint = p.handleGiveRecipePoint
 
     const { recipeId } = useParams()
     const [authorName, setAuthorName] = useState()
+    const [profilePicture, setProfilePicture] = useState()
     const [recipeImage, setRecipeImage] = useState()
     const [title, setTitle] = useState()
     const [summary, setSummary] = useState()
@@ -43,18 +44,18 @@ function Recipe(p) {
     }
 
     useLayoutEffect(() => {
-        axios.get('http://localhost:8080/recipe', { params: { recipeId, userId: user.userId } })
+        axios.get('http://localhost:8080/get-recipe', { params: { recipeId, userId: user.userId } })
             .then(res => {
                 console.log('Status Code:' , res.status)
                 console.log('Data:', res.data)
                 
                 setAuthorName(res.data.payload.userInfo.username)
+                setProfilePicture(res.data.payload.userInfo.profilePicture)
                 setRecipeImage(res.data.payload.recipeContents.recipeImage)
                 setTitle(res.data.payload.recipeContents.title)
                 setSummary(res.data.payload.recipeContents.summary)
                 setIngredients(res.data.payload.recipeContents.ingredients)
                 setTags(res.data.payload.recipeContents.tags)
-                console.log(res.data.payload.recipeContents.tags)
                 setRecipeElements(res.data.payload.recipeContents.recipeElements)
                 setPoints(res.data.payload.recipeContents.points)
                 setPointStatus(res.data.payload.recipeStatus.pointStatus)
@@ -88,6 +89,7 @@ function Recipe(p) {
                 isRecipeSaved={ isRecipeSaved } formatDate={ formatDate } 
                 pointStatus={ pointStatus } setPointStatus={ setPointStatus }
                 handleSaveRecipe={ handleSaveRecipe } handleGiveRecipePoint={ handleGiveRecipePoint }
+                profilePicture={ profilePicture }
             />
             <div className="pr-0 flex flex-col gap-3 p-3 pb-0 h-svh overflow-y-scroll scrollable-div bg-zinc-950">
                 <div className="grid w-full gap-3" style={ { gridTemplateColumns: "repeat(15, minmax(0, 1fr))" } }>
@@ -95,7 +97,7 @@ function Recipe(p) {
                     <div className="col-span-11 flex flex-col rounded-3xl text-zinc-100">
                         {
                             title &&
-                            <div className="flex flex-col items-center w-full mb-3 p-6 rounded-3xl bg-zinc-900">
+                            <div className="flex flex-col items-center w-full mb-3 p-6 rounded-3xl bg-zinc-875">
                                 <p className="text-4xl font-bold w-full text-center">
                                     { title }
                                 </p>
@@ -107,7 +109,7 @@ function Recipe(p) {
                             recipeElements.map((element, key) => {
                                 if (element.contentType === "Section Header") {
                                     return (
-                                        <div className="py-6 px-3 flex flex-col gap-3 mb-3 rounded-3xl bg-zinc-900" key={ key }>
+                                        <div className="py-6 px-3 flex flex-col gap-3 mb-3 rounded-3xl bg-zinc-875" key={ key }>
                                             <p className="px-3 text-3xl font-semibold w-full text-justify">
                                                 { element.text }
                                             </p>
@@ -115,7 +117,7 @@ function Recipe(p) {
                                     )
                                 } else if (element.contentType === "Description Text") {
                                     return (
-                                        <div className="py-6 px-3 flex flex-col gap-3 mb-3 rounded-3xl bg-zinc-900" key={ key }>
+                                        <div className="py-6 px-3 flex flex-col gap-3 mb-3 rounded-3xl bg-zinc-875" key={ key }>
                                             <p className="px-3 text-xl w-full text-justify">
                                                 { element.text }
                                             </p>
@@ -123,12 +125,12 @@ function Recipe(p) {
                                     )
                                 } else if (element.contentType === "Image Carousel") {
                                     return (
-                                        <div className="pt-6 pb-3 px-6 flex flex-col justify-center items-center gap-3 mb-3 rounded-3xl overflow-hidden bg-zinc-900" key={ key }>
+                                        <div className="pt-6 pb-3 px-6 flex flex-col justify-center items-center gap-3 mb-3 rounded-3xl overflow-hidden bg-zinc-875" key={ key }>
                                             <div className={`${ element.files.length > 2 ? "lg:justify-start" : "lg:justify-center" } flex flex-row w-full h-full gap-3 items-center overflow-x-scroll scrollable-div md:justify-start`}>
                                                 {
                                                     element.files.map((file, index) => (
                                                         <div className="w-96 h-96 aspect-w-2 flex-none" key={ index }>
-                                                            <div className="bg-zinc-700 rounded-3xl">
+                                                            <div className="bg-zinc-600 rounded-3xl">
                                                                 <img className="absolute inset-0 w-full h-full rounded-3xl object-cover" src={ file } alt="" />
                                                             </div>
                                                         </div>

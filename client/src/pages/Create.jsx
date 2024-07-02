@@ -34,7 +34,7 @@ function ElementsModal(p) {
             }
         >
             <div className="flex flex-col gap-3 justify-center items-center w-5/12 overflow-hidden model-inner">
-                <div className="flex flex-col w-full rounded-3xl bg-zinc-900 overflow-hidden">
+                <div className="flex flex-col w-full rounded-3xl bg-zinc-875 overflow-hidden">
                     <div className="flex flex-row items-center p-6 gap-6 shadow-md shadow-zinc-950">
                         <img className="w-8" src={ AddIcon } alt="" />
                         <p className="text-2xl font-semibold">
@@ -44,7 +44,7 @@ function ElementsModal(p) {
                     <div className="p-6">
                         <ul className="flex flex-col gap-3 w-full h-full scrollable-div">
                             <li>
-                                <button className="flex w-full p-3 gap-3 rounded-3xl bg-zinc-700 hover:bg-zinc-500" onClick={ () => { addElement("Description Text") }}>
+                                <button className="flex w-full p-3 gap-3 rounded-3xl bg-zinc-600 hover:bg-zinc-500" onClick={ () => { addElement("Description Text") }}>
                                     <img className="p-3 w-24" src={ TextIcon } alt=""/>
                                     <div className="flex flex-col h-24 gap-3 justify-center overflow-hidden">
                                         <p className="w-full text-left text-xl font-semibold">Description Text</p>
@@ -53,7 +53,7 @@ function ElementsModal(p) {
                                 </button>
                             </li>
                             <li>
-                                <button className="flex w-full p-3 gap-3 rounded-3xl bg-zinc-700 hover:bg-zinc-500" onClick={ () => { addElement("Section Header") }}>
+                                <button className="flex w-full p-3 gap-3 rounded-3xl bg-zinc-600 hover:bg-zinc-500" onClick={ () => { addElement("Section Header") }}>
                                 <img className="p-3 w-24" src={ SectionIcon } alt="" />
                                     <div className="flex flex-col h-24 gap-3 justify-center overflow-hidden">
                                         <p className="w-full text-left text-xl font-semibold">Section Header</p>
@@ -62,7 +62,7 @@ function ElementsModal(p) {
                                 </button>
                             </li>
                             <li>
-                                <button className="flex w-full p-3 gap-3 rounded-3xl bg-zinc-700 hover:bg-zinc-500" onClick={ () => { addElement("Image Carousel") }}>
+                                <button className="flex w-full p-3 gap-3 rounded-3xl bg-zinc-600 hover:bg-zinc-500" onClick={ () => { addElement("Image Carousel") }}>
                                 <img className="p-3 w-24" src={ ImageIcon } alt="" />
                                     <div className="flex flex-col h-24 gap-3 justify-center overflow-hidden">
                                         <p className="w-full text-left text-xl font-semibold">Image Carousel</p>
@@ -82,7 +82,6 @@ function Create(p) {
     const user = p.user
     const currentTab = p.currentTab
     const setCurrentTab = p.setCurrentTab
-    
     const systemTags = p.systemTags
     
     const [publishState, setPublishState] = useState() 
@@ -95,22 +94,19 @@ function Create(p) {
     const [tags, setTags] = useState([])
     const navigate = useNavigate()
 
-    const keys = [uuidv4(), uuidv4(), uuidv4()]
+    const keys = [uuidv4(), uuidv4()]
 
     const [elementTexts, setElementTexts] = useState([
         { key: keys[0], value: '' },
-        { key: keys[1], value: '' },
-        { key: keys[2], value: '' }
+        { key: keys[1], value: '' }
     ])
     const [elementFiles, setElementFiles] = useState([
         { key: keys[0], value: [''] },
-        { key: keys[1], value: [''] },
-        { key: keys[2], value: [''] }
+        { key: keys[1], value: [''] }
     ])
     const [recipeElements, setRecipeElements] = useState([
         { key: keys[0], value:{ contentType: 'Image Carousel' } },
-        { key: keys[1], value:{ contentType: 'Section Header' } },
-        { key: keys[2], value:{ contentType: 'Description Text' } }
+        { key: keys[1], value:{ contentType: 'Description Text' } }
     ])
     
     function navigateToHome() {
@@ -127,20 +123,9 @@ function Create(p) {
     }
 
     function publishRecipe() {
-        console.log({
-            userId: p.user.userId,
-            categories: [],
-            tags: [],
-            recipeImage,
-            title,
-            summary,
-            ingredients,
-            recipeElements,
-        })
-
         const formData = new FormData()
 
-        formData.append('userId', p.user.userId)
+        formData.append('userId', user.userId)
         formData.append('recipeImage', recipeImage)
         formData.append('title', title)
         formData.append('summary', summary)
@@ -232,9 +217,9 @@ function Create(p) {
                         <p className="text-3xl font-bold h-16 mb-3 p-6 flex items-center text-zinc-400">
                             What are you cooking?
                         </p>
-                        <div className="flex flex-col items-center w-full mb-3 py-6 px-3 rounded-3xl bg-zinc-900">
+                        <div className="flex flex-col items-center w-full mb-3 py-6 px-3 rounded-3xl bg-zinc-875">
                             <Textarea 
-                                attribute={`${ !title && "pt-2.5 border border-red-600 bg-zinc-700" } px-3 text-4xl font-bold w-full text-center focus:bg-zinc-700 bg-transparent`} 
+                                attribute={`${ !title && "pt-2.5 border border-red-600 bg-zinc-600" } px-3 text-4xl font-bold w-full text-center focus:bg-zinc-600 bg-transparent`} 
                                 maxLength={ 200 } value={ title } setValue={ setTitle } 
                                 placeholder="What is the title of your recipe?" 
                             />
@@ -251,7 +236,7 @@ function Create(p) {
                                 />
                             )
                         }
-                        <button className="flex items-center w-full mb-3 p-6 rounded-3xl bg-orange-500 hover:bg-orange-400" onClick={ () => { setShowModal(true) } }>
+                        <button className="flex items-center w-full p-6 rounded-3xl bg-orange-500 hover:bg-orange-400" onClick={ () => { setShowModal(true) } }>
                             <div className="flex w-full justify-center">
                                 <img className="w-10" src={ AddIcon } alt=""/>
                             </div>
@@ -290,7 +275,7 @@ function Create(p) {
                         }
                     >
                         <div className="flex flex-col gap-3 justify-center items-center w-4/12 overflow-hidden model-inner">
-                            <div className="flex flex-col w-full py-20 gap-12 items-center rounded-3xl bg-zinc-900 overflow-hidden">
+                            <div className="flex flex-col w-full py-20 gap-12 items-center rounded-3xl bg-zinc-875 overflow-hidden">
                                 {
                                     publishState === "publishing" &&
                                     <>
