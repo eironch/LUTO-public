@@ -113,16 +113,6 @@ function AuthForm(p) {
                     type="text" placeholder="Username"
                     onKeyDown={ e => { focusInput(e, passwordRef) } }
                 />
-                {
-                    action === "Sign Up" &&
-                    <input 
-                        className={`${isCredsCorrect ? "border-zinc-100" : "border-red-600" } bg-transparent text-center border rounded-3xl p-3 mb-12 w-10/12 caret-zinc-100 text-xl text-zinc-100`} 
-                        value={ password } onChange={ (e) => { setPassword(e.target.value) } } 
-                        type="password" placeholder="Email"
-                        onKeyDown={ e => { handleEnterKey(e, passswordAgainRef) } } ref={ passwordRef }
-                        id="password"
-                    />
-                }
                 <input 
                     className={`${isCredsCorrect ? "border-zinc-100" : "border-red-600" } bg-transparent text-center border rounded-3xl p-3 w-10/12 caret-zinc-100 text-xl text-zinc-100 mb-5`} 
                     value={ password } onChange={ (e) => { setPassword(e.target.value) } } 
