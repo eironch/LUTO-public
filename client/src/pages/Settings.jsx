@@ -115,16 +115,16 @@ function Settings(p) {
                 user={ user } currentTab={ currentTab }
                 setCurrentTab={ setCurrentTab } setConfirmationShown={ setConfirmationShown }
             />
-            <div className="flex flex-col gap-3 p-3 h-svh bg-zinc-950">
+            <div className="flex flex-col gap-3 p-3 h-svh bg-zinc-900">
                 {/* space for top navbar */}
                 <div className="grid w-full gap-3 h-16" style={ { gridTemplateColumns: "repeat(15, minmax(0, 1fr))" } }>
-                    <div className="col-span-11 h-16 rounded-3xl bg-zinc-875" style={ { gridColumn:  "span 13" } }></div>
+                    <div className="col-span-11 h-16 rounded-3xl bg-zinc-800" style={ { gridColumn:  "span 13" } }></div>
                     <div className="col-span-2"></div>     
                 </div>
                 {/* content */}
                 <div className="grid w-full gap-3 h-full" style={ { gridTemplateColumns: "repeat(15, minmax(0, 1fr))" } }>
                     <div className="col-span-2"></div>
-                    <div className="flex flex-col p-9 bg-zinc-875 rounded-3xl text-zinc-100" style={ { gridColumn: "span 13" } }>
+                    <div className="flex flex-col p-9 bg-zinc-800 rounded-3xl text-zinc-100" style={ { gridColumn: "span 13" } }>
                         <p className="text-3xl font-bold mb-3">Account Settings</p>
                         <p className="text-lg mb-6 text-zinc-400">Account Preferences</p>
                         <p className="text-xl mb-6">Change Profile Picture</p>

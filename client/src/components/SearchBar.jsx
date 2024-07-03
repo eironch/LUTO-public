@@ -21,7 +21,7 @@ function SearchBar(p) {
             <div className="col-span-2"></div>
             <div className="flex flex-col col-span-11 rounded-3xl items-center justify-center pointer-events-none">
                 {/* search bar */}
-                <div className="relative flex m-3 w-8/12 h-10 items-center justify-center shadow-md shadow-zinc-950 rounded-3xl bg-zinc-600">
+                <div className="relative flex m-3 w-8/12 h-10 items-center justify-center shadow-md shadow-zinc-900 rounded-3xl bg-zinc-600">
                     <div className="absolute flex ml-6 left-0 right-0 items-start justify-left pointer-events-none">
                         <img className="w-6" src={ SearchIcon } alt="" />
                     </div>

@@ -63,31 +63,31 @@ function SidebarTab(p) {
 
     return (
         <div className="p-3 pt-0 grid w-full gap-3 h-full overflow-hidden" style={ { gridTemplateColumns: "repeat(15, minmax(0, 1fr))" } }>
-            <div className="flex flex-col col-span-2 rounded-3xl bg-zinc-900 pointer-events-auto">
+            <div className="flex flex-col col-span-2 rounded-3xl bg-zinc-800 pointer-events-auto">
                 <div className="flex items-center flex-col gap-3 m-3">
-                    <Link to="/home" className={`${ currentTab==="Home" && "bg-zinc-600 shadow-md shadow-zinc-950" } flex flex-row items-center gap-4 p-4 overflow-hidden w-full rounded-3xl hover:bg-zinc-500 hover:shadow-md hover:shadow-zinc-950`}>
+                    <Link to="/home" className={`${ currentTab==="Home" && "bg-zinc-600 shadow-md shadow-zinc-900" } flex flex-row items-center gap-4 p-4 overflow-hidden w-full rounded-3xl hover:bg-zinc-500 hover:shadow-md hover:shadow-zinc-900`}>
                         <img className="w-8" src={ HomeIcon } alt="" />
                         <p className="text-zinc-100 text-lg font-semibold">Home</p>
                     </Link>
-                    <Link to="/popular" className={`${ currentTab==="Popular" && "bg-zinc-600 shadow-md shadow-zinc-950" } flex flex-row items-center gap-4 p-4 overflow-hidden w-full rounded-3xl hover:bg-zinc-500 hover:shadow-md hover:shadow-zinc-950`}>
+                    <Link to="/popular" className={`${ currentTab==="Popular" && "bg-zinc-600 shadow-md shadow-zinc-900" } flex flex-row items-center gap-4 p-4 overflow-hidden w-full rounded-3xl hover:bg-zinc-500 hover:shadow-md hover:shadow-zinc-900`}>
                         <img className="w-8" src={ PopularIcon } alt="" />
                         <p className="text-zinc-100 text-lg font-semibold">Popular</p>
                     </Link>
-                    <Link to="/saved" className={`${ currentTab==="Saved" && "bg-zinc-600 shadow-md shadow-zinc-950" } flex flex-row items-center gap-4 p-4 overflow-hidden w-full rounded-3xl hover:bg-zinc-500 hover:shadow-md hover:shadow-zinc-950`}>
+                    <Link to="/saved" className={`${ currentTab==="Saved" && "bg-zinc-600 shadow-md shadow-zinc-900" } flex flex-row items-center gap-4 p-4 overflow-hidden w-full rounded-3xl hover:bg-zinc-500 hover:shadow-md hover:shadow-zinc-900`}>
                         <img className="w-8" src={ SavedIcon } alt="" />
                         <p className="text-zinc-100 text-lg font-semibold">Saved</p>
                     </Link>
-                    <Link to="/create" className={`${ currentTab==="Create" && "bg-zinc-600 shadow-md shadow-zinc-950" } flex flex-row items-center gap-4 p-4 overflow-hidden w-full rounded-3xl hover:bg-zinc-500 hover:shadow-md hover:shadow-zinc-950`}>
+                    <Link to="/create" className={`${ currentTab==="Create" && "bg-zinc-600 shadow-md shadow-zinc-900" } flex flex-row items-center gap-4 p-4 overflow-hidden w-full rounded-3xl hover:bg-zinc-500 hover:shadow-md hover:shadow-zinc-900`}>
                         <img className="w-8" src={ CreateIcon } alt="" />
                         <p className="text-zinc-100 text-lg font-semibold">Create</p>
                     </Link>
                 </div>
                 <div className="flex flex-col gap-3 m-3 h-full justify-end">
-                    <Link to="/settings" className={`${ currentTab==="Settings" && "bg-zinc-600 shadow-md shadow-zinc-950" } flex flex-row items-center gap-4 p-4 overflow-hidden w-full rounded-3xl hover:bg-zinc-500 hover:shadow-md hover:shadow-zinc-950`}>
+                    <Link to="/settings" className={`${ currentTab==="Settings" && "bg-zinc-600 shadow-md shadow-zinc-900" } flex flex-row items-center gap-4 p-4 overflow-hidden w-full rounded-3xl hover:bg-zinc-500 hover:shadow-md hover:shadow-zinc-900`}>
                         <img className="w-8" src={ SettingsIcon } alt="" />
                         <p className="text-zinc-100 text-lg font-semibold">Settings</p>
                     </Link>
-                    <button className="flex flex-row items-center gap-4 p-4 overflow-hidden w-full rounded-3xl hover:bg-zinc-500 hover:shadow-md hover:shadow-zinc-950" onClick={ () => { setConfirmationShown('log out') } }>
+                    <button className="flex flex-row items-center gap-4 p-4 overflow-hidden w-full rounded-3xl hover:bg-zinc-500 hover:shadow-md hover:shadow-zinc-900" onClick={ () => { setConfirmationShown('log out') } }>
                         <img className="w-8" src={ LogOutIcon } alt="" />
                         <p className="text-zinc-100 text-lg font-semibold">Log Out</p>
                     </button>
@@ -97,8 +97,8 @@ function SidebarTab(p) {
             {/* filters */}
             {
                 currentTab !== "Settings" &&
-                <div className="bg-zinc-900 flex flex-col text-zinc-100 rounded-3xl col-span-2 overflow-hidden pointer-events-auto">
-                    <div className="flex p-6 gap-3 shadow-md shadow-zinc-950 flex-row items-center">
+                <div className="bg-zinc-800 flex flex-col text-zinc-100 rounded-3xl col-span-2 overflow-hidden pointer-events-auto">
+                    <div className="flex p-6 gap-3 shadow-md shadow-zinc-900 flex-row items-center">
                         <img  className="w-8" src={ FilterIcon } alt="" />
                         <p className="text-2xl font-bold">
                             Filter
@@ -119,12 +119,12 @@ function SidebarTab(p) {
                             </div>
                             {
                                 filters.length > 0 &&
-                                <button className="px-3 py-2 font-semibold rounded-3xl shadow-md shadow-zinc-950 bg-zinc-600 hover:bg-zinc-500" onClick={ () => setFilters([]) }>
+                                <button className="px-3 py-2 font-semibold rounded-3xl shadow-md shadow-zinc-900 bg-zinc-600 hover:bg-zinc-500" onClick={ () => setFilters([]) }>
                                     Clear filters
                                 </button>
                             }
                             {/* search input */}
-                            <div className="relative flex w-full items-center justify-center shadow-md shadow-zinc-950 rounded-3xl bg-zinc-600">
+                            <div className="relative flex w-full items-center justify-center shadow-md shadow-zinc-900 rounded-3xl bg-zinc-600">
                                 <div className="absolute flex ml-4 left-0 right-0 items-start justify-left pointer-events-none">
                                     <img className="w-6" src={ SearchIcon } alt="" />
                                 </div>
