@@ -44,7 +44,7 @@ function Profile(p) {
             .then(res => {
                 console.log('Status Code:', res.status)
                 console.log('Data:', res.data)
-                console.log("asdasdsa" + [...userRecipes])
+        
                 setIsFetching(false)
 
                 if (res.status === 202) {
@@ -57,8 +57,20 @@ function Profile(p) {
                 if (res.data.payload.length < 10) {
                     setIsFetchedAll(true)
                 }
+
+                let userRecipes
+
+                if (userRecipeRef.current.length > 0) {
+                    const combinedRecipes = [...userRecipeRef.current, ...res.data.payload];
+
+                    userRecipes = combinedRecipes.filter((recipe, index, self) =>
+                      index === self.findIndex((r) => r.id === recipe.id)
+                    )
+                } else {
+                    userRecipes = res.data.payload
+                }
          
-                setUserRecipes(userRecipeRef.current.length > 0 ? [...userRecipeRef.current, ...res.data.payload] : res.data.payload)
+                setUserRecipes(userRecipes)
                 setFetchedRecipeIds([...fetchedRecipeIds, ...res.data.payload.map(recipe => recipe.recipeId)])
             })
             .catch(err => {
@@ -124,6 +136,7 @@ function Profile(p) {
 
     useLayoutEffect(() => {
         setCurrentTab('Profile')
+        setUserRecipes([])
     }, [])
 
     if (currentTab !== 'Profile') {
@@ -136,7 +149,7 @@ function Profile(p) {
                 user={ user }authorName={ authorName } 
                 currentTab={ currentTab } setCurrentTab={ setCurrentTab }
             />
-            <div className="flex flex-col p-3 pr-0 h-svh bg-zinc-950">
+            <div className="flex flex-col p-3 pr-0 h-svh bg-zinc-900">
                 {/* content */}
                 <div className="grid w-full gap-3 h-full" style={ { gridTemplateColumns: "repeat(15, minmax(0, 1fr))" } }>
                     <div className="col-span-4"></div>

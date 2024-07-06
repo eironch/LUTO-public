@@ -67,7 +67,7 @@ function SidebarProfile(p) {
         <div className="grid pl-3 w-full h-full overflow-hidden" style={ { gridTemplateColumns: "repeat(15, minmax(0, 1fr))" } }>
             <div className="flex flex-col gap-3 text-zinc-100 col-span-4 pointer-events-auto overflow-y-scroll scrollable-div">
                 {/* user  */}
-                <div className="flex flex-row p-6 gap-6 items-center text-2xl rounded-3xl bg-zinc-875">
+                <div className="flex flex-row p-6 gap-6 items-center text-2xl rounded-3xl bg-zinc-800">
                     <img className="w-28 h-28 aspect-1 rounded-full object-cover" src={ authorProfilePicture || ProfileIcon } alt="" />
                     <div className="grid grid-row-2 w-full gap-3 overflow-hidden">
                         <div className="flex flex-row h-12 pr-1 items-center">
@@ -95,7 +95,7 @@ function SidebarProfile(p) {
                 {/* bio */}
                 {
                     authorBio &&
-                    <div className="flex flex-col gap-3 p-6 rounded-3xl bg-zinc-875">
+                    <div className="flex flex-col gap-3 p-6 rounded-3xl bg-zinc-800">
                         <p className="text-2xl font-semibold">Bio</p>
                         <p className="w-full">
                             { authorBio }                        
@@ -103,7 +103,7 @@ function SidebarProfile(p) {
                     </div>
                 }
                 {/* friends */}
-                <div className="flex flex-col gap-3 p-3 rounded-3xl bg-zinc-875">
+                <div className="flex flex-col gap-3 p-3 rounded-3xl bg-zinc-800">
                     <p className="text-2xl px-3 pt-3 font-semibold">Followers</p>
                     <div className="flex flex-col gap-3">
                         {

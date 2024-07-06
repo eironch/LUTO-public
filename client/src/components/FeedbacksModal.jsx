@@ -13,7 +13,7 @@ function FeedbacksModal(p) {
     const setFeedRecipes = p.setFeedRecipes
     
     return (
-        <div className="absolute inset-0 grid place-items-center h-screen pt-3 text-zinc-100 bg-zinc-950 bg-opacity-80 overflow-y-scroll scrollable-div" 
+        <div className="absolute inset-0 grid place-items-center h-screen pt-3 text-zinc-100 bg-zinc-900 bg-opacity-80 overflow-y-scroll scrollable-div" 
             onMouseDownCapture={e => { 
                     const isOutsideModal = !e.target.closest('.model-inner')
 
