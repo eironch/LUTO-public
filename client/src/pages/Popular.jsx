@@ -84,8 +84,8 @@ function Popular(p) {
                     {/* space for top navbar */}
                     <div className="grid w-full gap-3" style={ { gridTemplateColumns: "repeat(15, minmax(0, 1fr))" } }>
                         <div className="col-span-2"></div>
-                        <div className="col-span-11 rounded-3xl bg-zinc-800">
-                            <div className="grid grid-cols-2 p-6 w-full text-zinc-100 text-5xl font-bold rounded-3xl bg-zinc-800">
+                        <div className="col-span-11 rounded-3xl bg-zinc-900">
+                            <div className="grid grid-cols-2 p-6 w-full text-zinc-100 text-5xl font-bold rounded-3xl bg-zinc-900">
                                 <div className="flex px-6 pb-2.5 h-full items-center">
                                     Popular Recipes
                                 </div>
@@ -103,7 +103,7 @@ function Popular(p) {
                                 popularRecipes.map((recipe, index) => 
                                     recipe &&
                                     <div className="flex rounded-3xl" key={ index }>
-                                        <div className={`${ index + 1 !== 10 && "mb-3"  } max-w-32 w-32 rounded-l-3xl bg-zinc-800 overflow-hidden`}>
+                                        <div className={`${ index + 1 !== 10 && "mb-3"  } max-w-32 w-32 rounded-l-3xl bg-zinc-900 overflow-hidden`}>
                                             <p className={`${ index + 1 === 10 ? "-ml-8" : "ml-1.5" } -mt-8 text-zinc-100`} style={ { fontSize: "13rem" } }>{ index + 1 }</p>
                                         </div>
                                         <div className={`${ index + 1 !== 10 ? "mb-0" : "-mb-3"  } w-full`}>

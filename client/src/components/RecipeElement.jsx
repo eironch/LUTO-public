@@ -64,7 +64,7 @@ function SectionHeader(p) {
     const removeElement = p.removeElement
 
     return (
-        <div className="py-6 px-3 flex flex-col justify-center items-center gap-3 mb-3 rounded-3xl bg-zinc-800">
+        <div className="py-6 px-3 flex flex-col justify-center items-center gap-3 mb-3 rounded-3xl bg-zinc-900">
             <CustomTextarea attribute={`${ !values.some(value => value.key === keyIndex) && "bg-zinc-600" } px-3 text-3xl font-semibold w-full text-justify focus:bg-zinc-600 bg-transparent`} 
                 maxLength={ 50 } keyIndex={ keyIndex } values={ values } setValues={ setValues }
                 placeholder="Enter section title here" 
@@ -83,7 +83,7 @@ function DescriptionText(p) {
     const removeElement = p.removeElement
 
     return (
-        <div className="py-6 px-3 flex flex-col justify-center items-center gap-6 mb-3 rounded-3xl bg-zinc-800">
+        <div className="py-6 px-3 flex flex-col justify-center items-center gap-6 mb-3 rounded-3xl bg-zinc-900">
             <CustomTextarea attribute={`${ !values.some(value => value.key === keyIndex) && "bg-zinc-600" } px-3 text-xl w-full text-justify focus:bg-zinc-600 bg-transparent`} 
                 maxLength={ 2000 } keyIndex={ keyIndex } values={ values } setValues={ setValues }
                 placeholder="Enter description text here" 
@@ -143,7 +143,7 @@ function ImageCarousel(p) {
     }
 
     return (
-        <div className="pt-6 pb-3 px-6 flex flex-col justify-center items-center gap-3 mb-3 rounded-3xl overflow-hidden bg-zinc-800">
+        <div className="pt-6 pb-3 px-6 flex flex-col justify-center items-center gap-3 mb-3 rounded-3xl overflow-hidden bg-zinc-900">
             <div className="flex flex-row w-full h-full gap-3 justify-start items-center overflow-x-scroll scrollable-div" ref={ divRef }>
                 {
                     elementFiles.value.map((value, index) => (

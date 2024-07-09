@@ -123,9 +123,9 @@ function RecipeOverview(p) {
     }, [prevFeedbackCount])
 
     return (
-        <div className={`${ currentTab === "Popular" ? "rounded-r-3xl" : "rounded-3xl" } grid grid-cols-12 mb-3 w-full bg-zinc-800 overflow-hidden`}>
+        <div className={`${ currentTab === "Popular" ? "rounded-r-3xl" : "rounded-3xl" } grid grid-cols-12 mb-3 w-full bg-zinc-900 overflow-hidden`}>
             {/* recipe image */}
-            <Link to={`/recipe/${ recipeId }`}  className="flex col-span-4 rounded-3xl p-2 shadow-zinc-900 shadow-right bg-gradient-to-br from-orange-600 to-orange-400">
+            <Link to={`/recipe/${ recipeId }`}  className="flex col-span-4 rounded-3xl p-2 shadow-zinc-950 shadow-right bg-gradient-to-br from-orange-600 to-orange-400">
                 <div className="w-full aspect-w-1 aspect-h-1 overflow-hidden">
                     <img className="w-full h-full rounded-3xl object-cover" src={ recipeImage } alt="" />
                 </div>
@@ -143,7 +143,7 @@ function RecipeOverview(p) {
                             </button>
                             {
                                 moreModalShown === recipeId &&
-                                <div className="absolute flex p-3 mt-28 mr-24 w-36 rounded-3xl bg-zinc-600 shadow-md shadow-zinc-900" ref={ modalRef }>
+                                <div className="absolute flex p-3 mt-28 mr-24 w-36 rounded-3xl bg-zinc-600 shadow-md shadow-zinc-950" ref={ modalRef }>
                                     <button className="p-3 w-full text-left font-semibold text-red-600 rounded-3xl hover:bg-zinc-500" onClick={ () => flagRecipe() }>
                                         Flag Content
                                     </button>

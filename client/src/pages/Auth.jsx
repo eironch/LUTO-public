@@ -59,7 +59,9 @@ function Auth(p) {
                     setUser({ 
                         username: res.data.payload.username, 
                         userId: res.data.payload.userId, 
-                        accountType: res.data.payload.accountType 
+                        accountType: res.data.payload.accountType,
+                        profilePicture: res.data.payload.profilePicture,
+                        bio: res.data.payload.bio
                     })
                     setIsAuthenticated(true)
                     navigate('/')

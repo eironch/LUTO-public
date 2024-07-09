@@ -10,7 +10,7 @@ function ConfirmModal(p) {
     const isDanger = p.isDanger
 
     return (
-        <div className="absolute inset-0 grid place-items-center h-screen pt-3 text-zinc-100 bg-zinc-900 bg-opacity-80 overflow-y-scroll scrollable-div" 
+        <div className="absolute inset-0 grid place-items-center h-screen pt-3 text-zinc-100 bg-zinc-950 bg-opacity-80 overflow-y-scroll scrollable-div" 
             onMouseDownCapture={ 
                 (event) => { 
                     const isOutsideModal = !event.target.closest('.model-inner')
@@ -26,8 +26,8 @@ function ConfirmModal(p) {
                     title &&
                     <p className="px-6 text-2xl font-semibold text-ellipsis line-clamp-1">{ title }</p>
                 }
-                <div className="flex flex-col w-full rounded-3xl bg-zinc-800 overflow-hidden">
-                    <div className="flex flex-row items-center p-6 gap-6 shadow-md shadow-zinc-900">
+                <div className="flex flex-col w-full rounded-3xl bg-zinc-900 overflow-hidden">
+                    <div className="flex flex-row items-center p-6 gap-6 shadow-md shadow-zinc-950">
                         <img className="w-8" src={ icon } alt="" />
                         <p className="text-2xl font-semibold">
                             { headerText }

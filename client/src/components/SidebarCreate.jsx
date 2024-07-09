@@ -40,7 +40,7 @@ function IngredientForm(p) {
             <p className="flex items-center px-3 text-2xl font-bold">
                 •
             </p>
-            <input className={`${ (ingredient === "") ? "bg-zinc-600 border border-red-600" : "bg-zinc-800" } p-3 w-full rounded-3xl focus:bg-zinc-600 hover:bg-zinc-600`} 
+            <input className={`${ (ingredient === "") ? "bg-zinc-600 border border-red-600" : "bg-zinc-900" } p-3 w-full rounded-3xl focus:bg-zinc-600 hover:bg-zinc-600`} 
                 value={ ingredientValue } onChange={ e => setIngredientValue(e.target.value) } 
                 placeholder="What Ingredient?" maxLength={ 30 }
             />
@@ -124,7 +124,7 @@ function SidebarCreate(p) {
         <div className="pl-3 grid w-full h-full overflow-hidden" style={ { gridTemplateColumns: "repeat(15, minmax(0, 1fr))" } }>
             <div className="flex overflow-x-hidden overflow-y-scroll h-full scrollable-div flex-col text-zinc-100 col-span-4 pointer-events-auto">
                 {/* recipe image */}
-                <div className="mb-3 rounded-3xl bg-zinc-800">
+                <div className="mb-3 rounded-3xl bg-zinc-900">
                     <div className="p-2 rounded-3xl bg-gradient-to-tr from-orange-500 to-orange-400">
                         <div className="relative w-full h-auto aspect-w-2 aspect-h-2">
                             {
@@ -163,8 +163,8 @@ function SidebarCreate(p) {
                     </div>
                 </div>
                 {/* summary */}
-                <div className="flex flex-col mb-3 rounded-3xl bg-zinc-800">
-                    <div className="flex flex-row p-6 gap-6 items-center shadow-md shadow-zinc-900">
+                <div className="flex flex-col mb-3 rounded-3xl bg-zinc-900">
+                    <div className="flex flex-row p-6 gap-6 items-center shadow-md shadow-zinc-950">
                         <img className="w-10" src={ SummaryIcon } alt="" />
                         <p className="text-2xl font-semibold">
                             Summary
@@ -182,8 +182,8 @@ function SidebarCreate(p) {
                     </div>
                 </div>
                 {/* ingredients */}
-                <div className="flex flex-col mb-3 rounded-3xl bg-zinc-800">
-                    <div className="flex flex-row p-6 gap-6 items-center shadow-md shadow-zinc-900">
+                <div className="flex flex-col mb-3 rounded-3xl bg-zinc-900">
+                    <div className="flex flex-row p-6 gap-6 items-center shadow-md shadow-zinc-950">
                         <img className="w-10" src={ IngredientsIcon } alt="" />
                         <p className="text-2xl font-semibold">Ingredients</p>
                     </div>
@@ -197,22 +197,22 @@ function SidebarCreate(p) {
                                 />
                             )
                         }
-                        <button className="flex justify-center p-3 my-3 rounded-3xl shadow-md shadow-zinc-900 bg-zinc-600 hover:bg-zinc-500" onClick={ () => addIngredient() }>
+                        <button className="flex justify-center p-3 my-3 rounded-3xl shadow-md shadow-zinc-950 bg-zinc-600 hover:bg-zinc-500" onClick={ () => addIngredient() }>
                             <img className="w-5" src={ AddIcon } alt="" />
                         </button>
                     </ul>
                 </div>
                 {/* user */}
-                <div className="flex gap-6 flex-row items-center mb-3 p-6 rounded-3xl bg-zinc-800">
+                <div className="flex gap-6 flex-row items-center mb-3 p-6 rounded-3xl bg-zinc-900">
                     <img className="w-14 h-14 rounded-full object-cover" src={ user.profilePicture || ProfileIcon } alt="" />
                     <p className="text-xl font-semibold">
                         { user.username }
                     </p>
                 </div>
                 {/* tags */}
-                <div className="flex flex-col mb-3 gap-3 rounded-3xl bg-zinc-800">
+                <div className="flex flex-col mb-3 gap-3 rounded-3xl bg-zinc-900">
                     {/* header */}
-                    <div className="flex flex-row gap-6 p-6 mb-3 items-center shadow-md shadow-zinc-900">
+                    <div className="flex flex-row gap-6 p-6 mb-3 items-center shadow-md shadow-zinc-950">
                         <img className="w-10" src={ TagIcon } alt="" />
                         <p className="text-2xl font-semibold">Tags</p>
                     </div>
@@ -232,7 +232,7 @@ function SidebarCreate(p) {
                     }
                     {
                         tags.length > 0 &&
-                        <button className="mx-6 py-2 font-semibold rounded-3xl shadow-md shadow-zinc-900 bg-zinc-600 hover:bg-zinc-500" onClick={ () => setTags([]) }>
+                        <button className="mx-6 py-2 font-semibold rounded-3xl shadow-md shadow-zinc-950 bg-zinc-600 hover:bg-zinc-500" onClick={ () => setTags([]) }>
                             Clear filters
                         </button>
                     }
@@ -241,7 +241,7 @@ function SidebarCreate(p) {
                         {
                             !searchValue && <p className="text-xl font-bold">Popular</p>
                         }
-                        <div className="relative flex w-full items-center justify-center rounded-3xl shadow-md shadow-zinc-900 bg-zinc-600">
+                        <div className="relative flex w-full items-center justify-center rounded-3xl shadow-md shadow-zinc-950 bg-zinc-600">
                             <div className="absolute flex ml-4 left-0 right-0 items-start justify-left pointer-events-none">
                                 <img className="w-6" src={ SearchIcon } alt="" />
                             </div>

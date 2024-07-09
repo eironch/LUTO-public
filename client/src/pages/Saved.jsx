@@ -125,8 +125,8 @@ function Saved(p) {
                     {/* space for top navbar */}
                     <div className="grid w-full gap-3 h-16" style={ { gridTemplateColumns: "repeat(15, minmax(0, 1fr))" } }>
                         <div className="col-span-2"></div>
-                        <div className="col-span-11 h-16 rounded-3xl bg-zinc-800">
-                            <div className="grid grid-cols-2 w-full h-16 text-zinc-100 text-4xl font-bold rounded-3xl bg-zinc-800">
+                        <div className="col-span-11 h-16 rounded-3xl bg-zinc-900">
+                            <div className="grid grid-cols-2 w-full h-16 text-zinc-100 text-4xl font-bold rounded-3xl bg-zinc-900">
                                 <div className="flex px-9 pb-1.5 h-full items-center">
                                     Saved Recipes
                                 </div>
