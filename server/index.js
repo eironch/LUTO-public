@@ -132,7 +132,7 @@ app.get('/sign-in', (req, res) => {
                         }
                     )
 
-                    return res.status(200).json({ success: true, payload: { username: user.username, userId: user._id, accountType: user.accountType }, message: 'User signed in.' })
+                    return res.status(200).json({ success: true, payload: { username: user.username, userId: user._id, accountType: user.accountType, profilePicture: user.profilePicture, bio: user.bio }, message: 'User signed in.' })
                 })
                 .catch(err => {
                     console.error('Password comparison error')
@@ -152,7 +152,7 @@ app.get('/check-auth', async (req, res) => {
         if (accessToken && decodedAccessToken) {
             const user = await User.findById(decodedAccessToken.userId)
 
-            return res.status(200).json({ isAuthenticated: true, payload: { username: user.username, userId: user._id, accountType: user.accountType, profilePicture: user.profilePicture }})
+            return res.status(200).json({ isAuthenticated: true, payload: { username: user.username, userId: user._id, accountType: user.accountType, profilePicture: user.profilePicture, bio: user.bio }})
         }
     
         const refreshToken = req.cookies.refreshToken
@@ -917,7 +917,7 @@ app.get('/get-author-info', async (req, res) => {
             return res.status(200).json({ status: true, payload: { isFollowed: false, followCount: follows.followCount, followers: followers, profilePicture: user.profilePicture, bio: user.bio } })
         }
 
-        return res.status(200).json({ status: true, payload: { isFollowed: true, followCount: follows.followCount, followers: followers } })
+        return res.status(200).json({ status: true, payload: { isFollowed: true, followCount: follows.followCount, followers: followers, profilePicture: user.profilePicture, bio: user.bio  } })
     } catch (err) {
         console.log(err)
         return res.status(500).json({ message:'Internal server error.', err})

@@ -56,7 +56,7 @@ function NavBar(p) {
                                 currentTab === "Home" || currentTab === "Search" || 
                                 currentTab === "Saved" || currentTab === "Popular"
                             ) &&
-                            <Link to="/home" className="pointer-events-auto rounded-3xl flex col-span-2 items-center justify-center bg-zinc-800 hover:bg-zinc-500">
+                            <Link to="/home" className="pointer-events-auto rounded-3xl flex col-span-2 items-center justify-center bg-zinc-900 hover:bg-zinc-500">
                                 <img className="px-4 w-48" src={ Logo } alt="" />
                             </Link>
                         }
@@ -66,11 +66,11 @@ function NavBar(p) {
                             <>
                                 {
                                     currentTab === "Create" ?
-                                    <button className="col-span-2 items-center gap-4 bg-zinc-800 pointer-events-auto flex flex-row justify-center w-full h-full rounded-3xl overflow-hidden hover:bg-zinc-500" onClick={ () => { setConfirmationShown("exit") } }>
+                                    <button className="col-span-2 items-center gap-4 bg-zinc-900 pointer-events-auto flex flex-row justify-center w-full h-full rounded-3xl overflow-hidden hover:bg-zinc-500" onClick={ () => { setConfirmationShown("exit") } }>
                                         <img className="px-4 w-48 " src={ Logo } alt="" />
                                     </button>
                                     :
-                                    <Link to="/home" className="col-span-2 items-center gap-4 bg-zinc-800 pointer-events-auto flex flex-row justify-center w-full h-full rounded-3xl overflow-hidden hover:bg-zinc-500">
+                                    <Link to="/home" className="col-span-2 items-center gap-4 bg-zinc-900 pointer-events-auto flex flex-row justify-center w-full h-full rounded-3xl overflow-hidden hover:bg-zinc-500">
                                         <img className="px-4 w-48 " src={ Logo } alt="" />
                                     </Link>
                                 }
@@ -89,7 +89,7 @@ function NavBar(p) {
                                         <button className="flex items-center w-full h-full bg-zinc-600 rounded-3xl overflow-hidden">
                                             <button className={`
                                                     ${ (title && recipeImage.size && summary && (ingredients.length > 1 || ingredients[0].value)) && "bg-orange-500 hover:bg-orange-400" } 
-                                                    rounded-3xl flex items-center p-4 gap-4 w-full h-full disabled:bg-zinc-800 disabled:cursor-not-allowed
+                                                    rounded-3xl flex items-center p-4 gap-4 w-full h-full disabled:bg-zinc-900 disabled:cursor-not-allowed
                                                 `} 
                                                 onClick={ () => { publishRecipe() } } disabled={ !(title && recipeImage.size && summary && (ingredients.length > 1  || ingredients[0].value)) }
                                             >
@@ -100,7 +100,7 @@ function NavBar(p) {
                                     }
                                     {
                                         currentTab === "Recipe" &&
-                                        <button className={`${ isRecipeSaved ? "bg-zinc-800 hover:bg-zinc-500" : "bg-orange-500 disabled:cursor-not-allowed disabled:bg-zinc-800 hover:bg-orange-400"} flex items-center p-4 gap-4 w-full h-full rounded-3xl overflow-hidden`} 
+                                        <button className={`${ isRecipeSaved ? "bg-zinc-900 hover:bg-zinc-500" : "bg-orange-500 disabled:cursor-not-allowed disabled:bg-zinc-900 hover:bg-orange-400"} flex items-center p-4 gap-4 w-full h-full rounded-3xl overflow-hidden`} 
                                             onClick={ () => handleSaveRecipe() } disabled={ !title }
                                         >
                                             <p className="flex text-zinc-100 text-lg w-full font-semibold">
@@ -119,7 +119,7 @@ function NavBar(p) {
                                 currentTab === "Settings" || currentTab === "Saved" || 
                                 currentTab === "Popular"
                             ) &&
-                            <div className={`${ (currentTab === "Recipe" && currentTab === "Settings") && "bg-zinc-800" } rounded-3xl flex items-center justify-center`} 
+                            <div className={`${ (currentTab === "Recipe" && currentTab === "Settings") && "bg-zinc-900" } rounded-3xl flex items-center justify-center`} 
                                 style={ { gridColumn: (currentTab === "Home" || currentTab === "Search" || currentTab === "Saved" || currentTab === "Popular") ? "span 11" : "span 13" } }
                             >
                                 { 
@@ -137,7 +137,7 @@ function NavBar(p) {
                                 currentTab === "Settings" || currentTab === "Saved" || 
                                 currentTab === "Popular"
                             ) &&
-                            <Link to={`/${ user.username }`} className={`${ user.accountType === "user" ? "bg-zinc-800" : "bg-orange-500" }  col-span-2 flex items-center justify-end rounded-3xl pointer-events-auto hover:bg-zinc-500`}>
+                            <Link to={`/${ user.username }`} className={`${ user.accountType === "user" ? "bg-zinc-900 hover:bg-zinc-500" : "bg-orange-500 hover:bg-orange-400" }  col-span-2 flex items-center justify-end rounded-3xl pointer-events-auto`}>
                                 { 
                                     currentTab!=="Profile" && <p className="text-zinc-100 text-end w-full ml-3 text-xl font-semibold overflow-hidden">
                                         { user.username }

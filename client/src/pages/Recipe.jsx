@@ -91,13 +91,13 @@ function Recipe(p) {
                 handleSaveRecipe={ handleSaveRecipe } handleGiveRecipePoint={ handleGiveRecipePoint }
                 profilePicture={ profilePicture }
             />
-            <div className="pr-0 flex flex-col gap-3 p-3 pb-0 h-svh overflow-y-scroll scrollable-div bg-zinc-900">
+            <div className="pr-0 flex flex-col gap-3 p-3 pb-0 h-svh overflow-y-scroll scrollable-div bg-zinc-950">
                 <div className="grid w-full gap-3" style={ { gridTemplateColumns: "repeat(15, minmax(0, 1fr))" } }>
                     <div className="col-span-4"></div>
                     <div className="col-span-11 flex flex-col rounded-3xl text-zinc-100">
                         {
                             title &&
-                            <div className="flex flex-col items-center w-full mb-3 p-6 rounded-3xl bg-zinc-800">
+                            <div className="flex flex-col items-center w-full mb-3 p-6 rounded-3xl bg-zinc-900">
                                 <p className="text-4xl font-bold w-full text-center">
                                     { title }
                                 </p>
@@ -109,7 +109,7 @@ function Recipe(p) {
                             recipeElements.map((element, key) => {
                                 if (element.contentType === "Section Header") {
                                     return (
-                                        <div className="py-6 px-3 flex flex-col gap-3 mb-3 rounded-3xl bg-zinc-800" key={ key }>
+                                        <div className="py-6 px-3 flex flex-col gap-3 mb-3 rounded-3xl bg-zinc-900" key={ key }>
                                             <p className="px-3 text-3xl font-semibold w-full text-justify">
                                                 { element.text }
                                             </p>
@@ -117,7 +117,7 @@ function Recipe(p) {
                                     )
                                 } else if (element.contentType === "Description Text") {
                                     return (
-                                        <div className="py-6 px-3 flex flex-col gap-3 mb-3 rounded-3xl bg-zinc-800" key={ key }>
+                                        <div className="py-6 px-3 flex flex-col gap-3 mb-3 rounded-3xl bg-zinc-900" key={ key }>
                                             <p className="px-3 text-xl w-full text-justify">
                                                 { element.text }
                                             </p>
@@ -125,7 +125,7 @@ function Recipe(p) {
                                     )
                                 } else if (element.contentType === "Image Carousel") {
                                     return (
-                                        <div className="pt-6 pb-3 px-6 flex flex-col justify-center items-center gap-3 mb-3 rounded-3xl overflow-hidden bg-zinc-800" key={ key }>
+                                        <div className="pt-6 pb-3 px-6 flex flex-col justify-center items-center gap-3 mb-3 rounded-3xl overflow-hidden bg-zinc-900" key={ key }>
                                             <div className={`${ element.files.length > 2 ? "lg:justify-start" : "lg:justify-center" } flex flex-row w-full h-full gap-3 items-center overflow-x-scroll scrollable-div md:justify-start`}>
                                                 {
                                                     element.files.map((file, index) => (

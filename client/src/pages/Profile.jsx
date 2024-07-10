@@ -35,9 +35,8 @@ function Profile(p) {
     const [isFetchedAll, setIsFetchedAll] = useState(false)
     const scrollDivRef = useRef(null)
     const fetchedRecipeIdsRef = useRef(fetchedRecipeIds)
-    const userRecipeRef = useRef(userRecipes)
 
-    function fetchUserRecipes() {
+    function fetchUserRecipes(userRecipes) {
         setIsFetching(true)
 
         axios.get('http://localhost:8080/user-recipes', { params: { userId: user.userId, authorName, sort: user.accountType === "user" ? { createdAt: -1 } : { flagCount: 1 }, fetchedRecipeIds: fetchedRecipeIdsRef.current } })
@@ -58,19 +57,24 @@ function Profile(p) {
                     setIsFetchedAll(true)
                 }
 
-                let userRecipes
+                if (userRecipes.length > 0) {
+                    const combinedRecipes = [...userRecipes, ...res.data.payload];
 
-                if (userRecipeRef.current.length > 0) {
-                    const combinedRecipes = [...userRecipeRef.current, ...res.data.payload];
+                    combinedRecipes.forEach((recipeToMatch, indexToMatch) => {
+                        combinedRecipes.forEach((recipe, index) => {
+                            if (recipeToMatch.recipeId === recipe.recipeId && indexToMatch !== index) {
+                                combinedRecipes.pop(index)
+                            }
+                        })
+                    })
 
-                    userRecipes = combinedRecipes.filter((recipe, index, self) =>
-                      index === self.findIndex((r) => r.id === recipe.id)
-                    )
-                } else {
-                    userRecipes = res.data.payload
+                    setUserRecipes(combinedRecipes)
+                    setFetchedRecipeIds([...fetchedRecipeIds, ...res.data.payload.map(recipe => recipe.recipeId)])
+
+                    return
                 }
-         
-                setUserRecipes(userRecipes)
+
+                setUserRecipes(res.data.payload)
                 setFetchedRecipeIds([...fetchedRecipeIds, ...res.data.payload.map(recipe => recipe.recipeId)])
             })
             .catch(err => {
@@ -107,7 +111,7 @@ function Profile(p) {
             const { scrollTop, scrollHeight, clientHeight } = scrollDiv
 
             if (scrollTop + clientHeight >= scrollHeight - (scrollHeight * 0.05)) {
-                fetchUserRecipes()
+                fetchUserRecipes(userRecipes)
             }
         }
             
@@ -122,16 +126,10 @@ function Profile(p) {
         fetchedRecipeIdsRef.current = fetchedRecipeIds
     }, [fetchedRecipeIds])
 
-    
-    useLayoutEffect(() => {
-        userRecipeRef.current = userRecipes
-    }, [userRecipes])
-
-
     useEffect(() => {
-        userRecipeRef.current = []
         fetchedRecipeIdsRef.current = []
-        fetchUserRecipes()
+        setUserRecipes([])
+        fetchUserRecipes([])
     }, [authorName])
 
     useLayoutEffect(() => {
@@ -149,7 +147,7 @@ function Profile(p) {
                 user={ user }authorName={ authorName } 
                 currentTab={ currentTab } setCurrentTab={ setCurrentTab }
             />
-            <div className="flex flex-col p-3 pr-0 h-svh bg-zinc-900">
+            <div className="flex flex-col p-3 pr-0 h-svh bg-zinc-950">
                 {/* content */}
                 <div className="grid w-full gap-3 h-full" style={ { gridTemplateColumns: "repeat(15, minmax(0, 1fr))" } }>
                     <div className="col-span-4"></div>

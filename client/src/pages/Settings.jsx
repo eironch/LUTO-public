@@ -115,20 +115,20 @@ function Settings(p) {
                 user={ user } currentTab={ currentTab }
                 setCurrentTab={ setCurrentTab } setConfirmationShown={ setConfirmationShown }
             />
-            <div className="flex flex-col gap-3 p-3 h-svh bg-zinc-900">
+            <div className="flex flex-col gap-3 p-3 h-svh bg-zinc-950">
                 {/* space for top navbar */}
                 <div className="grid w-full gap-3 h-16" style={ { gridTemplateColumns: "repeat(15, minmax(0, 1fr))" } }>
-                    <div className="col-span-11 h-16 rounded-3xl bg-zinc-800" style={ { gridColumn:  "span 13" } }></div>
+                    <div className="col-span-11 h-16 rounded-3xl bg-zinc-900" style={ { gridColumn:  "span 13" } }></div>
                     <div className="col-span-2"></div>     
                 </div>
                 {/* content */}
                 <div className="grid w-full gap-3 h-full" style={ { gridTemplateColumns: "repeat(15, minmax(0, 1fr))" } }>
                     <div className="col-span-2"></div>
-                    <div className="flex flex-col p-9 bg-zinc-800 rounded-3xl text-zinc-100" style={ { gridColumn: "span 13" } }>
-                        <p className="text-3xl font-bold mb-3">Account Settings</p>
-                        <p className="text-lg mb-6 text-zinc-400">Account Preferences</p>
-                        <p className="text-xl mb-6">Change Profile Picture</p>
-                        <div className="grid grid-cols-2 mb-6 h-24">
+                    <div className="flex flex-col p-9 gap-6 bg-zinc-900 rounded-3xl text-zinc-100" style={ { gridColumn: "span 13" } }>
+                        <p className="text-3xl font-bold">Account Settings</p>
+                        <p className="text-lg text-zinc-400 font-semibold">Account Preferences</p>
+                        <p className="text-xl font-semibold">Change Profile Picture</p>
+                        <div className="grid grid-cols-2 h-24">
                             <img className="w-24 h-24 object-cover rounded-full" src={ user.profilePicture || ProfileIcon } alt="" />
                             <div className="flex justify-end items-center">
                                 <button className="flex p-3 w-44 rounded-3xl bg-zinc-700 hover:bg-zinc-500">
@@ -139,11 +139,11 @@ function Settings(p) {
                                 </button>
                             </div>
                         </div>
-                        <p className="text-xl mb-6">Change Bio</p>
+                        <p className="text-xl font-semibold">Change Bio</p>
                         <div className="flex flex-row gap-6">
                             <div className="w-11/12">
                                 <Textarea 
-                                    attribute="px-3 text-lg w-full font-semibold bg-zinc-600 focus:bg-zinc-600" 
+                                    attribute="px-3 text-lg w-full bg-zinc-600 focus:bg-zinc-600" 
                                     maxLength={ 200 } value={ bio } setValue={ setBio } 
                                     placeholder="How would you describe yourself?" 
                                 />
@@ -154,11 +154,11 @@ function Settings(p) {
                                 </button>
                             </div>
                         </div>
-                        <div className="grid grid-cols-2 mb-6 h-24">
+                        <div className="grid grid-cols-2 h-24">
                             <div className="flex flex-row h-full items-center">
                                 <div className="w-full">
-                                    <p className="text-xl">Change Password</p>
-                                    <p className="text-lg text-zinc-400">Pasword must be at least 8 characters long</p>
+                                    <p className="text-xl font-semibold">Change Password</p>
+                                    <p className="text-md text-zinc-400">Pasword must be at least 8 characters long</p>
                                 </div>
                             </div>
                             <div className="flex flex-row gap-6 items-center justify-end">
@@ -180,7 +180,7 @@ function Settings(p) {
                                             />
                                         </div>
                                         <button 
-                                            className={`${ password && passwordAgain && password === passwordAgain ? "hover:bg-zinc-500" : "" } p-3 w-44 rounded-3xl bg-zinc-700 disabled:cursor-not-allowed disabled:bg-zinc-800`} 
+                                            className={`${ password && passwordAgain && password === passwordAgain ? "hover:bg-zinc-500" : "" } p-3 w-44 rounded-3xl bg-zinc-700 disabled:cursor-not-allowed disabled:bg-zinc-900`} 
                                             disabled={ password !== passwordAgain || password === "" || passwordAgain === "" } ref={ buttonRef }
                                             onClick={ () => { handleChangePassword() } }
                                         >

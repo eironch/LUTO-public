@@ -90,9 +90,9 @@ function FeedbackSection(p) {
     }, [])
 
     return (
-        <div className="flex flex-col w-full mb-3 rounded-3xl bg-zinc-800 overflow-hidden">
+        <div className="flex flex-col w-full mb-3 rounded-3xl bg-zinc-900 overflow-hidden">
             {/* header */}
-            <div className="flex flex-row items-center p-6 gap-6 shadow-md shadow-zinc-900">
+            <div className="flex flex-row items-center p-6 gap-6 shadow-md shadow-zinc-950">
                 <img className="w-10" src={ FeedbackIcon } alt="" />
                 <p className="text-2xl font-semibold">Feedbacks</p>
                 <p className="flex pr-3 text-2xl font-semibold justify-end w-full">
